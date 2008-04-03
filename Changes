@@ -1,5 +1,9 @@
 Revision history for Perl extension AutoXS and Class::XSAccessor.
 
+0.02  Mon Apr  3 17:12 2008
+	- Mention in the docs that fully qualified method names are
+          supported.
+
 0.01  Mon Apr  3 17:09 2008
 	- original version as uploaded to CPAN.
 

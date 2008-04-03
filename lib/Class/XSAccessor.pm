@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
@@ -104,6 +104,10 @@ pure-perl getter and setter implementations in some simple benchmarking.
 The lower factor applies to the potentially slightly obscure
 C<sub set_foo_pp {$_[0]-E<gt>{foo} = $_[1]}>, so if you usually
 write clear code, a factor of two speed-up is a good estimate.
+
+The method names may be fully qualified. In the example of the
+synopsis, you could have written C<MyClass::get_foo> instead
+of C<get_foo>.
 
 =head1 CAVEATS
 
