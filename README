@@ -1,0 +1,54 @@
+NAME
+    Class::XSAccessor - Generate fast XS accessors without runtime
+    compilation
+
+SYNOPSIS
+      package MyClass;
+      use Class::XSAccessor
+        getters => {
+          get_foo => 'foo', # 'foo' is the hash key to access
+          get_bar => 'bar',
+        },
+        setters => {
+          set_foo => 'foo',
+          set_bar => 'bar',
+        };
+      # The imported methods are implemented in fast XS.
+  
+      # normal class code here.
+
+DESCRIPTION
+    The module implements fast XS accessors both for getting at and setting
+    an objects attribute. The module works only with objects that are
+    implement as ordinary hashes.
+
+    The XS methods were between 1.6 and 2.5 times faster than typical
+    pure-perl getter and setter implementations in some simple benchmarking.
+    The lower factor applies to the potentially slightly obscure "sub
+    set_foo_pp {$_[0]->{foo} = $_[1]}", so if you usually write clear code,
+    a factor of two speed-up is a good estimate.
+
+CAVEATS
+    Probably wouldn't work if your objects are *tied* hashes. But that's a
+    strange thing to do anyway.
+
+    Scary code exploiting strange XS features.
+
+    If you think writing an accessor in XS should be a laughably simple
+    exercise, then please contemplate how you could instantiate a new XS
+    accessor for a new hash key that's only known at run-time. Note that
+    compiling C code at run-time a la Inline::C is a no go.
+
+SEE ALSO
+    AutoXS
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8 or, at your
+    option, any later version of Perl 5 you may have available.
+
