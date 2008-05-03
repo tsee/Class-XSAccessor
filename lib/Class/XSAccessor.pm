@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
@@ -97,7 +97,9 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
 
 The module implements fast XS accessors both for getting at and
 setting an objects attribute. The module works only with objects
-that are implement as ordinary hashes.
+that are implement as ordinary hashes. L<Class::XSAccessor::Array>
+implements the same interface for objects that use arrays as
+internal representation.
 
 The XS methods were between 1.6 and 2.5 times faster than typical
 pure-perl getter and setter implementations in some simple benchmarking.
@@ -121,6 +123,8 @@ that's only known at run-time. Note that compiling C code at run-time a la Inlin
 is a no go.
 
 =head1 SEE ALSO
+
+L<Class::XSAccessor::Array>
 
 L<AutoXS>
 

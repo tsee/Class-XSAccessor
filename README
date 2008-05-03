@@ -20,13 +20,17 @@ SYNOPSIS
 DESCRIPTION
     The module implements fast XS accessors both for getting at and setting
     an objects attribute. The module works only with objects that are
-    implement as ordinary hashes.
+    implement as ordinary hashes. Class::XSAccessor::Array implements the
+    same interface for objects that use arrays as internal representation.
 
     The XS methods were between 1.6 and 2.5 times faster than typical
     pure-perl getter and setter implementations in some simple benchmarking.
     The lower factor applies to the potentially slightly obscure "sub
     set_foo_pp {$_[0]->{foo} = $_[1]}", so if you usually write clear code,
     a factor of two speed-up is a good estimate.
+
+    The method names may be fully qualified. In the example of the synopsis,
+    you could have written "MyClass::get_foo" instead of "get_foo".
 
 CAVEATS
     Probably wouldn't work if your objects are *tied* hashes. But that's a
@@ -40,6 +44,8 @@ CAVEATS
     compiling C code at run-time a la Inline::C is a no go.
 
 SEE ALSO
+    Class::XSAccessor::Array
+
     AutoXS
 
 AUTHOR
