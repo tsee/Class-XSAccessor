@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::XSAccessor.
 
+0.04  Mun May  3 19:12 2008
+        - Win32 support.
+
 0.03  Mon May  3 19:12 2008
         - Refer to Class::XSAccessor::Array for array based objects.
 

@@ -22,7 +22,7 @@ WriteMakefile(
 sub MY::post_initialize{
   return <<'MAKE_FRAG';
 linkext ::
-	$(PERL) -MAutoXS::Header -e 'AutoXS::Header::WriteAutoXSHeader()'
+	$(PERL) -MAutoXS::Header -e AutoXS::Header::WriteAutoXSHeader
 
 MAKE_FRAG
 }

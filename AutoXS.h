@@ -1,4 +1,4 @@
-/* AutoXS::Header version '0.02' */
+/* AutoXS::Header version '0.03' */
 typedef struct {
   U32 hash;
   SV* key;
