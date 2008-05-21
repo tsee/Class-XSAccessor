@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
@@ -20,6 +20,7 @@ sub import {
 
   my $read_subs = $opts{getters} || {};
   my $set_subs = $opts{setters} || {};
+  my $acc_subs = $opts{accessors} || {};
 
   foreach my $subname (keys %$read_subs) {
     my $hashkey = $read_subs->{$subname};
@@ -29,6 +30,11 @@ sub import {
   foreach my $subname (keys %$set_subs) {
     my $hashkey = $set_subs->{$subname};
     _generate_accessor($caller_pkg, $subname, $hashkey, $replace, "setter");
+  }
+
+  foreach my $subname (keys %$acc_subs) {
+    my $hashkey = $acc_subs->{$subname};
+    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, "accessor");
   }
 }
 
@@ -64,8 +70,11 @@ sub _generate_accessor {
   if ($type eq 'getter') {
     newxs_getter($subname, $hashkey);
   }
-  else {
+  elsif ($type eq 'setter') {
     newxs_setter($subname, $hashkey);
+  }
+  else {
+    newxs_accessor($subname, $hashkey);
   }
 }
 
@@ -88,21 +97,24 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
     setters => {
       set_foo => 'foo',
       set_bar => 'bar',
-    };
+    },
+    accessors => {
+      foo => 'foo',
+      bar => 'bar',
+    },
   # The imported methods are implemented in fast XS.
   
   # normal class code here.
 
 =head1 DESCRIPTION
 
-The module implements fast XS accessors both for getting at and
-setting an objects attribute. The module works only with objects
-that are implement as ordinary hashes. L<Class::XSAccessor::Array>
-implements the same interface for objects that use arrays as
-internal representation.
+Class::XSAccessor implements fast read, write and read/write accessors in XS.
+It only works with objects that are implemented as ordinary hashes.
+L<Class::XSAccessor::Array> implements the same interface for objects
+that use arrays for their internal representation.
 
 The XS methods were between 1.6 and 2.5 times faster than typical
-pure-perl getter and setter implementations in some simple benchmarking.
+pure-perl accessors in some simple benchmarking.
 The lower factor applies to the potentially slightly obscure
 C<sub set_foo_pp {$_[0]-E<gt>{foo} = $_[1]}>, so if you usually
 write clear code, a factor of two speed-up is a good estimate.
@@ -131,6 +143,8 @@ L<AutoXS>
 =head1 AUTHOR
 
 Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+
+Chocolateboy, E<lt>chocolate@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

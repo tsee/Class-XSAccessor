@@ -6,7 +6,7 @@
 
 #include "AutoXS.h"
 
-MODULE = Class::XSAccessor		PACKAGE = Class::XSAccessor
+MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor
 
 void
 getter(self)
@@ -45,7 +45,37 @@ setter(self, newvalue)
     if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newvalue, readfrom.hash)) {
       croak("Failed to write new value to hash.");
     }
-    XSRETURN_UNDEF;
+    XPUSHs(newvalue);
+
+
+
+void
+accessor(self, ...)
+    SV* self;
+  ALIAS:
+  INIT:
+    /* Get the const hash key struct from the global storage */
+    /* ix is the magic integer variable that is set by the perl guts for us.
+     * We uses it to identify the currently running alias of the accessor. Gollum! */
+    const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
+    HE* he;
+  PPCODE:
+    if (items > 1) {
+      SV* newvalue = ST(1);
+      SvREFCNT_inc(newvalue);
+      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newvalue, readfrom.hash)) {
+        croak("Failed to write new value to hash.");
+      }
+      XPUSHs(newvalue);
+    }
+    else {
+      if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)) {
+        XPUSHs(HeVAL(he));
+      }
+      else {
+        XSRETURN_UNDEF;
+      }
+    }
 
 
 void
@@ -97,3 +127,27 @@ newxs_setter(name, key)
       AutoXS_hashkeys[functionIndex] = hashkey;
     }
 
+
+void
+newxs_accessor(name, key)
+  char* name;
+  char* key;
+  PPCODE:
+    char* file = __FILE__;
+    const unsigned int functionIndex = get_next_hashkey();
+    {
+      CV * cv;
+      /* This code is very similar to what you get from using the ALIAS XS syntax.
+       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
+      cv = newXS(name, XS_Class__XSAccessor_accessor, file);
+      if (cv == NULL)
+        croak("ARG! SOMETHING WENT REALLY WRONG!");
+      XSANY.any_i32 = functionIndex;
+
+      /* Precompute the hash of the key and store it in the global structure */
+      autoxs_hashkey hashkey;
+      const unsigned int len = strlen(key);
+      hashkey.key = newSVpvn(key, len);
+      PERL_HASH(hashkey.hash, key, len);
+      AutoXS_hashkeys[functionIndex] = hashkey;
+    }
