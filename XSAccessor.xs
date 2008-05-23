@@ -20,12 +20,10 @@ getter(self)
     HE* he;
   PPCODE:
     /*if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, 0)) {*/
-    if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)) {
+    if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash))
       XPUSHs(HeVAL(he));
-    }
-    else {
+    else
       XSRETURN_UNDEF;
-    }
 
 
 
@@ -42,9 +40,8 @@ setter(self, newvalue)
     HE* he;
   PPCODE:
     SvREFCNT_inc(newvalue);
-    if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newvalue, readfrom.hash)) {
+    if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newvalue, readfrom.hash))
       croak("Failed to write new value to hash.");
-    }
     XPUSHs(newvalue);
 
 
@@ -63,18 +60,15 @@ accessor(self, ...)
     if (items > 1) {
       SV* newvalue = ST(1);
       SvREFCNT_inc(newvalue);
-      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newvalue, readfrom.hash)) {
+      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newvalue, readfrom.hash))
         croak("Failed to write new value to hash.");
-      }
       XPUSHs(newvalue);
     }
     else {
-      if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)) {
+      if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash))
         XPUSHs(HeVAL(he));
-      }
-      else {
+      else
         XSRETURN_UNDEF;
-      }
     }
 
 
@@ -151,3 +145,4 @@ newxs_accessor(name, key)
       PERL_HASH(hashkey.hash, key, len);
       AutoXS_hashkeys[functionIndex] = hashkey;
     }
+
