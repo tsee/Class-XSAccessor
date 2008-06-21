@@ -1,6 +1,6 @@
 Revision history for Perl extension Class::XSAccessor.
 
-0.05  Wed May 21 10:07 2008
+0.05  Sat Jun 21 18:06 2008
   - Add read/write accessors. (Chocolateboy)
   - By default, return the new value from setters. (Chocolateboy)
   - Add predicates, i.e. "has_foo".
