@@ -21,6 +21,7 @@ sub import {
   my $read_subs = $opts{getters} || {};
   my $set_subs = $opts{setters} || {};
   my $acc_subs = $opts{accessors} || {};
+  my $pred_subs = $opts{predicates} || {};
 
   foreach my $subname (keys %$read_subs) {
     my $hashkey = $read_subs->{$subname};
@@ -35,6 +36,11 @@ sub import {
   foreach my $subname (keys %$acc_subs) {
     my $hashkey = $acc_subs->{$subname};
     _generate_accessor($caller_pkg, $subname, $hashkey, $replace, "accessor");
+  }
+
+  foreach my $subname (keys %$pred_subs) {
+    my $hashkey = $pred_subs->{$subname};
+    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, "predicate");
   }
 }
 
@@ -73,6 +79,9 @@ sub _generate_accessor {
   elsif ($type eq 'setter') {
     newxs_setter($subname, $hashkey);
   }
+  elsif ($type eq 'predicate') {
+    newxs_predicate($subname, $hashkey);
+  }
   else {
     newxs_accessor($subname, $hashkey);
   }
@@ -102,6 +111,10 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
       foo => 'foo',
       bar => 'bar',
     },
+    predicates => {
+      has_foo => 'foo',
+      has_bar => 'bar',
+    },
   # The imported methods are implemented in fast XS.
   
   # normal class code here.
@@ -109,6 +122,8 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
 =head1 DESCRIPTION
 
 Class::XSAccessor implements fast read, write and read/write accessors in XS.
+Additionally, it can provide predicates such as C<has_foo()> for testing
+whether the attribute C<foo> is defined in the object.
 It only works with objects that are implemented as ordinary hashes.
 L<Class::XSAccessor::Array> implements the same interface for objects
 that use arrays for their internal representation.
