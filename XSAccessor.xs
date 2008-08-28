@@ -39,8 +39,7 @@ setter(self, newvalue)
     const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
     HE* he;
   PPCODE:
-    SvREFCNT_inc(newvalue);
-    if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newvalue, readfrom.hash))
+    if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
     XPUSHs(newvalue);
 
@@ -59,8 +58,7 @@ accessor(self, ...)
   PPCODE:
     if (items > 1) {
       SV* newvalue = ST(1);
-      SvREFCNT_inc(newvalue);
-      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newvalue, readfrom.hash))
+      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
       XPUSHs(newvalue);
     }
