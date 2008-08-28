@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 14;
+use Test::More tests => 15;
 BEGIN { use_ok('Class::XSAccessor') };
 
 package Foo;
@@ -53,4 +53,10 @@ pass();
 
 ok($foo->get_foo() eq '1');
 ok($foo->get_bar() eq '2');
+
+# Make sure scalars are copied and not stored by reference (RT 38573)
+my $x = 1;
+$foo->set_foo($x);
+$x++;
+is( $foo->get_foo(), 1, 'scalar copied properly' );
 
