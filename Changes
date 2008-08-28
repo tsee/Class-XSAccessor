@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::XSAccessor.
 
+0.06  Thu Aug 28 13:39 2008
+  - Copy input scalars on setter/mutator calls (RT #38573)
+
 0.05  Sat Jun 21 18:06 2008
   - Add read/write accessors. (Chocolateboy)
   - By default, return the new value from setters. (Chocolateboy)
