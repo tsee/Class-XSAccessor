@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
@@ -17,35 +17,36 @@ sub import {
   my %opts = @_;
 
   my $replace = $opts{replace} || 0;
+  my $chained = $opts{chained} || 0;
 
   my $read_subs = $opts{getters} || {};
-  my $set_subs = $opts{setters} || {};
-  my $acc_subs = $opts{accessors} || {};
+  my $set_subs  = $opts{setters} || {};
+  my $acc_subs  = $opts{accessors} || {};
   my $pred_subs = $opts{predicates} || {};
 
   foreach my $subname (keys %$read_subs) {
     my $hashkey = $read_subs->{$subname};
-    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, "getter");
+    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, $chained, "getter");
   }
 
   foreach my $subname (keys %$set_subs) {
     my $hashkey = $set_subs->{$subname};
-    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, "setter");
+    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, $chained, "setter");
   }
 
   foreach my $subname (keys %$acc_subs) {
     my $hashkey = $acc_subs->{$subname};
-    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, "accessor");
+    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, $chained, "accessor");
   }
 
   foreach my $subname (keys %$pred_subs) {
     my $hashkey = $pred_subs->{$subname};
-    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, "predicate");
+    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, $chained, "predicate");
   }
 }
 
 sub _generate_accessor {
-  my ($caller_pkg, $subname, $hashkey, $replace, $type) = @_;
+  my ($caller_pkg, $subname, $hashkey, $replace, $chained, $type) = @_;
 
   if (not defined $hashkey) {
     croak("Cannot use undef as a hash key for generating an XS $type accessor. (Sub: $subname)");
@@ -77,13 +78,21 @@ sub _generate_accessor {
     newxs_getter($subname, $hashkey);
   }
   elsif ($type eq 'setter') {
-    newxs_setter($subname, $hashkey);
+    if ($chained) {
+      newxs_chained_setter($subname, $hashkey);
+    } else {
+      newxs_setter($subname, $hashkey);
+    }
   }
   elsif ($type eq 'predicate') {
     newxs_predicate($subname, $hashkey);
   }
   else {
-    newxs_accessor($subname, $hashkey);
+    if ($chained) {
+      newxs_chained_accessor($subname, $hashkey);
+    } else {
+      newxs_accessor($subname, $hashkey);
+    }
   }
 }
 
@@ -138,6 +147,10 @@ The method names may be fully qualified. In the example of the
 synopsis, you could have written C<MyClass::get_foo> instead
 of C<get_foo>.
 
+By default, the setters return the new value that was set
+and the accessors (mutators) do the same. You can change this behaviour
+with the C<chained> option, see below. The predicates obviously return a boolean.
+
 =head1 OPTIONS
 
 In addition to specifying the types and names of accessors, you can add options
@@ -156,6 +169,17 @@ The list of available options is:
 
 Set this to a true value to prevent C<Class::XSAccessor> from
 complaining about replacing existing subroutines.
+
+=head2 chained
+
+Set this to a true value to change the return value of setters
+and mutators (when called with an argument).
+If C<chained> is enabled, the setters and accessors/mutators will
+return the object. Mutators called without an argument still
+return the value of the associated attribute.
+
+As with the other options, C<chained> affects all methods generated
+in the same C<use Class::XSAccessor ...> statement.
 
 =head1 CAVEATS
 
