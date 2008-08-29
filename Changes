@@ -1,5 +1,10 @@
 Revision history for Perl extension Class::XSAccessor.
 
+0.07  Thu Aug 29 14:14 2008
+  - Documented the "replace" option.
+  - Added the "chained" option to generate chainable setters
+    and mutators.
+
 0.06  Thu Aug 28 13:39 2008
   - Copy input scalars on setter/mutator calls (RT #38573)
 
