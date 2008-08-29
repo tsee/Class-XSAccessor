@@ -6,4 +6,8 @@ MANIFEST			This list of files
 ppport.h
 README
 t/01basic.t
+t/02accessor.t
+t/03predicate.t
+t/04chained.t
+t/05replace.t
 XSAccessor.xs
