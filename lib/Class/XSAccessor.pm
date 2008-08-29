@@ -138,6 +138,25 @@ The method names may be fully qualified. In the example of the
 synopsis, you could have written C<MyClass::get_foo> instead
 of C<get_foo>.
 
+=head1 OPTIONS
+
+In addition to specifying the types and names of accessors, you can add options
+which modify behaviour. The options are specified as key/value pairs just as the
+accessor declaration. Example:
+
+  use Class::XSAccessor
+    getters => {
+      get_foo => 'foo',
+    },
+    replace => 1;
+
+The list of available options is:
+
+=head2 replace
+
+Set this to a true value to prevent C<Class::XSAccessor> from
+complaining about replacing existing subroutines.
+
 =head1 CAVEATS
 
 Probably wouldn't work if your objects are I<tied> hashes. But that's a strange thing to do anyway.
