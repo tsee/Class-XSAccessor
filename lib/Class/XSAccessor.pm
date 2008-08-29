@@ -78,21 +78,13 @@ sub _generate_accessor {
     newxs_getter($subname, $hashkey);
   }
   elsif ($type eq 'setter') {
-    if ($chained) {
-      newxs_chained_setter($subname, $hashkey);
-    } else {
-      newxs_setter($subname, $hashkey);
-    }
+    newxs_setter($subname, $hashkey, $chained);
   }
   elsif ($type eq 'predicate') {
     newxs_predicate($subname, $hashkey);
   }
   else {
-    if ($chained) {
-      newxs_chained_accessor($subname, $hashkey);
-    } else {
-      newxs_accessor($subname, $hashkey);
-    }
+    newxs_accessor($subname, $hashkey, $chained);
   }
 }
 

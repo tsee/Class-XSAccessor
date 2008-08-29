@@ -156,9 +156,10 @@ newxs_getter(name, key)
 
 
 void
-newxs_setter(name, key)
+newxs_setter(name, key, chained)
   char* name;
   char* key;
+  bool chained;
   PPCODE:
     char* file = __FILE__;
     const unsigned int functionIndex = get_next_hashkey();
@@ -166,7 +167,10 @@ newxs_setter(name, key)
       CV * cv;
       /* This code is very similar to what you get from using the ALIAS XS syntax.
        * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor_setter, file);
+      if (chained)
+        cv = newXS(name, XS_Class__XSAccessor_chained_setter, file);
+      else
+        cv = newXS(name, XS_Class__XSAccessor_setter, file);
       if (cv == NULL)
         croak("ARG! SOMETHING WENT REALLY WRONG!");
       XSANY.any_i32 = functionIndex;
@@ -181,9 +185,10 @@ newxs_setter(name, key)
 
 
 void
-newxs_chained_setter(name, key)
+newxs_accessor(name, key, chained)
   char* name;
   char* key;
+  bool chained;
   PPCODE:
     char* file = __FILE__;
     const unsigned int functionIndex = get_next_hashkey();
@@ -191,58 +196,10 @@ newxs_chained_setter(name, key)
       CV * cv;
       /* This code is very similar to what you get from using the ALIAS XS syntax.
        * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor_chained_setter, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-      XSANY.any_i32 = functionIndex;
-
-      /* Precompute the hash of the key and store it in the global structure */
-      autoxs_hashkey hashkey;
-      const unsigned int len = strlen(key);
-      hashkey.key = newSVpvn(key, len);
-      PERL_HASH(hashkey.hash, key, len);
-      AutoXS_hashkeys[functionIndex] = hashkey;
-    }
-
-
-void
-newxs_accessor(name, key)
-  char* name;
-  char* key;
-  PPCODE:
-    char* file = __FILE__;
-    const unsigned int functionIndex = get_next_hashkey();
-    {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor_accessor, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-      XSANY.any_i32 = functionIndex;
-
-      /* Precompute the hash of the key and store it in the global structure */
-      autoxs_hashkey hashkey;
-      const unsigned int len = strlen(key);
-      hashkey.key = newSVpvn(key, len);
-      PERL_HASH(hashkey.hash, key, len);
-      AutoXS_hashkeys[functionIndex] = hashkey;
-    }
-
-
-
-void
-newxs_chained_accessor(name, key)
-  char* name;
-  char* key;
-  PPCODE:
-    char* file = __FILE__;
-    const unsigned int functionIndex = get_next_hashkey();
-    {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor_chained_accessor, file);
+      if (chained)
+        cv = newXS(name, XS_Class__XSAccessor_chained_accessor, file);
+      else
+        cv = newXS(name, XS_Class__XSAccessor_accessor, file);
       if (cv == NULL)
         croak("ARG! SOMETHING WENT REALLY WRONG!");
       XSANY.any_i32 = functionIndex;
