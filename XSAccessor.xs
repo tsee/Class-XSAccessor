@@ -122,8 +122,8 @@ predicate(self)
     const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
     HE* he;
   PPCODE:
-    if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash))
-      SvOK( HeVAL(he) ) ? XSRETURN_YES : XSRETURN_NO;
+    if ( (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)) && SvOK(HeVAL(he)) )
+       XSRETURN_YES;
     else
       XSRETURN_NO;
 
