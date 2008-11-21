@@ -1,7 +1,8 @@
 Revision history for Perl extension Class::XSAccessor.
 
+0.08 Fri Nov 21 12:17 2008
   - Reduce code duplication.
-  - Attempt a fix for compilation issues on some OS's and compilers.
+  - Fix for compilation issues on Solaris with Sun's cc.
 
 0.07  Thu Aug 29 14:14 2008
   - Documented the "replace" option.
