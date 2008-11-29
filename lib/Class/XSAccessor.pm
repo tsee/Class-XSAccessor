@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
@@ -15,6 +15,8 @@ sub import {
   my ($caller_pkg) = caller();
 
   my %opts = @_;
+
+  $caller_pkg = $opts{class} if defined $opts{class};
 
   my $replace = $opts{replace} || 0;
   my $chained = $opts{chained} || 0;
@@ -172,6 +174,12 @@ return the value of the associated attribute.
 
 As with the other options, C<chained> affects all methods generated
 in the same C<use Class::XSAccessor ...> statement.
+
+=head2 class
+
+By default, the accessors are generated in the calling class. Using
+the C<class> option, you can explicitly specify where the methods
+are to be generated.
 
 =head1 CAVEATS
 

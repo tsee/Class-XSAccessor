@@ -12,25 +12,70 @@ SYNOPSIS
         setters => {
           set_foo => 'foo',
           set_bar => 'bar',
-        };
+        },
+        accessors => {
+          foo => 'foo',
+          bar => 'bar',
+        },
+        predicates => {
+          has_foo => 'foo',
+          has_bar => 'bar',
+        },
       # The imported methods are implemented in fast XS.
   
       # normal class code here.
 
 DESCRIPTION
-    The module implements fast XS accessors both for getting at and setting
-    an objects attribute. The module works only with objects that are
-    implement as ordinary hashes. Class::XSAccessor::Array implements the
-    same interface for objects that use arrays as internal representation.
+    Class::XSAccessor implements fast read, write and read/write accessors
+    in XS. Additionally, it can provide predicates such as "has_foo()" for
+    testing whether the attribute "foo" is defined in the object. It only
+    works with objects that are implemented as ordinary hashes.
+    Class::XSAccessor::Array implements the same interface for objects that
+    use arrays for their internal representation.
 
     The XS methods were between 1.6 and 2.5 times faster than typical
-    pure-perl getter and setter implementations in some simple benchmarking.
-    The lower factor applies to the potentially slightly obscure "sub
-    set_foo_pp {$_[0]->{foo} = $_[1]}", so if you usually write clear code,
-    a factor of two speed-up is a good estimate.
+    pure-perl accessors in some simple benchmarking. The lower factor
+    applies to the potentially slightly obscure "sub set_foo_pp
+    {$_[0]->{foo} = $_[1]}", so if you usually write clear code, a factor of
+    two speed-up is a good estimate.
 
     The method names may be fully qualified. In the example of the synopsis,
     you could have written "MyClass::get_foo" instead of "get_foo".
+
+    By default, the setters return the new value that was set and the
+    accessors (mutators) do the same. You can change this behaviour with the
+    "chained" option, see below. The predicates obviously return a boolean.
+
+OPTIONS
+    In addition to specifying the types and names of accessors, you can add
+    options which modify behaviour. The options are specified as key/value
+    pairs just as the accessor declaration. Example:
+
+      use Class::XSAccessor
+        getters => {
+          get_foo => 'foo',
+        },
+        replace => 1;
+
+    The list of available options is:
+
+  replace
+    Set this to a true value to prevent "Class::XSAccessor" from complaining
+    about replacing existing subroutines.
+
+  chained
+    Set this to a true value to change the return value of setters and
+    mutators (when called with an argument). If "chained" is enabled, the
+    setters and accessors/mutators will return the object. Mutators called
+    without an argument still return the value of the associated attribute.
+
+    As with the other options, "chained" affects all methods generated in
+    the same "use Class::XSAccessor ..." statement.
+
+  class
+    By default, the accessors are generated in the calling class. Using the
+    "class" option, you can explicitly specify where the methods are to be
+    generated.
 
 CAVEATS
     Probably wouldn't work if your objects are *tied* hashes. But that's a
@@ -50,6 +95,8 @@ SEE ALSO
 
 AUTHOR
     Steffen Mueller, <smueller@cpan.org>
+
+    Chocolateboy, <chocolate@cpan.org>
 
 COPYRIGHT AND LICENSE
     Copyright (C) 2008 by Steffen Mueller

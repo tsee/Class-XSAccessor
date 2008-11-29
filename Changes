@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::XSAccessor.
 
+0.09  Sat Nov 29 17:28 2008
+  - Add the class option to set the target class.
+
 0.08 Fri Nov 21 12:17 2008
   - Reduce code duplication.
   - Fix for compilation issues on Solaris with Sun's cc.
