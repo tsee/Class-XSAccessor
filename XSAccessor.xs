@@ -139,7 +139,7 @@ constructor(class, ...)
     char* classname;
   PPCODE:
     if (sv_isobject(class)) {
-      classname = HvNAME(SvSTASH(class));
+      classname = sv_reftype(SvRV(class), 1);
     }
     else {
       if (!SvPOK(class))
