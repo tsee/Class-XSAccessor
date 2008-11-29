@@ -1,5 +1,6 @@
 Revision history for Perl extension Class::XSAccessor.
 
+0.10  Sat Nov 29 21:17 2008
   - Add generation of constructors.
 
 0.09  Sat Nov 29 17:28 2008

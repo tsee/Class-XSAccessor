@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
@@ -110,6 +110,7 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
   
   package MyClass;
   use Class::XSAccessor
+    constructor => 'new',
     getters => {
       get_foo => 'foo', # 'foo' is the hash key to access
       get_bar => 'bar',
@@ -125,7 +126,7 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
     predicates => {
       has_foo => 'foo',
       has_bar => 'bar',
-    },
+    };
   # The imported methods are implemented in fast XS.
   
   # normal class code here.
@@ -139,7 +140,21 @@ It only works with objects that are implemented as ordinary hashes.
 L<Class::XSAccessor::Array> implements the same interface for objects
 that use arrays for their internal representation.
 
-The XS methods were between 1.6 and 2.5 times faster than typical
+Since version 0.10, the module can also generate simple constructors
+(implemented in XS) for you. Simply supply the
+C<constructor =E<gt> 'constructor_name'> option or the
+C<constructors =E<gt> ['new', 'create', 'spawn']> option.
+These constructors do the equivalent of the following perl code:
+
+  sub new {
+    my $class = shift;
+    return bless { @_ }, ref($class)||$class;
+  }
+
+That means they can be called on objects and classes but will not
+clone objects entirely.
+
+The XS accessor methods were between 1.6 and 2.5 times faster than typical
 pure-perl accessors in some simple benchmarking.
 The lower factor applies to the potentially slightly obscure
 C<sub set_foo_pp {$_[0]-E<gt>{foo} = $_[1]}>, so if you usually
@@ -147,7 +162,8 @@ write clear code, a factor of two speed-up is a good estimate.
 
 The method names may be fully qualified. In the example of the
 synopsis, you could have written C<MyClass::get_foo> instead
-of C<get_foo>.
+of C<get_foo>. This way, you can install methods in classes other
+than the current class. See also: The C<class> option below.
 
 By default, the setters return the new value that was set
 and the accessors (mutators) do the same. You can change this behaviour
