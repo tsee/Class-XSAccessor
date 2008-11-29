@@ -21,33 +21,38 @@ sub import {
   my $replace = $opts{replace} || 0;
   my $chained = $opts{chained} || 0;
 
-  my $read_subs = $opts{getters} || {};
-  my $set_subs  = $opts{setters} || {};
-  my $acc_subs  = $opts{accessors} || {};
-  my $pred_subs = $opts{predicates} || {};
+  my $read_subs      = $opts{getters} || {};
+  my $set_subs       = $opts{setters} || {};
+  my $acc_subs       = $opts{accessors} || {};
+  my $pred_subs      = $opts{predicates} || {};
+  my $construct_subs = $opts{constructors} || [defined($opts{constructor}) ? $opts{constructor} : ()];
 
   foreach my $subname (keys %$read_subs) {
     my $hashkey = $read_subs->{$subname};
-    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, $chained, "getter");
+    _generate_method($caller_pkg, $subname, $hashkey, $replace, $chained, "getter");
   }
 
   foreach my $subname (keys %$set_subs) {
     my $hashkey = $set_subs->{$subname};
-    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, $chained, "setter");
+    _generate_method($caller_pkg, $subname, $hashkey, $replace, $chained, "setter");
   }
 
   foreach my $subname (keys %$acc_subs) {
     my $hashkey = $acc_subs->{$subname};
-    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, $chained, "accessor");
+    _generate_method($caller_pkg, $subname, $hashkey, $replace, $chained, "accessor");
   }
 
   foreach my $subname (keys %$pred_subs) {
     my $hashkey = $pred_subs->{$subname};
-    _generate_accessor($caller_pkg, $subname, $hashkey, $replace, $chained, "predicate");
+    _generate_method($caller_pkg, $subname, $hashkey, $replace, $chained, "predicate");
+  }
+  
+  foreach my $subname (@$construct_subs) {
+    _generate_method($caller_pkg, $subname, "", $replace, $chained, "constructor");
   }
 }
 
-sub _generate_accessor {
+sub _generate_method {
   my ($caller_pkg, $subname, $hashkey, $replace, $chained, $type) = @_;
 
   if (not defined $hashkey) {
@@ -84,6 +89,9 @@ sub _generate_accessor {
   }
   elsif ($type eq 'predicate') {
     newxs_predicate($subname, $hashkey);
+  }
+  elsif ($type eq 'constructor') {
+    newxs_constructor($subname);
   }
   else {
     newxs_accessor($subname, $hashkey, $chained);

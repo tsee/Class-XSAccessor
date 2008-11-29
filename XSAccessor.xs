@@ -128,6 +128,37 @@ predicate(self)
       XSRETURN_NO;
 
 
+void
+constructor(class, ...)
+    SV* class;
+  ALIAS:
+  PREINIT:
+    unsigned int iStack;
+    HV* hash;
+    SV* obj;
+    char* classname;
+  PPCODE:
+    if (sv_isobject(class)) {
+      classname = HvNAME(SvSTASH(class));
+    }
+    else {
+      if (!SvPOK(class))
+        croak("Need an object or class name as first argument to the constructor.");
+      classname = SvPV_nolen(class);
+    }
+    
+    hash = (HV *)sv_2mortal((SV *)newHV());
+    obj = sv_bless( newRV((SV*)hash), gv_stashpv(classname, 1) );
+
+    if (items > 1) {
+      if (!(items % 2))
+        croak("Uneven number of argument to constructor.");
+
+      for (iStack = 1; iStack < items; iStack += 2) {
+        hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
+      }
+    }
+    XPUSHs(sv_2mortal(obj));
 
 
 void
@@ -235,5 +266,19 @@ newxs_predicate(name, key)
       hashkey.key = newSVpvn(key, len);
       PERL_HASH(hashkey.hash, key, len);
       AutoXS_hashkeys[functionIndex] = hashkey;
+    }
+
+void
+newxs_constructor(name)
+  char* name;
+  PPCODE:
+    char* file = __FILE__;
+    {
+      CV * cv;
+      /* This code is very similar to what you get from using the ALIAS XS syntax.
+       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
+      cv = newXS(name, XS_Class__XSAccessor_constructor, file);
+      if (cv == NULL)
+        croak("ARG! SOMETHING WENT REALLY WRONG!");
     }
 
