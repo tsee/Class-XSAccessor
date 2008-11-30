@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::XSAccessor.
 
+0.11  Sat Nov 29 21:37 2008
+  - Forgot to add more tests in previous release.
+
 0.10  Sat Nov 29 21:17 2008
   - Add generation of constructors.
 

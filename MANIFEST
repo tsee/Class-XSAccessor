@@ -10,4 +10,5 @@ t/02accessor.t
 t/03predicate.t
 t/04chained.t
 t/05replace.t
+t/06constructor.t
 XSAccessor.xs

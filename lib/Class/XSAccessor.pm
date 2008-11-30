@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
@@ -152,7 +152,8 @@ These constructors do the equivalent of the following perl code:
   }
 
 That means they can be called on objects and classes but will not
-clone objects entirely.
+clone objects entirely. Parameters to C<new()> are added to the
+object.
 
 The XS accessor methods were between 1.6 and 2.5 times faster than typical
 pure-perl accessors in some simple benchmarking.
