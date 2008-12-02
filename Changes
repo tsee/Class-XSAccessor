@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::XSAccessor.
 
+0.12  Tue Dec  2 14:07 2008
+  - Compilation fix for Solaris cc. (Probably going half-way only.)
+
 0.11  Sat Nov 29 21:37 2008
   - Forgot to add more tests in previous release.
 

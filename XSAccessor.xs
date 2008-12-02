@@ -136,7 +136,7 @@ constructor(class, ...)
     unsigned int iStack;
     HV* hash;
     SV* obj;
-    char* classname;
+    const char* classname;
   PPCODE:
     if (sv_isobject(class)) {
       classname = sv_reftype(SvRV(class), 1);
