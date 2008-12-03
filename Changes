@@ -1,5 +1,7 @@
 Revision history for Perl extension Class::XSAccessor.
 
+  - Add predicate tests
+
 0.12  Tue Dec  2 14:07 2008
   - Compilation fix for Solaris cc. (Probably going half-way only.)
 
