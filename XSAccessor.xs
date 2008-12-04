@@ -7,6 +7,7 @@
 #include "AutoXS.h"
 
 MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor
+PROTOTYPES: DISABLE
 
 void
 getter(self)
@@ -170,6 +171,8 @@ newxs_getter(name, key)
     const unsigned int functionIndex = get_next_hashkey();
     {
       CV * cv;
+      autoxs_hashkey hashkey;
+      const unsigned int len = strlen(key);
       /* This code is very similar to what you get from using the ALIAS XS syntax.
        * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
       cv = newXS(name, XS_Class__XSAccessor_getter, file);
@@ -178,8 +181,6 @@ newxs_getter(name, key)
       XSANY.any_i32 = functionIndex;
 
       /* Precompute the hash of the key and store it in the global structure */
-      autoxs_hashkey hashkey;
-      const unsigned int len = strlen(key);
       hashkey.key = newSVpvn(key, len);
       PERL_HASH(hashkey.hash, key, len);
       AutoXS_hashkeys[functionIndex] = hashkey;
@@ -196,6 +197,8 @@ newxs_setter(name, key, chained)
     const unsigned int functionIndex = get_next_hashkey();
     {
       CV * cv;
+      autoxs_hashkey hashkey;
+      const unsigned int len = strlen(key);
       /* This code is very similar to what you get from using the ALIAS XS syntax.
        * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
       if (chained)
@@ -207,8 +210,6 @@ newxs_setter(name, key, chained)
       XSANY.any_i32 = functionIndex;
 
       /* Precompute the hash of the key and store it in the global structure */
-      autoxs_hashkey hashkey;
-      const unsigned int len = strlen(key);
       hashkey.key = newSVpvn(key, len);
       PERL_HASH(hashkey.hash, key, len);
       AutoXS_hashkeys[functionIndex] = hashkey;
@@ -225,6 +226,8 @@ newxs_accessor(name, key, chained)
     const unsigned int functionIndex = get_next_hashkey();
     {
       CV * cv;
+      autoxs_hashkey hashkey;
+      const unsigned int len = strlen(key);
       /* This code is very similar to what you get from using the ALIAS XS syntax.
        * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
       if (chained)
@@ -236,8 +239,6 @@ newxs_accessor(name, key, chained)
       XSANY.any_i32 = functionIndex;
 
       /* Precompute the hash of the key and store it in the global structure */
-      autoxs_hashkey hashkey;
-      const unsigned int len = strlen(key);
       hashkey.key = newSVpvn(key, len);
       PERL_HASH(hashkey.hash, key, len);
       AutoXS_hashkeys[functionIndex] = hashkey;
@@ -253,6 +254,8 @@ newxs_predicate(name, key)
     const unsigned int functionIndex = get_next_hashkey();
     {
       CV * cv;
+      autoxs_hashkey hashkey;
+      const unsigned int len = strlen(key);
       /* This code is very similar to what you get from using the ALIAS XS syntax.
        * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
       cv = newXS(name, XS_Class__XSAccessor_predicate, file);
@@ -261,8 +264,6 @@ newxs_predicate(name, key)
       XSANY.any_i32 = functionIndex;
 
       /* Precompute the hash of the key and store it in the global structure */
-      autoxs_hashkey hashkey;
-      const unsigned int len = strlen(key);
       hashkey.key = newSVpvn(key, len);
       PERL_HASH(hashkey.hash, key, len);
       AutoXS_hashkeys[functionIndex] = hashkey;
