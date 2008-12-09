@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::XSAccessor.
 
+0.14  Tue Dec  9 21:06 2008
+  - Fix Makefile issue on Windows using nmake (Petar Shangov)
+
 0.13  Thu Dec  4 15:06 2008
   - Add predicate tests
   - Fix some compiler warnings (Tom Heady)
