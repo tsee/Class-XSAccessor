@@ -168,7 +168,7 @@ newxs_getter(name, key)
   char* key;
   PPCODE:
     char* file = __FILE__;
-    const unsigned int functionIndex = get_next_hashkey();
+    const unsigned int functionIndex = get_hashkey_index(key, strlen(key));
     {
       CV * cv;
       autoxs_hashkey hashkey;
@@ -194,7 +194,7 @@ newxs_setter(name, key, chained)
   bool chained;
   PPCODE:
     char* file = __FILE__;
-    const unsigned int functionIndex = get_next_hashkey();
+    const unsigned int functionIndex = get_hashkey_index(key, strlen(key));
     {
       CV * cv;
       autoxs_hashkey hashkey;
@@ -223,7 +223,7 @@ newxs_accessor(name, key, chained)
   bool chained;
   PPCODE:
     char* file = __FILE__;
-    const unsigned int functionIndex = get_next_hashkey();
+    const unsigned int functionIndex = get_hashkey_index(key, strlen(key));
     {
       CV * cv;
       autoxs_hashkey hashkey;
@@ -251,7 +251,7 @@ newxs_predicate(name, key)
   char* key;
   PPCODE:
     char* file = __FILE__;
-    const unsigned int functionIndex = get_next_hashkey();
+    const unsigned int functionIndex = get_hashkey_index(key, strlen(key));
     {
       CV * cv;
       autoxs_hashkey hashkey;

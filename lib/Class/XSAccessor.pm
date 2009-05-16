@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '0.14';
+our $VERSION = '1.00';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
@@ -217,6 +217,16 @@ please contemplate how you could instantiate a new XS accessor for a new hash ke
 that's only known at run-time. Note that compiling C code at run-time a la Inline::C
 is a no go.
 
+Threading. With version 1.00, a memory leak has been B<fixed> that would leak a small amount of
+memory if you loaded C<Class::XSAccessor>-based classes in a subthread that hadn't been loaded
+in the "main" thread before. If the subthread then terminated, a hash key and an int per
+associated method used ot be lost. Note that this mattered only if classes were B<only> loaded
+in a sort of throw-away thread.
+
+In the new implementation as of 1.00, the memory will not be released again either in the above
+situation. But it will be recycled when the same class or a similar class is loaded
+again in B<any> thread.
+
 =head1 SEE ALSO
 
 L<Class::XSAccessor::Array>
@@ -231,7 +241,7 @@ Chocolateboy, E<lt>chocolate@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008 by Steffen Mueller
+Copyright (C) 2008-2009 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,
