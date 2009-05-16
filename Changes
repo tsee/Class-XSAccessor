@@ -1,5 +1,8 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.01  Sat May 16 16:11 2009
+  - XS boolean constants for PPI
+
 1.00  Sat May 16 13:48 2009
   - Implement new caching algorithm: Only recreate
     the int => hash key association for new hash keys.

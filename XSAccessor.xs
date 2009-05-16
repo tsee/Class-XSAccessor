@@ -163,6 +163,24 @@ constructor(class, ...)
 
 
 void
+constant_false(self)
+    SV* self;
+  PPCODE:
+    {
+      XSRETURN_NO;
+    }
+
+   
+void
+constant_true(self)
+    SV* self;
+  PPCODE:
+    {
+      XSRETURN_YES;
+    }
+
+
+void
 newxs_getter(name, key)
   char* name;
   char* key;
@@ -282,4 +300,29 @@ newxs_constructor(name)
       if (cv == NULL)
         croak("ARG! SOMETHING WENT REALLY WRONG!");
     }
+
+
+void
+newxs_boolean(name, truth)
+  char* name;
+  bool truth;
+  PPCODE:
+    char* file = __FILE__;
+    if (truth) {
+      CV * cv;
+      /* This code is very similar to what you get from using the ALIAS XS syntax.
+       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
+      cv = newXS(name, XS_Class__XSAccessor_constant_true, file);
+      if (cv == NULL)
+        croak("ARG! SOMETHING WENT REALLY WRONG!");
+    }
+    else {
+      CV * cv;
+      /* This code is very similar to what you get from using the ALIAS XS syntax.
+       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
+      cv = newXS(name, XS_Class__XSAccessor_constant_false, file);
+      if (cv == NULL)
+        croak("ARG! SOMETHING WENT REALLY WRONG!");
+    }
+
 

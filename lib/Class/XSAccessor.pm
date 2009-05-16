@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
@@ -21,11 +21,15 @@ sub import {
   my $replace = $opts{replace} || 0;
   my $chained = $opts{chained} || 0;
 
+  # TODO: Refactor. This code sucks really bad.
+  
   my $read_subs      = $opts{getters} || {};
   my $set_subs       = $opts{setters} || {};
   my $acc_subs       = $opts{accessors} || {};
   my $pred_subs      = $opts{predicates} || {};
   my $construct_subs = $opts{constructors} || [defined($opts{constructor}) ? $opts{constructor} : ()];
+  my $true_subs      = $opts{true} || [];
+  my $false_subs     = $opts{false} || [];
 
   foreach my $subname (keys %$read_subs) {
     my $hashkey = $read_subs->{$subname};
@@ -49,6 +53,14 @@ sub import {
   
   foreach my $subname (@$construct_subs) {
     _generate_method($caller_pkg, $subname, "", $replace, $chained, "constructor");
+  }
+
+  foreach my $subname (@$true_subs) {
+    _generate_method($caller_pkg, $subname, "", $replace, $chained, "true");
+  }
+
+  foreach my $subname (@$false_subs) {
+    _generate_method($caller_pkg, $subname, "", $replace, $chained, "false");
   }
 }
 
@@ -93,6 +105,12 @@ sub _generate_method {
   elsif ($type eq 'constructor') {
     newxs_constructor($subname);
   }
+  elsif ($type eq 'true') {
+    newxs_boolean($subname, 1);
+  }
+  elsif ($type eq 'false') {
+    newxs_boolean($subname, 0);
+  }
   else {
     newxs_accessor($subname, $hashkey, $chained);
   }
@@ -126,7 +144,10 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
     predicates => {
       has_foo => 'foo',
       has_bar => 'bar',
-    };
+    }
+    true => [ 'is_token', 'is_whitespace' ],
+    false => [ 'significant' ];
+
   # The imported methods are implemented in fast XS.
   
   # normal class code here.
@@ -169,6 +190,12 @@ than the current class. See also: The C<class> option below.
 By default, the setters return the new value that was set
 and the accessors (mutators) do the same. You can change this behaviour
 with the C<chained> option, see below. The predicates obviously return a boolean.
+
+Since version 1.01, you can generate extremely simply methods which
+simply return true or false (and always do so). If that seems like a
+really superfluous thing to you, then think of a large class hierarchy
+with interfaces such as PPI. This is implemented as the C<true>
+and C<false> options, see synopsis.
 
 =head1 OPTIONS
 
