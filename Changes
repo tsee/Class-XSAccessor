@@ -1,5 +1,9 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.02  Sun May 17 11:18 2009
+  - Require new AutoXS header version in order to fix
+    rototyping issue.
+
 1.01  Sat May 16 16:11 2009
   - XS boolean constants for PPI
 

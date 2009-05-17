@@ -1,8 +1,19 @@
-/* AutoXS::Header version '0.06' */
+/* AutoXS::Header version '1.00' */
 typedef struct {
   U32 hash;
   SV* key;
 } autoxs_hashkey;
+
+/* prototype section */
+
+I32 get_hashkey_index(const char* key, const I32 len);
+I32 _new_hashkey();
+void _resize_array(I32** array, unsigned int* len, unsigned int newlen);
+void _resize_array_init(I32** array, unsigned int* len, unsigned int newlen, I32 init);
+I32 _new_internal_arrayindex();
+I32 get_internal_array_index(I32 object_ary_idx);
+
+/* initialization section */
 
 unsigned int AutoXS_no_hashkeys = 0;
 unsigned int AutoXS_free_hashkey_no = 0;
@@ -15,6 +26,9 @@ I32* AutoXS_arrayindices = NULL;
 
 unsigned int AutoXS_reverse_arrayindices_length = 0;
 I32* AutoXS_reverse_arrayindices = NULL;
+
+
+/* implementation section */
 
 I32 get_hashkey_index(const char* key, const I32 len) {
   /* init */
@@ -108,4 +122,3 @@ I32 get_internal_array_index(I32 object_ary_idx) {
   AutoXS_reverse_arrayindices[object_ary_idx] = new_index;
   return new_index;
 }
-
