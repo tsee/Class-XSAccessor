@@ -1,4 +1,4 @@
-/* AutoXS::Header version '1.00' */
+/* AutoXS::Header version '1.01' */
 typedef struct {
   U32 hash;
   SV* key;
@@ -31,11 +31,13 @@ I32* AutoXS_reverse_arrayindices = NULL;
 /* implementation section */
 
 I32 get_hashkey_index(const char* key, const I32 len) {
+  I32 index;
+
   /* init */
   if (AutoXS_reverse_hashkeys == NULL)
     AutoXS_reverse_hashkeys = newHV();
 
-  I32 index = 0;
+  index = 0;
   if ( hv_exists(AutoXS_reverse_hashkeys, key, len) ) {
     SV** index_sv = hv_fetch(AutoXS_reverse_hashkeys, key, len, 0);
 
@@ -109,6 +111,8 @@ I32 _new_internal_arrayindex() {
 }
 
 I32 get_internal_array_index(I32 object_ary_idx) {
+  I32 new_index;
+
   if (AutoXS_reverse_arrayindices_length <= object_ary_idx)
     _resize_array_init( &AutoXS_reverse_arrayindices,
                         &AutoXS_reverse_arrayindices_length,
@@ -118,7 +122,7 @@ I32 get_internal_array_index(I32 object_ary_idx) {
   if (AutoXS_reverse_arrayindices[object_ary_idx] > -1)
     return AutoXS_reverse_arrayindices[object_ary_idx];
 
-  I32 new_index = _new_internal_arrayindex();
+  new_index = _new_internal_arrayindex();
   AutoXS_reverse_arrayindices[object_ary_idx] = new_index;
   return new_index;
 }

@@ -1,5 +1,8 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.03  Sun May 31 18:45 2009
+  - Upgrade to AutoXS::Header 1.01: Make it C89!
+
 1.02  Sun May 17 11:18 2009
   - Require new AutoXS header version in order to fix
     rototyping issue.
