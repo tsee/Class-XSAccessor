@@ -6,7 +6,7 @@ WriteMakefile(
     NAME              => 'Class::XSAccessor',
     VERSION_FROM      => 'lib/Class/XSAccessor.pm', # finds $VERSION
     PREREQ_PM         => {
-      'AutoXS::Header' => '1.00',
+      'AutoXS::Header' => '1.02',
     }, # e.g., Module::Name => 1.1
     LICENSE => 'perl',
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
