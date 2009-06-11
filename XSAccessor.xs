@@ -21,7 +21,7 @@ getter(self)
     HE* he;
   PPCODE:
     /*if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, 0)) {*/
-    if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash))
+    if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
       XPUSHs(HeVAL(he));
     else
       XSRETURN_UNDEF;
@@ -38,7 +38,6 @@ setter(self, newvalue)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
-    HE* he;
   PPCODE:
     if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
@@ -55,7 +54,6 @@ chained_setter(self, newvalue)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
-    HE* he;
   PPCODE:
     if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
@@ -80,7 +78,7 @@ accessor(self, ...)
       XPUSHs(newvalue);
     }
     else {
-      if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash))
+      if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
         XPUSHs(HeVAL(he));
       else
         XSRETURN_UNDEF;
@@ -105,7 +103,7 @@ chained_accessor(self, ...)
       XPUSHs(self);
     }
     else {
-      if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash))
+      if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
         XPUSHs(HeVAL(he));
       else
         XSRETURN_UNDEF;
@@ -134,7 +132,7 @@ constructor(class, ...)
     SV* class;
   ALIAS:
   PREINIT:
-    unsigned int iStack;
+    int iStack;
     HV* hash;
     SV* obj;
     const char* classname;
