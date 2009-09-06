@@ -165,7 +165,7 @@ Since version 0.10, the module can also generate simple constructors
 (implemented in XS) for you. Simply supply the
 C<constructor =E<gt> 'constructor_name'> option or the
 C<constructors =E<gt> ['new', 'create', 'spawn']> option.
-These constructors do the equivalent of the following perl code:
+These constructors do the equivalent of the following Perl code:
 
   sub new {
     my $class = shift;
