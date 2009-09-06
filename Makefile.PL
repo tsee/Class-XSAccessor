@@ -17,11 +17,3 @@ WriteMakefile(
     # OBJECT            => '$(O_FILES)', # link all the C files too
 );
 
-sub MY::post_constants {
-  return <<'MAKE_FRAG';
-linkext ::
-	$(PERL) -MAutoXS::Header -e AutoXS::Header::WriteAutoXSHeader
-
-MAKE_FRAG
-}
-
