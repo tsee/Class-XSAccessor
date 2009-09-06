@@ -25,13 +25,28 @@ STMT_START {                                                                \
 } STMT_END
 
 /* Install a new XSUB under 'name' and set the function index attribute
- * Requires a previous declaration of a CV* cv!
+ * for array-based objects. Requires a previous declaration of a CV* cv!
  **/
 #define INSTALL_NEW_CV_ARRAY_OBJ(name, xsub, obj_array_index)                \
 STMT_START {                                                                 \
   const U32 function_index = get_internal_array_index((I32)obj_array_index); \
   INSTALL_NEW_CV_WITH_INDEX(name, xsub, function_index);                     \
   CXSAccessor_arrayindices[function_index] = obj_array_index;                \
+} STMT_END
+
+
+/* Install a new XSUB under 'name' and set the function index attribute
+ * for hash-based objects. Requires a previous declaration of a CV* cv!
+ **/
+#define INSTALL_NEW_CV_HASH_OBJ(name, xsub, obj_hash_key)              \
+STMT_START {                                                           \
+  autoxs_hashkey hashkey;                                              \
+  const U32 key_len = strlen(obj_hash_key);                            \
+  const U32 function_index = get_hashkey_index(obj_hash_key, key_len); \
+  INSTALL_NEW_CV_WITH_INDEX(name, xsub, function_index);               \
+  hashkey.key = newSVpvn(obj_hash_key, key_len);                       \
+  PERL_HASH(hashkey.hash, obj_hash_key, key_len);                      \
+  CXSAccessor_hashkeys[function_index] = hashkey;                      \
 } STMT_END
 
 MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor

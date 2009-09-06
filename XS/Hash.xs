@@ -258,24 +258,7 @@ newxs_predicate(name, key)
   char* name;
   char* key;
   PPCODE:
-    char* file = __FILE__;
-    const unsigned int functionIndex = get_hashkey_index(key, strlen(key));
-    {
-      CV * cv;
-      autoxs_hashkey hashkey;
-      const unsigned int len = strlen(key);
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor_predicate, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-      XSANY.any_i32 = functionIndex;
-
-      /* Precompute the hash of the key and store it in the global structure */
-      hashkey.key = newSVpvn(key, len);
-      PERL_HASH(hashkey.hash, key, len);
-      CXSAccessor_hashkeys[functionIndex] = hashkey;
-    }
+    INSTALL_NEW_CV_HASH_OBJ(name, XS_Class__XSAccessor_predicate, key);
 
 void
 newxs_constructor(name)
