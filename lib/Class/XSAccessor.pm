@@ -11,6 +11,20 @@ require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
 require Class::XSAccessor::Heavy;
 
+sub _make_hash {
+  my $ref = shift;
+
+  if (ref ($ref)) {
+    if (ref($ref) eq 'ARRAY') {
+      $ref = { map { $_ => $_ } @$ref }
+    } 
+  } else {
+    $ref = { $ref, $ref };
+  }
+
+  return $ref;
+}
+
 sub import {
   my $own_class = shift;
   my ($caller_pkg) = caller();
@@ -19,12 +33,12 @@ sub import {
 
   $caller_pkg = $opts{class} if defined $opts{class};
 
-  # TODO: Refactor. This code sucks really bad.
+  # TODO: Refactor. Move more duplicated code to ::Heavy
   
-  my $read_subs      = $opts{getters} || {};
-  my $set_subs       = $opts{setters} || {};
-  my $acc_subs       = $opts{accessors} || {};
-  my $pred_subs      = $opts{predicates} || {};
+  my $read_subs      = _make_hash($opts{getters} || {});
+  my $set_subs       = _make_hash($opts{setters} || {});
+  my $acc_subs       = _make_hash($opts{accessors} || {});
+  my $pred_subs      = _make_hash($opts{predicates} || {});
   my $construct_subs = $opts{constructors} || [defined($opts{constructor}) ? $opts{constructor} : ()];
   my $true_subs      = $opts{true} || [];
   my $false_subs     = $opts{false} || [];
