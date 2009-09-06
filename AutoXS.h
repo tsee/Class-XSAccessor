@@ -1,4 +1,4 @@
-/* AutoXS::Header version '1.01' */
+/* AutoXS::Header version '1.02' */
 typedef struct {
   U32 hash;
   SV* key;
@@ -113,7 +113,7 @@ I32 _new_internal_arrayindex() {
 I32 get_internal_array_index(I32 object_ary_idx) {
   I32 new_index;
 
-  if (AutoXS_reverse_arrayindices_length <= object_ary_idx)
+  if (AutoXS_reverse_arrayindices_length <= (unsigned int)object_ary_idx)
     _resize_array_init( &AutoXS_reverse_arrayindices,
                         &AutoXS_reverse_arrayindices_length,
                         object_ary_idx+1, -1 );
