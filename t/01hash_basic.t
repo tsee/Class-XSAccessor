@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 35;
 BEGIN { use_ok('Class::XSAccessor') };
 
 package Foo;
@@ -72,13 +72,30 @@ use Class::XSAccessor
     set_FOO => 'foo',
   };
 
+
+# test shorthand syntax
+package Foo;
+use Class::XSAccessor
+  getters => 'barfle',
+  setters => {set_barfle => 'barfle'};
+
+use Class::XSAccessor
+  getters => [qw/a b/],
+  setters  => 'c';
+
 package main;
 BEGIN{pass()}
 
 ok( Foo->can('get_foo') );
 ok( Foo->can('get_bar') );
 
-my $FOO = bless  {foo => 'a', bar => 'c'} => 'Foo';
+my $FOO = bless {
+  foo => 'a', bar => 'c',
+  barfle => 'works',
+  a => 'a1',
+  b => 'b1',
+  c => 'c1',
+} => 'Foo';
 ok( $FOO->can('get_FOO') );
 ok( $FOO->can('set_FOO') );
 
@@ -88,4 +105,22 @@ $FOO->set_FOO('b');
 ok($FOO->get_FOO() eq 'b');
 ok($FOO->get_foo() eq 'b');
 
+
+# tests for shorthand
+foreach my $name (qw(barfle a b c)) {
+  ok($FOO->can($name));
+}
+
+is($FOO->a(), 'a1');
+is($FOO->b(), 'b1');
+$FOO->c("1c");
+is($FOO->{c}, '1c');
+$FOO->{a} = '1a';
+$FOO->{b} = '1b';
+is($FOO->a(), '1a');
+is($FOO->b(), '1b');
+
+is($FOO->barfle(), 'works');
+$FOO->set_barfle("elfrab");
+is($FOO->barfle(), "elfrab");
 

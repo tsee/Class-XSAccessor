@@ -9,6 +9,11 @@ use Class::XSAccessor
   setters    => { set_foo => 'foo' },
   predicates => { has_foo => 'foo', has_bar => 'bar' };
 
+use Class::XSAccessor
+  predicates => 'single';
+use Class::XSAccessor
+  predicates => [qw/mult iple/];
+
 sub new {
   my $class = shift;
   bless { bar => 'baz' }, $class;
@@ -16,7 +21,7 @@ sub new {
 
 package main;
 
-use Test::More tests => 12;
+use Test::More tests => 18;
 
 my $obj = Class::XSAccessor::Test->new();
 
@@ -37,4 +42,14 @@ is($obj->bar(undef), undef);
 
 ok(!$obj->has_foo());
 ok(!$obj->has_bar());
+
+ok(!$obj->single);
+ok(!$obj->mult);
+ok(!$obj->iple);
+
+$obj->{$_} = 1 for qw/single mult/;
+
+ok($obj->single);
+ok($obj->mult);
+ok(!$obj->iple);
 

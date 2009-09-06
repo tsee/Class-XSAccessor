@@ -8,6 +8,12 @@ use Class::XSAccessor
   getters   => { get_foo => 'foo' },
   setters   => { set_foo => 'foo' };
 
+use Class::XSAccessor
+  accessors => 'single';
+
+use Class::XSAccessor
+  accessors => [qw/mult iple/];
+
 sub new {
   my $class = shift;
   bless { bar => 'baz' }, $class;
@@ -15,7 +21,7 @@ sub new {
 
 package main;
 
-use Test::More tests => 12;
+use Test::More tests => 21;
 
 my $obj = Class::XSAccessor::Test->new();
 
@@ -25,6 +31,14 @@ is ($obj->get_foo(), 'bar');
 is ($obj->bar(), 'baz');
 is ($obj->bar('quux'), 'quux');
 is ($obj->bar(), 'quux');
+
+ok ($obj->can($_)) for qw/single mult iple/;
+is ($obj->single("elgnis"), "elgnis");
+is ($obj->mult("tlum"), "tlum");
+is ($obj->iple("elpi"), "elpi");
+is ($obj->single(), "elgnis");
+is ($obj->mult(), "tlum");
+is ($obj->iple(), "elpi");
 
 package Class::XSAccessor::Test2;
 sub new {
