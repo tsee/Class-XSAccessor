@@ -7,8 +7,7 @@ use Carp qw/croak/;
 
 our $VERSION = '1.04';
 
-require XSLoader;
-XSLoader::load('Class::XSAccessor::Array', $VERSION);
+require Class::XSAccessor;
 
 sub import {
   my $own_class = shift;
