@@ -54,13 +54,10 @@ sub import {
 sub _generate_method {
   my ($caller_pkg, $subname, $hashkey, $opts, $type) = @_;
 
-  if (not defined $hashkey) {
-    croak("Cannot use undef as a hash key for generating an XS $type accessor. (Sub: $subname)");
-  }
+  croak("Cannot use undef as a hash key for generating an XS $type accessor. (Sub: $subname)")
+    if not defined $hashkey;
 
-  if ($subname !~ /::/) {
-    $subname = "${caller_pkg}::$subname";
-  }
+  $subname = "${caller_pkg}::$subname" if $subname !~ /::/;
 
   Class::XSAccessor::Heavy::check_sub_existance($subname) if not $opts->{replace};
 
