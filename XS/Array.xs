@@ -169,72 +169,39 @@ constant_true(self)
 void
 newxs_getter(name, index)
   char* name;
-  unsigned int index;
+  U32 index;
   PPCODE:
-    char* file = __FILE__;
-    const unsigned int functionIndex = get_internal_array_index( (I32)index );
-    {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor__Array_getter, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-      XSANY.any_i32 = functionIndex;
-
-      CXSAccessor_arrayindices[functionIndex] = index;
-    }
+    INSTALL_NEW_CV_ARRAY_OBJ(name, XS_Class__XSAccessor__Array_getter, index);
 
 
 void
 newxs_setter(name, index, chained)
   char* name;
-  unsigned int index;
+  U32 index;
   bool chained;
   PPCODE:
-    char* file = __FILE__;
-    const unsigned int functionIndex = get_internal_array_index( (I32)index );
-    {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      if (chained)
-        cv = newXS(name, XS_Class__XSAccessor__Array_chained_setter, file);
-      else
-        cv = newXS(name, XS_Class__XSAccessor__Array_setter, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-      XSANY.any_i32 = functionIndex;
-
-      CXSAccessor_arrayindices[functionIndex] = index;
-    }
-
+    if (chained)
+      INSTALL_NEW_CV_ARRAY_OBJ(name, XS_Class__XSAccessor__Array_chained_setter, index);
+    else
+      INSTALL_NEW_CV_ARRAY_OBJ(name, XS_Class__XSAccessor__Array_setter, index);
 
 void
 newxs_accessor(name, index, chained)
   char* name;
-  unsigned int index;
+  U32 index;
   bool chained;
   PPCODE:
-    CV * cv;
-    char* file = __FILE__;
-    const unsigned int functionIndex = get_internal_array_index( (I32)index );
     if (chained)
-      INSTALL_NEW_CV_WITH_INDEX(name, XS_Class__XSAccessor__Array_chained_accessor, functionIndex);
+      INSTALL_NEW_CV_ARRAY_OBJ(name, XS_Class__XSAccessor__Array_chained_accessor, index);
     else
-      INSTALL_NEW_CV_WITH_INDEX(name, XS_Class__XSAccessor__Array_accessor, functionIndex);
-    CXSAccessor_arrayindices[functionIndex] = index;
+      INSTALL_NEW_CV_ARRAY_OBJ(name, XS_Class__XSAccessor__Array_accessor, index);
 
 void
 newxs_predicate(name, index)
   char* name;
-  unsigned int index;
+  U32 index;
   PPCODE:
-    CV * cv;
-    char* file = __FILE__;
-    const unsigned int functionIndex = get_internal_array_index( (I32)index );
-    INSTALL_NEW_CV_WITH_INDEX(name, XS_Class__XSAccessor__Array_predicate, functionIndex);
-    CXSAccessor_arrayindices[functionIndex] = index;
+    INSTALL_NEW_CV_ARRAY_OBJ(name, XS_Class__XSAccessor__Array_predicate, index);
 
 void
 newxs_constructor(name)
