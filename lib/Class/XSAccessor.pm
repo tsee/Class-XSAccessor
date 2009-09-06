@@ -19,9 +19,6 @@ sub import {
 
   $caller_pkg = $opts{class} if defined $opts{class};
 
-  my $replace = $opts{replace} || 0;
-  my $chained = $opts{chained} || 0;
-
   # TODO: Refactor. This code sucks really bad.
   
   my $read_subs      = $opts{getters} || {};
@@ -32,41 +29,30 @@ sub import {
   my $true_subs      = $opts{true} || [];
   my $false_subs     = $opts{false} || [];
 
-  foreach my $subname (keys %$read_subs) {
-    my $hashkey = $read_subs->{$subname};
-    _generate_method($caller_pkg, $subname, $hashkey, $replace, $chained, "getter");
+  foreach my $subtype ( ["getter", $read_subs],
+                        ["setter", $set_subs],
+                        ["accessor", $acc_subs],
+                        ["pred_subs", $pred_subs] )
+  {
+    my $subs = $subtype->[1];
+    foreach my $subname (keys %$subs) {
+      my $hashkey = $subs->{$subname};
+      _generate_method($caller_pkg, $subname, $hashkey, \%opts, $subtype->[0]);
+    }
   }
 
-  foreach my $subname (keys %$set_subs) {
-    my $hashkey = $set_subs->{$subname};
-    _generate_method($caller_pkg, $subname, $hashkey, $replace, $chained, "setter");
-  }
-
-  foreach my $subname (keys %$acc_subs) {
-    my $hashkey = $acc_subs->{$subname};
-    _generate_method($caller_pkg, $subname, $hashkey, $replace, $chained, "accessor");
-  }
-
-  foreach my $subname (keys %$pred_subs) {
-    my $hashkey = $pred_subs->{$subname};
-    _generate_method($caller_pkg, $subname, $hashkey, $replace, $chained, "predicate");
-  }
-  
-  foreach my $subname (@$construct_subs) {
-    _generate_method($caller_pkg, $subname, "", $replace, $chained, "constructor");
-  }
-
-  foreach my $subname (@$true_subs) {
-    _generate_method($caller_pkg, $subname, "", $replace, $chained, "true");
-  }
-
-  foreach my $subname (@$false_subs) {
-    _generate_method($caller_pkg, $subname, "", $replace, $chained, "false");
+  foreach my $subtype ( ["constructor", $construct_subs],
+                        ["true", $true_subs],
+                        ["false", $false_subs] )
+  {
+    foreach my $subname (@{$subtype->[1]}) {
+      _generate_method($caller_pkg, $subname, "", \%opts, $subtype->[0]);
+    }
   }
 }
 
 sub _generate_method {
-  my ($caller_pkg, $subname, $hashkey, $replace, $chained, $type) = @_;
+  my ($caller_pkg, $subname, $hashkey, $opts, $type) = @_;
 
   if (not defined $hashkey) {
     croak("Cannot use undef as a hash key for generating an XS $type accessor. (Sub: $subname)");
@@ -76,13 +62,13 @@ sub _generate_method {
     $subname = "${caller_pkg}::$subname";
   }
 
-  Class::XSAccessor::Heavy::check_sub_existance($subname) if not $replace;
+  Class::XSAccessor::Heavy::check_sub_existance($subname) if not $opts->{replace};
 
   if ($type eq 'getter') {
     newxs_getter($subname, $hashkey);
   }
   elsif ($type eq 'setter') {
-    newxs_setter($subname, $hashkey, $chained);
+    newxs_setter($subname, $hashkey, $opts->{chained}||0);
   }
   elsif ($type eq 'predicate') {
     newxs_predicate($subname, $hashkey);
@@ -97,7 +83,7 @@ sub _generate_method {
     newxs_boolean($subname, 0);
   }
   else {
-    newxs_accessor($subname, $hashkey, $chained);
+    newxs_accessor($subname, $hashkey, $opts->{chained}||0);
   }
 }
 

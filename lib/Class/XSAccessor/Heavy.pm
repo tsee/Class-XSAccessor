@@ -25,7 +25,7 @@ sub check_sub_existance {
   local *s = $sym->{$bare_subname};
   my $coderef = *s{CODE};
   if ($coderef) {
-    $package =~ s/::$//;
+    $sub_package =~ s/::$//;
     Carp::croak("Cannot replace existing subroutine '$bare_subname' in package '$sub_package' with an XS implementation. If you wish to force a replacement, add the 'replace => 1' parameter to the arguments of 'use ".(caller())[0]."'.");
   }
 }

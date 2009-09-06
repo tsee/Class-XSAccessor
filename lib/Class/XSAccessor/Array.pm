@@ -17,9 +17,6 @@ sub import {
   my %opts = @_;
   $caller_pkg = $opts{class} if defined $opts{class};
 
-  my $replace = $opts{replace} || 0;
-  my $chained = $opts{chained} || 0;
-
   my $read_subs      = $opts{getters} || {};
   my $set_subs       = $opts{setters} || {};
   my $acc_subs       = $opts{accessors} || {};
@@ -29,43 +26,32 @@ sub import {
   my $false_subs     = $opts{false} || [];
 
 
-  foreach my $subname (keys %$read_subs) {
-    my $arrayIndex = $read_subs->{$subname};
-    _generate_method($caller_pkg, $subname, $arrayIndex, $replace, $chained, "getter");
-  }
-
-  foreach my $subname (keys %$set_subs) {
-    my $arrayIndex = $set_subs->{$subname};
-    _generate_method($caller_pkg, $subname, $arrayIndex, $replace, $chained, "setter");
-  }
-
-  foreach my $subname (keys %$acc_subs) {
-    my $arrayIndex = $acc_subs->{$subname};
-    _generate_method($caller_pkg, $subname, $arrayIndex, $replace, $chained, "accessor");
-  }
-
-  foreach my $subname (keys %$pred_subs) {
-    my $arrayIndex = $pred_subs->{$subname};
-    _generate_method($caller_pkg, $subname, $arrayIndex, $replace, $chained, "predicate");
+  foreach my $subtype ( ["getter", $read_subs],
+                        ["setter", $set_subs],
+                        ["accessor", $acc_subs],
+                        ["pred_subs", $pred_subs] )
+  {
+    my $subs = $subtype->[1];
+    foreach my $subname (keys %$subs) {
+      my $array_index = $subs->{$subname};
+      _generate_method($caller_pkg, $subname, $array_index, \%opts, $subtype->[0]);
+    }
   }
    
-  foreach my $subname (@$construct_subs) {
-    _generate_method($caller_pkg, $subname, "", $replace, $chained, "constructor");
-  }
-  
-  foreach my $subname (@$true_subs) {
-    _generate_method($caller_pkg, $subname, "", $replace, $chained, "true");
-  }
-
-  foreach my $subname (@$false_subs) {
-    _generate_method($caller_pkg, $subname, "", $replace, $chained, "false");
+  foreach my $subtype ( ["constructor", $construct_subs],
+                        ["true", $true_subs],
+                        ["false", $false_subs] )
+  {
+    foreach my $subname (@{$subtype->[1]}) {
+      _generate_method($caller_pkg, $subname, "", \%opts, $subtype->[0]);
+    }
   }
 }
 
 sub _generate_method {
-  my ($caller_pkg, $subname, $arrayIndex, $replace, $chained, $type) = @_;
+  my ($caller_pkg, $subname, $array_index, $opts, $type) = @_;
 
-  if (not defined $arrayIndex) {
+  if (not defined $array_index) {
     croak("Cannot use undef as a array index for generating an XS $type accessor. (Sub: $subname)");
   }
 
@@ -73,16 +59,16 @@ sub _generate_method {
     $subname = "${caller_pkg}::$subname";
   }
 
-  Class::XSAccessor::Heavy::check_sub_existance($subname) if not $replace;
+  Class::XSAccessor::Heavy::check_sub_existance($subname) if not $opts->{replace};
 
   if ($type eq 'getter') {
-    newxs_getter($subname, $arrayIndex);
+    newxs_getter($subname, $array_index);
   }
   elsif ($type eq 'setter') {
-    newxs_setter($subname, $arrayIndex, $chained);
+    newxs_setter($subname, $array_index, $opts->{chained}||0);
   }
   elsif ($type eq 'predicate') {
-    newxs_predicate($subname, $arrayIndex);
+    newxs_predicate($subname, $array_index);
   }
   elsif ($type eq 'constructor') {
     newxs_constructor($subname);
@@ -94,7 +80,7 @@ sub _generate_method {
     newxs_boolean($subname, 0);
   }
   else {
-    newxs_accessor($subname, $arrayIndex, $chained);
+    newxs_accessor($subname, $array_index, $opts->{chained}||0);
   }
 }
 
