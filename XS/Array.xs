@@ -1,4 +1,4 @@
-MODULE = Class::XSAccessor::Array		PACKAGE = Class::XSAccessor::Array
+MODULE = Class::XSAccessor		PACKAGE = Class::XSAccessor::Array
 PROTOTYPES: DISABLE
 
 void
