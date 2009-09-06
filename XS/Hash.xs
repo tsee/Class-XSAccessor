@@ -175,25 +175,7 @@ newxs_getter(name, key)
   char* name;
   char* key;
   PPCODE:
-    char* file = __FILE__;
-    const unsigned int functionIndex = get_hashkey_index(key, strlen(key));
-    {
-      CV * cv;
-      autoxs_hashkey hashkey;
-      const unsigned int len = strlen(key);
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor_getter, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-      XSANY.any_i32 = functionIndex;
-
-      /* Precompute the hash of the key and store it in the global structure */
-      hashkey.key = newSVpvn(key, len);
-      PERL_HASH(hashkey.hash, key, len);
-      CXSAccessor_hashkeys[functionIndex] = hashkey;
-    }
-
+    INSTALL_NEW_CV_HASH_OBJ(name, XS_Class__XSAccessor_getter, key);
 
 void
 newxs_setter(name, key, chained)
@@ -201,28 +183,10 @@ newxs_setter(name, key, chained)
   char* key;
   bool chained;
   PPCODE:
-    char* file = __FILE__;
-    const unsigned int functionIndex = get_hashkey_index(key, strlen(key));
-    {
-      CV * cv;
-      autoxs_hashkey hashkey;
-      const unsigned int len = strlen(key);
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      if (chained)
-        cv = newXS(name, XS_Class__XSAccessor_chained_setter, file);
-      else
-        cv = newXS(name, XS_Class__XSAccessor_setter, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-      XSANY.any_i32 = functionIndex;
-
-      /* Precompute the hash of the key and store it in the global structure */
-      hashkey.key = newSVpvn(key, len);
-      PERL_HASH(hashkey.hash, key, len);
-      CXSAccessor_hashkeys[functionIndex] = hashkey;
-    }
-
+    if (chained)
+      INSTALL_NEW_CV_HASH_OBJ(name, XS_Class__XSAccessor_chained_setter, key);
+    else
+      INSTALL_NEW_CV_HASH_OBJ(name, XS_Class__XSAccessor_setter, key);
 
 void
 newxs_accessor(name, key, chained)
@@ -230,28 +194,10 @@ newxs_accessor(name, key, chained)
   char* key;
   bool chained;
   PPCODE:
-    char* file = __FILE__;
-    const unsigned int functionIndex = get_hashkey_index(key, strlen(key));
-    {
-      CV * cv;
-      autoxs_hashkey hashkey;
-      const unsigned int len = strlen(key);
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      if (chained)
-        cv = newXS(name, XS_Class__XSAccessor_chained_accessor, file);
-      else
-        cv = newXS(name, XS_Class__XSAccessor_accessor, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-      XSANY.any_i32 = functionIndex;
-
-      /* Precompute the hash of the key and store it in the global structure */
-      hashkey.key = newSVpvn(key, len);
-      PERL_HASH(hashkey.hash, key, len);
-      CXSAccessor_hashkeys[functionIndex] = hashkey;
-    }
-
+    if (chained)
+      INSTALL_NEW_CV_HASH_OBJ(name, XS_Class__XSAccessor_chained_accessor, key);
+    else
+      INSTALL_NEW_CV_HASH_OBJ(name, XS_Class__XSAccessor_accessor, key);
 
 void
 newxs_predicate(name, key)
@@ -264,38 +210,16 @@ void
 newxs_constructor(name)
   char* name;
   PPCODE:
-    char* file = __FILE__;
-    {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor_constructor, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-    }
-
+    INSTALL_NEW_CV(name, XS_Class__XSAccessor_constructor);
 
 void
 newxs_boolean(name, truth)
   char* name;
   bool truth;
   PPCODE:
-    char* file = __FILE__;
-    if (truth) {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor_constant_true, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-    }
-    else {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor_constant_false, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-    }
+    if (truth)
+      INSTALL_NEW_CV(name, XS_Class__XSAccessor_constant_true);
+    else
+      INSTALL_NEW_CV(name, XS_Class__XSAccessor_constant_false);
 
 
