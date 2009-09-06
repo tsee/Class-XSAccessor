@@ -216,81 +216,39 @@ newxs_accessor(name, index, chained)
   unsigned int index;
   bool chained;
   PPCODE:
+    CV * cv;
     char* file = __FILE__;
     const unsigned int functionIndex = get_internal_array_index( (I32)index );
-    {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      if (chained)
-        cv = newXS(name, XS_Class__XSAccessor__Array_chained_accessor, file);
-      else
-        cv = newXS(name, XS_Class__XSAccessor__Array_accessor, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-      XSANY.any_i32 = functionIndex;
-
-      CXSAccessor_arrayindices[functionIndex] = index;
-    }
-
+    if (chained)
+      INSTALL_NEW_CV_WITH_INDEX(name, XS_Class__XSAccessor__Array_chained_accessor, functionIndex);
+    else
+      INSTALL_NEW_CV_WITH_INDEX(name, XS_Class__XSAccessor__Array_accessor, functionIndex);
+    CXSAccessor_arrayindices[functionIndex] = index;
 
 void
 newxs_predicate(name, index)
   char* name;
   unsigned int index;
   PPCODE:
+    CV * cv;
     char* file = __FILE__;
     const unsigned int functionIndex = get_internal_array_index( (I32)index );
-    {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor__Array_predicate, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-      XSANY.any_i32 = functionIndex;
-
-      CXSAccessor_arrayindices[functionIndex] = index;
-    }
-
+    INSTALL_NEW_CV_WITH_INDEX(name, XS_Class__XSAccessor__Array_predicate, functionIndex);
+    CXSAccessor_arrayindices[functionIndex] = index;
 
 void
 newxs_constructor(name)
   char* name;
   PPCODE:
-    char* file = __FILE__;
-    {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor__Array_constructor, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-    }
-
-
+    INSTALL_NEW_CV(name, XS_Class__XSAccessor__Array_constructor);
 
 void
 newxs_boolean(name, truth)
   char* name;
   bool truth;
   PPCODE:
-    char* file = __FILE__;
-    if (truth) {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor__Array_constant_true, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-    }
-    else {
-      CV * cv;
-      /* This code is very similar to what you get from using the ALIAS XS syntax.
-       * Except I took it from the generated C code. Hic sunt dragones, I suppose... */
-      cv = newXS(name, XS_Class__XSAccessor__Array_constant_false, file);
-      if (cv == NULL)
-        croak("ARG! SOMETHING WENT REALLY WRONG!");
-    }
-
+    if (truth)
+      INSTALL_NEW_CV(name, XS_Class__XSAccessor__Array_constant_true);
+    else
+      INSTALL_NEW_CV(name, XS_Class__XSAccessor__Array_constant_false);
 

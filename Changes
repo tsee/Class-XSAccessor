@@ -1,5 +1,10 @@
 Revision history for Perl extension Class-XSAccessor.
 
+** This release features some fairly radical changes. Test well. **
+  - Remove dependency on AutoXS::Header.
+  - Merge Class::XSAccessor::Array into this distribution.
+  - Upgrade Devel::PPPort/ppport.h (Chocolateboy)
+
 1.04  Thu Jun 11 16:40 2009
   - Fix a bunch of warnings thanks to a heads up from
     Marcela Maslanova.
