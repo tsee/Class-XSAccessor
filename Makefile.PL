@@ -5,9 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Class::XSAccessor',
     VERSION_FROM      => 'lib/Class/XSAccessor.pm', # finds $VERSION
-    PREREQ_PM         => {
-      'AutoXS::Header' => '1.02',
-    }, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
     LICENSE => 'perl',
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Class/XSAccessor.pm', # retrieve abstract from module
