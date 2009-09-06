@@ -158,7 +158,7 @@ That means they can be called on objects and classes but will not
 clone objects entirely. Parameters to C<new()> are added to the
 object.
 
-The XS accessor methods were between 1.6 and 2.5 times faster than typical
+The XS accessor methods are between 2.6 and 3.4 times faster than typical
 pure-perl accessors in some simple benchmarking.
 The lower factor applies to the potentially slightly obscure
 C<sub set_foo_pp {$_[0]-E<gt>{foo} = $_[1]}>, so if you usually

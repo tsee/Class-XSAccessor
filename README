@@ -48,7 +48,7 @@ DESCRIPTION
     That means they can be called on objects and classes but will not clone
     objects entirely.
 
-    The XS accessor methods were between 1.6 and 2.5 times faster than
+    The XS accessor methods are between 2.6 and 3.4 times faster than
     typical pure-perl accessors in some simple benchmarking. The lower
     factor applies to the potentially slightly obscure "sub set_foo_pp
     {$_[0]->{foo} = $_[1]}", so if you usually write clear code, a factor of

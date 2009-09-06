@@ -5,7 +5,7 @@ typedef struct {
 
 /* prototype section */
 
-I32 get_hashkey_index(const char* key, const I32 len);
+I32 get_hashkey_index(pTHX_ const char* key, const I32 len);
 I32 _new_hashkey();
 void _resize_array(I32** array, U32* len, U32 newlen);
 void _resize_array_init(I32** array, U32* len, U32 newlen, I32 init);
@@ -29,7 +29,7 @@ I32* CXSAccessor_reverse_arrayindices = NULL;
 
 /* implementation section */
 
-I32 get_hashkey_index(const char* key, const I32 len) {
+I32 get_hashkey_index(pTHX_ const char* key, const I32 len) {
   I32 index;
 
   /* init */
@@ -63,12 +63,10 @@ I32 _new_hashkey() {
   if (CXSAccessor_no_hashkeys == CXSAccessor_free_hashkey_no) {
     U32 extend = 1 + CXSAccessor_no_hashkeys * 2;
     /*printf("extending hashkey storage by %u\n", extend);*/
-    U32 oldsize = CXSAccessor_no_hashkeys * sizeof(autoxs_hashkey);
-    /*printf("previous data size %u\n", oldsize);*/
-    autoxs_hashkey* tmphashkeys =
-      (autoxs_hashkey*) malloc( oldsize + extend * sizeof(autoxs_hashkey) );
-    memcpy(tmphashkeys, CXSAccessor_hashkeys, oldsize);
-    free(CXSAccessor_hashkeys);
+    autoxs_hashkey* tmphashkeys;
+    Newx(tmphashkeys, CXSAccessor_no_hashkeys + extend, autoxs_hashkey);
+    Copy(CXSAccessor_hashkeys, tmphashkeys, CXSAccessor_no_hashkeys, autoxs_hashkey);
+    Safefree(CXSAccessor_hashkeys);
     CXSAccessor_hashkeys = tmphashkeys;
     CXSAccessor_no_hashkeys += extend;
   }
@@ -77,20 +75,20 @@ I32 _new_hashkey() {
 
 
 void _resize_array(I32** array, U32* len, U32 newlen) {
-  U32 oldsize = *len * sizeof(I32);
-  I32* tmparraymap = (I32*) malloc( newlen * sizeof(I32) );
-  memcpy(tmparraymap, *array, oldsize);
-  free(*array);
+  I32* tmparraymap;
+  Newx(tmparraymap, newlen * sizeof(I32), I32);
+  Copy(*array, tmparraymap, *len, I32);
+  Safefree(*array);
   *array = tmparraymap;
   *len = newlen;
 }
 
 void _resize_array_init(I32** array, U32* len, U32 newlen, I32 init) {
   U32 i;
-  U32 oldsize = *len * sizeof(I32);
-  I32* tmparraymap = (I32*) malloc( newlen * sizeof(I32) );
-  memcpy(tmparraymap, *array, oldsize);
-  free(*array);
+  I32* tmparraymap;
+  Newx(tmparraymap, newlen * sizeof(I32), I32);
+  Copy(*array, tmparraymap, *len, I32);
+  Safefree(*array);
   *array = tmparraymap;
   for (i = *len; i < newlen; ++i)
     (*array)[i] = init;
@@ -98,12 +96,11 @@ void _resize_array_init(I32** array, U32* len, U32 newlen, I32 init) {
 }
 
 
-/* this is private, call get_array_index instead */
+/* this is private, call get_internal_array_index instead */
 I32 _new_internal_arrayindex() {
   if (CXSAccessor_no_arrayindices == CXSAccessor_free_arrayindices_no) {
     U32 extend = 2 + CXSAccessor_no_arrayindices * 2;
     /*printf("extending array index storage by %u\n", extend);*/
-    /*printf("previous data size %u\n", oldsize);*/
     _resize_array(&CXSAccessor_arrayindices, &CXSAccessor_no_arrayindices, extend);
   }
   return CXSAccessor_free_arrayindices_no++;
