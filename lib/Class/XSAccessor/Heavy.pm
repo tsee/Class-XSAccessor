@@ -11,7 +11,7 @@ our @CARP_NOT = qw(Class::XSAccessor Class::XSAccessor::Array);
 # TODO Move more duplicated code from XSA and XSA::Array here
 
 
-sub check_sub_existance {
+sub check_sub_existence {
   my $subname = shift;
 
   my $sub_package = $subname;

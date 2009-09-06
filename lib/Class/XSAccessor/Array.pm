@@ -56,7 +56,7 @@ sub _generate_method {
 
   $subname = "${caller_pkg}::$subname" if $subname !~ /::/;
 
-  Class::XSAccessor::Heavy::check_sub_existance($subname) if not $opts->{replace};
+  Class::XSAccessor::Heavy::check_sub_existence($subname) if not $opts->{replace};
 
   if ($type eq 'getter') {
     newxs_getter($subname, $array_index);
