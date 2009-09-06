@@ -8,6 +8,7 @@ use Carp qw/croak/;
 our $VERSION = '1.04';
 
 require Class::XSAccessor;
+require Class::XSAccessor::Heavy;
 
 sub import {
   my $own_class = shift;
@@ -72,23 +73,7 @@ sub _generate_method {
     $subname = "${caller_pkg}::$subname";
   }
 
-  if (not $replace) {
-    my $sub_package = $subname;
-    $sub_package =~ s/([^:]+)$// or die;
-    my $bare_subname = $1;
-    
-    my $sym;
-    {
-      no strict 'refs';
-      $sym = \%{"$sub_package"};
-    }
-    no warnings;
-    local *s = $sym->{$bare_subname};
-    my $coderef = *s{CODE};
-    if ($coderef) {
-      croak("Cannot replace existing subroutine '$bare_subname' in package '$sub_package' with XS method of type '$type'. If you wish to force a replacement, add the 'replace => 1' parameter to the arguments of 'use ".__PACKAGE__."'.");
-    }
-  }
+  Class::XSAccessor::Heavy::check_sub_existance($subname) if not $replace;
 
   if ($type eq 'getter') {
     newxs_getter($subname, $arrayIndex);
