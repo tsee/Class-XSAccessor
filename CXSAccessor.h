@@ -1,4 +1,3 @@
-/* AutoXS::Header version '1.02' */
 typedef struct {
   U32 hash;
   SV* key;
@@ -15,17 +14,17 @@ I32 get_internal_array_index(I32 object_ary_idx);
 
 /* initialization section */
 
-unsigned int AutoXS_no_hashkeys = 0;
-unsigned int AutoXS_free_hashkey_no = 0;
-autoxs_hashkey* AutoXS_hashkeys = NULL;
-HV* AutoXS_reverse_hashkeys = NULL;
+unsigned int CXSAccessor_no_hashkeys = 0;
+unsigned int CXSAccessor_free_hashkey_no = 0;
+autoxs_hashkey* CXSAccessor_hashkeys = NULL;
+HV* CXSAccessor_reverse_hashkeys = NULL;
 
-unsigned int AutoXS_no_arrayindices = 0;
-unsigned int AutoXS_free_arrayindices_no = 0;
-I32* AutoXS_arrayindices = NULL;
+unsigned int CXSAccessor_no_arrayindices = 0;
+unsigned int CXSAccessor_free_arrayindices_no = 0;
+I32* CXSAccessor_arrayindices = NULL;
 
-unsigned int AutoXS_reverse_arrayindices_length = 0;
-I32* AutoXS_reverse_arrayindices = NULL;
+unsigned int CXSAccessor_reverse_arrayindices_length = 0;
+I32* CXSAccessor_reverse_arrayindices = NULL;
 
 
 /* implementation section */
@@ -34,12 +33,12 @@ I32 get_hashkey_index(const char* key, const I32 len) {
   I32 index;
 
   /* init */
-  if (AutoXS_reverse_hashkeys == NULL)
-    AutoXS_reverse_hashkeys = newHV();
+  if (CXSAccessor_reverse_hashkeys == NULL)
+    CXSAccessor_reverse_hashkeys = newHV();
 
   index = 0;
-  if ( hv_exists(AutoXS_reverse_hashkeys, key, len) ) {
-    SV** index_sv = hv_fetch(AutoXS_reverse_hashkeys, key, len, 0);
+  if ( hv_exists(CXSAccessor_reverse_hashkeys, key, len) ) {
+    SV** index_sv = hv_fetch(CXSAccessor_reverse_hashkeys, key, len, 0);
 
     /* simply return the index that corresponds to an earlier
      * use with the same hash key name */
@@ -55,25 +54,25 @@ I32 get_hashkey_index(const char* key, const I32 len) {
     index = _new_hashkey();
 
   /* store the new hash key in the reverse lookup table */
-  hv_store(AutoXS_reverse_hashkeys, key, len, newSViv(index), 0);
+  hv_store(CXSAccessor_reverse_hashkeys, key, len, newSViv(index), 0);
   return index;
 }
 
 /* this is private, call get_hashkey_index instead */
 I32 _new_hashkey() {
-  if (AutoXS_no_hashkeys == AutoXS_free_hashkey_no) {
-    unsigned int extend = 1 + AutoXS_no_hashkeys * 2;
+  if (CXSAccessor_no_hashkeys == CXSAccessor_free_hashkey_no) {
+    unsigned int extend = 1 + CXSAccessor_no_hashkeys * 2;
     /*printf("extending hashkey storage by %u\n", extend);*/
-    unsigned int oldsize = AutoXS_no_hashkeys * sizeof(autoxs_hashkey);
+    unsigned int oldsize = CXSAccessor_no_hashkeys * sizeof(autoxs_hashkey);
     /*printf("previous data size %u\n", oldsize);*/
     autoxs_hashkey* tmphashkeys =
       (autoxs_hashkey*) malloc( oldsize + extend * sizeof(autoxs_hashkey) );
-    memcpy(tmphashkeys, AutoXS_hashkeys, oldsize);
-    free(AutoXS_hashkeys);
-    AutoXS_hashkeys = tmphashkeys;
-    AutoXS_no_hashkeys += extend;
+    memcpy(tmphashkeys, CXSAccessor_hashkeys, oldsize);
+    free(CXSAccessor_hashkeys);
+    CXSAccessor_hashkeys = tmphashkeys;
+    CXSAccessor_no_hashkeys += extend;
   }
-  return AutoXS_free_hashkey_no++;
+  return CXSAccessor_free_hashkey_no++;
 }
 
 
@@ -101,28 +100,28 @@ void _resize_array_init(I32** array, unsigned int* len, unsigned int newlen, I32
 
 /* this is private, call get_array_index instead */
 I32 _new_internal_arrayindex() {
-  if (AutoXS_no_arrayindices == AutoXS_free_arrayindices_no) {
-    unsigned int extend = 2 + AutoXS_no_arrayindices * 2;
+  if (CXSAccessor_no_arrayindices == CXSAccessor_free_arrayindices_no) {
+    unsigned int extend = 2 + CXSAccessor_no_arrayindices * 2;
     /*printf("extending array index storage by %u\n", extend);*/
     /*printf("previous data size %u\n", oldsize);*/
-    _resize_array(&AutoXS_arrayindices, &AutoXS_no_arrayindices, extend);
+    _resize_array(&CXSAccessor_arrayindices, &CXSAccessor_no_arrayindices, extend);
   }
-  return AutoXS_free_arrayindices_no++;
+  return CXSAccessor_free_arrayindices_no++;
 }
 
 I32 get_internal_array_index(I32 object_ary_idx) {
   I32 new_index;
 
-  if (AutoXS_reverse_arrayindices_length <= (unsigned int)object_ary_idx)
-    _resize_array_init( &AutoXS_reverse_arrayindices,
-                        &AutoXS_reverse_arrayindices_length,
+  if (CXSAccessor_reverse_arrayindices_length <= (unsigned int)object_ary_idx)
+    _resize_array_init( &CXSAccessor_reverse_arrayindices,
+                        &CXSAccessor_reverse_arrayindices_length,
                         object_ary_idx+1, -1 );
 
   /* -1 == "undef" */
-  if (AutoXS_reverse_arrayindices[object_ary_idx] > -1)
-    return AutoXS_reverse_arrayindices[object_ary_idx];
+  if (CXSAccessor_reverse_arrayindices[object_ary_idx] > -1)
+    return CXSAccessor_reverse_arrayindices[object_ary_idx];
 
   new_index = _new_internal_arrayindex();
-  AutoXS_reverse_arrayindices[object_ary_idx] = new_index;
+  CXSAccessor_reverse_arrayindices[object_ary_idx] = new_index;
   return new_index;
 }

@@ -4,7 +4,7 @@
 
 #include "ppport.h"
 
-#include "AutoXS.h"
+#include "CXSAccessor.h"
 
 MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor
 PROTOTYPES: DISABLE

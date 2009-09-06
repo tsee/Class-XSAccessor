@@ -9,7 +9,7 @@ getter(self)
     /* Get the array index from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const I32 index = AutoXS_arrayindices[ix];
+    const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
     if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
@@ -27,7 +27,7 @@ setter(self, newvalue)
     /* Get the array index from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const I32 index = AutoXS_arrayindices[ix];
+    const I32 index = CXSAccessor_arrayindices[ix];
   PPCODE:
     if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
       croak("Failed to write new value to array.");
@@ -43,7 +43,7 @@ chained_setter(self, newvalue)
     /* Get the array index from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const I32 index = AutoXS_arrayindices[ix];
+    const I32 index = CXSAccessor_arrayindices[ix];
   PPCODE:
     if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
       croak("Failed to write new value to array.");
@@ -59,7 +59,7 @@ accessor(self, ...)
     /* Get the array index from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const I32 index = AutoXS_arrayindices[ix];
+    const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
     if (items > 1) {
@@ -84,7 +84,7 @@ chained_accessor(self, ...)
     /* Get the array index from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const I32 index = AutoXS_arrayindices[ix];
+    const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
     if (items > 1) {
@@ -109,7 +109,7 @@ predicate(self)
     /* Get the array index from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const I32 index = AutoXS_arrayindices[ix];
+    const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
     if ( (elem = av_fetch((AV *)SvRV(self), index, 1)) && SvOK(elem[0]) )
@@ -182,7 +182,7 @@ newxs_getter(name, index)
         croak("ARG! SOMETHING WENT REALLY WRONG!");
       XSANY.any_i32 = functionIndex;
 
-      AutoXS_arrayindices[functionIndex] = index;
+      CXSAccessor_arrayindices[functionIndex] = index;
     }
 
 
@@ -206,7 +206,7 @@ newxs_setter(name, index, chained)
         croak("ARG! SOMETHING WENT REALLY WRONG!");
       XSANY.any_i32 = functionIndex;
 
-      AutoXS_arrayindices[functionIndex] = index;
+      CXSAccessor_arrayindices[functionIndex] = index;
     }
 
 
@@ -230,7 +230,7 @@ newxs_accessor(name, index, chained)
         croak("ARG! SOMETHING WENT REALLY WRONG!");
       XSANY.any_i32 = functionIndex;
 
-      AutoXS_arrayindices[functionIndex] = index;
+      CXSAccessor_arrayindices[functionIndex] = index;
     }
 
 
@@ -250,7 +250,7 @@ newxs_predicate(name, index)
         croak("ARG! SOMETHING WENT REALLY WRONG!");
       XSANY.any_i32 = functionIndex;
 
-      AutoXS_arrayindices[functionIndex] = index;
+      CXSAccessor_arrayindices[functionIndex] = index;
     }
 
 

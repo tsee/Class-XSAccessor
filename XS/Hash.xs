@@ -9,7 +9,7 @@ getter(self)
     /* Get the const hash key struct from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
+    const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     HE* he;
   PPCODE:
     /*if (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, 0)) {*/
@@ -29,7 +29,7 @@ setter(self, newvalue)
     /* Get the const hash key struct from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
+    const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
     if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
@@ -45,7 +45,7 @@ chained_setter(self, newvalue)
     /* Get the const hash key struct from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
+    const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
     if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
@@ -60,7 +60,7 @@ accessor(self, ...)
     /* Get the const hash key struct from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
+    const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     HE* he;
   PPCODE:
     if (items > 1) {
@@ -85,7 +85,7 @@ chained_accessor(self, ...)
     /* Get the const hash key struct from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
+    const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     HE* he;
   PPCODE:
     if (items > 1) {
@@ -110,7 +110,7 @@ predicate(self)
     /* Get the const hash key struct from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    const autoxs_hashkey readfrom = AutoXS_hashkeys[ix];
+    const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     HE* he;
   PPCODE:
     if ( (he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)) && SvOK(HeVAL(he)) )
@@ -191,7 +191,7 @@ newxs_getter(name, key)
       /* Precompute the hash of the key and store it in the global structure */
       hashkey.key = newSVpvn(key, len);
       PERL_HASH(hashkey.hash, key, len);
-      AutoXS_hashkeys[functionIndex] = hashkey;
+      CXSAccessor_hashkeys[functionIndex] = hashkey;
     }
 
 
@@ -220,7 +220,7 @@ newxs_setter(name, key, chained)
       /* Precompute the hash of the key and store it in the global structure */
       hashkey.key = newSVpvn(key, len);
       PERL_HASH(hashkey.hash, key, len);
-      AutoXS_hashkeys[functionIndex] = hashkey;
+      CXSAccessor_hashkeys[functionIndex] = hashkey;
     }
 
 
@@ -249,7 +249,7 @@ newxs_accessor(name, key, chained)
       /* Precompute the hash of the key and store it in the global structure */
       hashkey.key = newSVpvn(key, len);
       PERL_HASH(hashkey.hash, key, len);
-      AutoXS_hashkeys[functionIndex] = hashkey;
+      CXSAccessor_hashkeys[functionIndex] = hashkey;
     }
 
 
@@ -274,7 +274,7 @@ newxs_predicate(name, key)
       /* Precompute the hash of the key and store it in the global structure */
       hashkey.key = newSVpvn(key, len);
       PERL_HASH(hashkey.hash, key, len);
-      AutoXS_hashkeys[functionIndex] = hashkey;
+      CXSAccessor_hashkeys[functionIndex] = hashkey;
     }
 
 void
