@@ -59,10 +59,10 @@
 #define CXAH_OPTIMIZE_ENTERSUB_TEST(name)                         \
 STMT_START {                                                      \
     if (PL_op->op_ppaddr == CXA_DEFAULT_ENTERSUB) {               \
+        warn("cxah: optimizing entersub for " #name);             \
         PL_op->op_ppaddr = cxah_entersub_ ## name;                \
-        warn("hash: optimized entersub for " #name);              \
     } else {                                                      \
-        warn("hash: disabling optimizing accessor for " #name);   \
+        warn("cxah: disabling optimizing accessor for " #name);   \
         CvXSUB(cv) = CXAH(name);                                  \
     }                                                             \
 } STMT_END
@@ -142,12 +142,13 @@ static OP * cxah_entersub_ ## name(pTHX) {                                      
     ) {                                                                                 \
         POPs;                                                                           \
         PUTBACK;                                                                        \
-        warn("hash: optimized entersub for " #name);                                    \
+        warn("cxah: inside optimized entersub for " #name);                             \
         (void)CXAH(name)(aTHX_ (CV *)sv);                                               \
         return NORMAL;                                                                  \
     } else { /* not static: disable optimization */                                     \
-        warn("hash: disabling optimized entersub for " #name);                          \
-        PL_op->op_ppaddr = CXA_DEFAULT_ENTERSUB;                                        \
+        warn("cxah: delegating to standard entersub for " #name);                       \
+	return CALL_FPTR(CXA_DEFAULT_ENTERSUB)(aTHX);                                   \
+        /* PL_op->op_ppaddr = CXA_DEFAULT_ENTERSUB; */                                  \
     }                                                                                   \
                                                                                         \
     return CALL_FPTR(PL_op->op_ppaddr)(aTHX);                                           \
