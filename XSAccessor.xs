@@ -56,6 +56,17 @@
  * re-assign the same optimized entersub
  */
 
+#define CXAH_OPTIMIZE_ENTERSUB_TEST(name)                         \
+STMT_START {                                                      \
+    if (PL_op->op_ppaddr == CXA_DEFAULT_ENTERSUB) {               \
+        PL_op->op_ppaddr = cxah_entersub_ ## name;                \
+        warn("hash: optimized entersub for " #name);              \
+    } else {                                                      \
+        warn("hash: disabling optimizing accessor for " #name);   \
+        CvXSUB(cv) = CXAH(name);                                  \
+    }                                                             \
+} STMT_END
+
 #define CXAH_OPTIMIZE_ENTERSUB(name)                              \
 STMT_START {                                                      \
     if (PL_op->op_ppaddr == CXA_DEFAULT_ENTERSUB) {               \
@@ -120,6 +131,27 @@ STMT_START {                                                      \
 #define Class__XSAccessor__Array_constant_true Cs_XSAs_Ay_csnt_true
 #endif
 
+#define CXAH_GENERATE_ENTERSUB_TEST(name)                                               \
+static OP * cxah_entersub_ ## name(pTHX) {                                              \
+    dVAR; dSP; dTOPss;                                                                  \
+    void (*xsub)(pTHX_ CV *);                                                           \
+                                                                                        \
+    if (sv                                                                              \
+        && (SvTYPE(sv) == SVt_PVCV)                                                     \
+        && (((xsub = CvXSUB((CV *)sv)) == CXAH(name ## _init)) || (xsub == CXAH(name))) \
+    ) {                                                                                 \
+        POPs;                                                                           \
+        PUTBACK;                                                                        \
+        warn("hash: optimized entersub for " #name);                                    \
+        (void)CXAH(name)(aTHX_ (CV *)sv);                                               \
+        return NORMAL;                                                                  \
+    } else { /* not static: disable optimization */                                     \
+        warn("hash: disabling optimized entersub for " #name);                          \
+        PL_op->op_ppaddr = CXA_DEFAULT_ENTERSUB;                                        \
+    }                                                                                   \
+                                                                                        \
+    return CALL_FPTR(PL_op->op_ppaddr)(aTHX);                                           \
+}
 
 #define CXAH_GENERATE_ENTERSUB(name)                                                    \
 static OP * cxah_entersub_ ## name(pTHX) {                                              \
@@ -243,6 +275,10 @@ CXAH_GENERATE_ENTERSUB(constant_false);
 XS(CXAH(constant_true));
 XS(CXAH(constant_true_init));
 CXAH_GENERATE_ENTERSUB(constant_true);
+
+XS(CXAH(test));
+XS(CXAH(test_init));
+CXAH_GENERATE_ENTERSUB_TEST(test);
 
 XS(CXAA(getter));
 XS(CXAA(getter_init));

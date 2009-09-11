@@ -327,6 +327,55 @@ constant_true(self)
     }
 
 void
+test_init(self, ...)
+    SV* self;
+  ALIAS:
+  INIT:
+    /* Get the const hash key struct from the global storage */
+    /* ix is the magic integer variable that is set by the perl guts for us.
+     * We uses it to identify the currently running alias of the accessor. Gollum! */
+    const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
+    HE* he;
+  PPCODE:
+    CXAH_OPTIMIZE_ENTERSUB_TEST(test);
+    if (items > 1) {
+      SV* newvalue = ST(1);
+      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+        croak("Failed to write new value to hash.");
+      XPUSHs(newvalue);
+    }
+    else {
+      if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
+        XPUSHs(HeVAL(he));
+      else
+        XSRETURN_UNDEF;
+    }
+
+void
+test(self, ...)
+    SV* self;
+  ALIAS:
+  INIT:
+    /* Get the const hash key struct from the global storage */
+    /* ix is the magic integer variable that is set by the perl guts for us.
+     * We uses it to identify the currently running alias of the accessor. Gollum! */
+    const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
+    HE* he;
+  PPCODE:
+    if (items > 1) {
+      SV* newvalue = ST(1);
+      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+        croak("Failed to write new value to hash.");
+      XPUSHs(newvalue);
+    }
+    else {
+      if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
+        XPUSHs(HeVAL(he));
+      else
+        XSRETURN_UNDEF;
+    }
+
+void
 newxs_getter(name, key)
   char* name;
   char* key;
@@ -377,3 +426,10 @@ newxs_boolean(name, truth)
       INSTALL_NEW_CV(name, CXAH(constant_true_init));
     else
       INSTALL_NEW_CV(name, CXAH(constant_false_init));
+
+void
+newxs_test(name, key)
+  char* name;
+  char* key;
+  PPCODE:
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(test_init), key);
