@@ -1,9 +1,12 @@
 Revision history for Perl extension Class-XSAccessor.
 
-1.04_01  Mon Sep  7 11:35 2009
+1.04_02  Mon Sep  7 11:35 2009
 ** This release features some fairly radical changes. Test well. **
   - Significant optimization by replacing the relevant entersub ops
     with stripped down versions (Chocolateboy)
+
+1.04_01  Mon Sep  7 11:35 2009
+** This release features some fairly radical changes. Test well. **
   - More aggressive OPTIMIZE flags if possible (Chocolateboy)
   - Added shorthand syntax for getters, setters, accessors, and predicates
     where the attribute has the same name as the method (Chocolateboy)
