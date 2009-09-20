@@ -96,6 +96,7 @@ STMT_START {                                                      \
  * This will probably never get used.
  */
 
+/* FIXME: redo this to include new names */
 #ifdef VMS
 #define Class__XSAccessor_getter_init Class_XSAccessor_getter_init
 #define Class__XSAccessor_setter_init Class_XSAccessor_setter_init

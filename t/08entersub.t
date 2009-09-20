@@ -67,6 +67,28 @@ sub test4 {
     is($self->{bar}, 'bar4');
 }
 
+# call the methods as subs to see how this impacts the optimized entersub
+sub test5 {
+    my $self = shift;
+    is(foo($self, 'foo5'), 'foo5');
+    is(foo($self), 'foo5');
+    is($self->{foo}, 'foo5');
+    is(bar($self, 'bar5'), 'bar5');
+    is(bar($self), 'bar5');
+    is($self->{bar}, 'bar5');
+}
+
+# call the methods with $self->can('accessor_name') to see how this impacts the optimized entersub
+sub test6 {
+    my $self = shift;
+    is($self->can('foo')->($self, 'foo6'), 'foo6');
+    is($self->can('foo')->($self), 'foo6');
+    is($self->{foo}, 'foo6');
+    is($self->can('bar')->($self, 'bar6'), 'bar6');
+    is($self->can('bar')->($self), 'bar6');
+    is($self->{bar}, 'bar6');
+}
+
 $SIG{__WARN__} = sub {
     my $warning = join '', @_;
     if ($warning =~ m{^cxah: (.+)\n$}) {
@@ -80,9 +102,14 @@ $self->test1();
 $self->test2();
 $self->test3();
 $self->test4();
+$self->test5();
+$self->test6();
+
 $self->test1();
 $self->test2();
 $self->test3();
 $self->test4();
+$self->test5();
+$self->test6();
 
 print Dumper(\@WARNINGS);
