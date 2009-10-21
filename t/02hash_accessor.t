@@ -21,7 +21,7 @@ sub new {
 
 package main;
 
-use Test::More tests => 21;
+use Test::More tests => 31;
 
 my $obj = Class::XSAccessor::Test->new();
 
@@ -60,4 +60,37 @@ is ($obj2->get_foo(), 'bar');
 is ($obj2->bar(), 'baz');
 is ($obj2->bar('quux'), 'quux');
 is ($obj2->bar(), 'quux');
+
+# test shorthand accessor mixed with getters/setters
+# for that same key
+package Class::XSAccessor::Test3;
+use Class::XSAccessor 
+    accessors => [ 'foo', 'bar' ],
+    getters   => { get_foo => 'foo',
+                   get_bar => 'bar',
+                 },
+    setters   => { set_foo => 'foo',
+                   set_bar => 'bar',
+                 };
+sub new {
+    my $class = shift;
+    bless {}, $class;
+}
+
+package main;
+
+my $obj3 = Class::XSAccessor::Test3->new;
+is($obj3->set_foo(3), 3);
+is($obj3->get_foo, 3);
+is($obj3->foo, 3);
+is($obj3->foo(4), 4);
+is($obj3->foo, 4);
+is($obj3->get_foo, 4);
+
+is($obj3->bar(33), 33);
+is($obj3->get_bar, 33);
+is($obj3->set_bar(44), 44);
+is($obj3->bar, 44);
+
+
 
