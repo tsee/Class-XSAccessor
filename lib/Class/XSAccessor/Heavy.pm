@@ -5,8 +5,11 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.04';
-our @CARP_NOT = qw(Class::XSAccessor Class::XSAccessor::Array);
+our $VERSION  = '1.04_03';
+our @CARP_NOT = qw(
+	Class::XSAccessor
+	Class::XSAccessor::Array
+);
 
 # TODO Move more duplicated code from XSA and XSA::Array here
 
@@ -33,6 +36,7 @@ sub check_sub_existence {
 }
 
 1;
+
 __END__
 
 =head1 NAME

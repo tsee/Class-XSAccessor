@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '1.04_01';
+our $VERSION = '1.04_03';
 
 require Class::XSAccessor;
 require Class::XSAccessor::Heavy;
@@ -14,7 +14,9 @@ sub import {
   my $own_class = shift;
   my ($caller_pkg) = caller();
 
-  my %opts = @_;
+  # Support both { getters => ... } and plain getters => ...
+  my %opts = ref($_[0]) eq 'HASH' ? %$_[0] : @_;
+
   $caller_pkg = $opts{class} if defined $opts{class};
 
   my $read_subs      = $opts{getters} || {};
@@ -81,8 +83,8 @@ sub _generate_method {
   }
 }
 
-
 1;
+
 __END__
 
 =head1 NAME
@@ -114,6 +116,19 @@ Class::XSAccessor::Array - Generate fast XS accessors without runtime compilatio
   # The imported methods are implemented in fast XS.
   
   # normal class code here.
+
+As of version 1.05, some alternative syntax forms are available:
+
+  package MyClass;
+  
+  # Options can be passed as a HASH reference if you prefer it,
+  # which can also help PerlTidy to flow the statement correctly.
+  use Class::XSAccessor {
+    getters => {
+      get_foo => 0,
+      get_bar => 1,
+    },
+  };
 
 =head1 DESCRIPTION
 
@@ -227,7 +242,7 @@ L<AutoXS>
 
 =head1 AUTHOR
 
-Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+Steffen Mueller E<lt>smueller@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

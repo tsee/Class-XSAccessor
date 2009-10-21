@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '1.04_02';
+our $VERSION = '1.04_03';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
@@ -29,12 +29,12 @@ sub import {
   my $own_class = shift;
   my ($caller_pkg) = caller();
 
-  my %opts = @_;
+  # Support both { getters => ... } and plain getters => ...
+  my %opts = ref($_[0]) eq 'HASH' ? %$_[0] : @_;
 
   $caller_pkg = $opts{class} if defined $opts{class};
 
   # TODO: Refactor. Move more duplicated code to ::Heavy
-  
   my $read_subs      = _make_hash($opts{getters} || {});
   my $set_subs       = _make_hash($opts{setters} || {});
   my $acc_subs       = _make_hash($opts{accessors} || {});
@@ -103,8 +103,8 @@ sub _generate_method {
   }
 }
 
-
 1;
+
 __END__
 
 =head1 NAME
@@ -112,11 +112,12 @@ __END__
 Class::XSAccessor - Generate fast XS accessors without runtime compilation
 
 =head1 SYNOPSIS
-  
+
   package MyClass;
   use Class::XSAccessor
+    replace     => 1,   # Replace existing methods (if any)
     constructor => 'new',
-    getters => {
+    getters     => {
       get_foo => 'foo', # 'foo' is the hash key to access
       get_bar => 'bar',
     },
@@ -132,19 +133,24 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
       has_foo => 'foo',
       has_bar => 'bar',
     }
-    true => [ 'is_token', 'is_whitespace' ],
+    true  => [ 'is_token', 'is_whitespace' ],
     false => [ 'significant' ];
-
+  
   # The imported methods are implemented in fast XS.
   
   # normal class code here.
 
-As of version 1.05, you can also use a shorthand syntax:
+As of version 1.05, some alternative syntax forms are available:
 
   package MyClass;
-  use Class::XSAccessor
-     accessors => [ 'foo', 'bar' ];
-
+  
+  # Options can be passed as a HASH reference if you prefer it,
+  # which can also help PerlTidy to flow the statement correctly.
+  use Class::XSAccessor {
+     # If the name => key values are always identical,
+     # you can use the following shorthand.
+     accessors => [ 'foo', 'bar' ],
+  };
 
 =head1 DESCRIPTION
 
@@ -187,8 +193,8 @@ with the C<chained> option, see below. The predicates obviously return a boolean
 
 Since version 1.01, you can generate extremely simply methods which
 simply return true or false (and always do so). If that seems like a
-really superfluous thing to you, then think of a large class hierarchy
-with interfaces such as PPI. This is implemented as the C<true>
+really superfluous thing to you, then consider a large class hierarchy
+with interfaces such as L<PPI>. This is implemented as the C<true>
 and C<false> options, see synopsis.
 
 =head1 OPTIONS
@@ -256,9 +262,9 @@ L<AutoXS>
 
 =head1 AUTHOR
 
-Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+Steffen Mueller E<lt>smueller@cpan.orgE<gt>
 
-Chocolateboy, E<lt>chocolate@cpan.orgE<gt>
+Chocolateboy E<lt>chocolate@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
