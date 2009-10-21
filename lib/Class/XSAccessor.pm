@@ -139,6 +139,13 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
   
   # normal class code here.
 
+As of version 1.05, you can also use a shorthand syntax:
+
+  package MyClass;
+  use Class::XSAccessor
+     accessors => [ 'foo', 'bar' ];
+
+
 =head1 DESCRIPTION
 
 Class::XSAccessor implements fast read, write and read/write accessors in XS.
