@@ -15,7 +15,7 @@ sub import {
   my ($caller_pkg) = caller();
 
   # Support both { getters => ... } and plain getters => ...
-  my %opts = ref($_[0]) eq 'HASH' ? %$_[0] : @_;
+  my %opts = ref($_[0]) eq 'HASH' ? %{$_[0]} : @_;
 
   $caller_pkg = $opts{class} if defined $opts{class};
 
