@@ -191,8 +191,8 @@ By default, the setters return the new value that was set
 and the accessors (mutators) do the same. You can change this behaviour
 with the C<chained> option, see below. The predicates obviously return a boolean.
 
-Since version 1.01, you can generate extremely simply methods which
-simply return true or false (and always do so). If that seems like a
+Since version 1.01, you can generate extremely simple methods which
+just return true or false (and always do so). If that seems like a
 really superfluous thing to you, then consider a large class hierarchy
 with interfaces such as L<PPI>. This is implemented as the C<true>
 and C<false> options, see synopsis.

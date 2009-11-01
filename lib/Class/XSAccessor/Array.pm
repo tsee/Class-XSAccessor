@@ -171,8 +171,8 @@ synopsis, you could have written C<MyClass::get_foo> instead
 of C<get_foo>. This way, you can install methods in classes other
 than the current class. See also: The C<class> option below.
 
-Since version 1.01, you can generate extremely simply methods which
-simply return true or false (and always do so). If that seems like a
+Since version 1.01, you can generate extremely simple methods which
+just return true or false (and always do so). If that seems like a
 really superfluous thing to you, then think of a large class hierarchy
 with interfaces such as PPI. This is implemented as the C<true>
 and C<false> options, see synopsis.
