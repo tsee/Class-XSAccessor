@@ -233,7 +233,10 @@ STMT_START {                                                                 \
   const U32 key_len = strlen(obj_hash_key);                                  \
   const U32 function_index = get_hashkey_index(aTHX_ obj_hash_key, key_len); \
   INSTALL_NEW_CV_WITH_INDEX(name, xsub, function_index);                     \
-  hashkey.key = newSVpvn(obj_hash_key, key_len);                             \
+  Newx(hashkey.key, key_len+1, char);                                        \
+  Copy(obj_hash_key, hashkey.key, key_len, char);                            \
+  hashkey.key[key_len] = 0;                                                  \
+  hashkey.len = key_len;                                                     \
   PERL_HASH(hashkey.hash, obj_hash_key, key_len);                            \
   CXSAccessor_hashkeys[function_index] = hashkey;                            \
 } STMT_END

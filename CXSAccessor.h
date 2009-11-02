@@ -2,7 +2,9 @@
 
 typedef struct {
   U32 hash;
-  SV* key;
+  char* key;
+  I32 len; /* not STRLEN for perl internal UTF hacks and hv_common_keylen
+              -- man, these things can take you by surprise */
 } autoxs_hashkey;
 
 typedef struct {

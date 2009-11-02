@@ -1,3 +1,8 @@
+
+## we want hv_fetch but with the U32 hash argument of hv_fetch_ent, so do it ourselves...
+
+#define CXSA_HASH_FETCH(hv, key, len, hash) hv_common_key_len((hv), (key), (len), HV_FETCH_JUST_SV, NULL, (hash))
+
 MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor
 PROTOTYPES: DISABLE
 
@@ -10,11 +15,11 @@ getter_init(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    HE* he;
+    SV** he;
   PPCODE:
     CXAH_OPTIMIZE_ENTERSUB(getter);
-    if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
-      XPUSHs(HeVAL(he));
+    if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+      XPUSHs(*he);
     else
       XSRETURN_UNDEF;
 
@@ -27,10 +32,10 @@ getter(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    HE* he;
+    SV** he;
   PPCODE:
-    if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
-      XPUSHs(HeVAL(he));
+    if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+      XPUSHs(*he);
     else
       XSRETURN_UNDEF;
 
@@ -46,7 +51,7 @@ setter_init(self, newvalue)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
     CXAH_OPTIMIZE_ENTERSUB(setter);
-    if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+    if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
     XPUSHs(newvalue);
 
@@ -61,7 +66,7 @@ setter(self, newvalue)
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
-    if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+    if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
     XPUSHs(newvalue);
 
@@ -77,7 +82,7 @@ chained_setter_init(self, newvalue)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
     CXAH_OPTIMIZE_ENTERSUB(chained_setter);
-    if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+    if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
     XPUSHs(self);
 
@@ -92,7 +97,7 @@ chained_setter(self, newvalue)
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
-    if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+    if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
     XPUSHs(self);
 
@@ -105,18 +110,18 @@ accessor_init(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    HE* he;
+    SV** he;
   PPCODE:
     CXAH_OPTIMIZE_ENTERSUB(accessor);
     if (items > 1) {
       SV* newvalue = ST(1);
-      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+      if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
       XPUSHs(newvalue);
     }
     else {
-      if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
-        XPUSHs(HeVAL(he));
+      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        XPUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
@@ -130,17 +135,17 @@ accessor(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    HE* he;
+    SV** he;
   PPCODE:
     if (items > 1) {
       SV* newvalue = ST(1);
-      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+      if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
       XPUSHs(newvalue);
     }
     else {
-      if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
-        XPUSHs(HeVAL(he));
+      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        XPUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
@@ -154,18 +159,18 @@ chained_accessor_init(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    HE* he;
+    SV** he;
   PPCODE:
     CXAH_OPTIMIZE_ENTERSUB(chained_accessor);
     if (items > 1) {
       SV* newvalue = ST(1);
-      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+      if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
       XPUSHs(self);
     }
     else {
-      if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
-        XPUSHs(HeVAL(he));
+      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        XPUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
@@ -179,17 +184,17 @@ chained_accessor(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    HE* he;
+    SV** he;
   PPCODE:
     if (items > 1) {
       SV* newvalue = ST(1);
-      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+      if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
       XPUSHs(self);
     }
     else {
-      if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
-        XPUSHs(HeVAL(he));
+      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        XPUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
@@ -203,10 +208,10 @@ predicate_init(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    HE* he;
+    SV** he;
   PPCODE:
     CXAH_OPTIMIZE_ENTERSUB(predicate);
-    if ( ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash))) && SvOK(HeVAL(he)) )
+    if ( ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*he) )
        XSRETURN_YES;
     else
       XSRETURN_NO;
@@ -220,9 +225,9 @@ predicate(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    HE* he;
+    SV** he;
   PPCODE:
-    if ( ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash))) && SvOK(HeVAL(he)) )
+    if ( ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*he) )
        XSRETURN_YES;
     else
       XSRETURN_NO;
@@ -335,19 +340,19 @@ test_init(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    HE* he;
+    SV** he;
   PPCODE:
     warn("cxah: inside optimizing accessor");
     CXAH_OPTIMIZE_ENTERSUB_TEST(test);
     if (items > 1) {
       SV* newvalue = ST(1);
-      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+      if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
       XPUSHs(newvalue);
     }
     else {
-      if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
-        XPUSHs(HeVAL(he));
+      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        XPUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
@@ -361,18 +366,18 @@ test(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    HE* he;
+    SV** he;
   PPCODE:
     warn("cxah: inside non-optimizing accessor");
     if (items > 1) {
       SV* newvalue = ST(1);
-      if (NULL == hv_store_ent((HV*)SvRV(self), readfrom.key, newSVsv(newvalue), readfrom.hash))
+      if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
       XPUSHs(newvalue);
     }
     else {
-      if ((he = hv_fetch_ent((HV *)SvRV(self), readfrom.key, 0, readfrom.hash)))
-        XPUSHs(HeVAL(he));
+      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        XPUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
