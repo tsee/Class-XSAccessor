@@ -1,5 +1,7 @@
 #include "perl.h"
 
+#include "hash_table.h"
+
 typedef struct {
   U32 hash;
   char* key;
