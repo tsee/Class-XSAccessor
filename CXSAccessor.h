@@ -36,7 +36,7 @@ void _init_cxsa_lock(cxsa_global_lock* theLock);
 U32 CXSAccessor_no_hashkeys = 0;
 U32 CXSAccessor_free_hashkey_no = 0;
 autoxs_hashkey* CXSAccessor_hashkeys = NULL;
-HV* CXSAccessor_reverse_hashkeys = NULL;
+HashTable* CXSAccessor_reverse_hashkeys = NULL;
 
 U32 CXSAccessor_no_arrayindices = 0;
 U32 CXSAccessor_free_arrayindices_no = 0;
@@ -87,29 +87,14 @@ I32 get_hashkey_index(pTHX_ const char* key, const I32 len) {
 
   /* init */
   if (CXSAccessor_reverse_hashkeys == NULL)
-    CXSAccessor_reverse_hashkeys = newHV();
+    CXSAccessor_reverse_hashkeys = CXSA_HashTable_new(16, 0.9);
 
-  index = 0;
-  if ( hv_exists(CXSAccessor_reverse_hashkeys, key, len) ) {
-    SV** index_sv = hv_fetch(CXSAccessor_reverse_hashkeys, key, len, 0);
-
-    /* simply return the index that corresponds to an earlier
-     * use with the same hash key name */
-
-    if ( (index_sv == NULL) || (!SvIOK(*index_sv)) ) {
-      /* shouldn't happen */
-      index = _new_hashkey();
-    }
-    else { /* Note to self: Check that this I32 cast is sane */
-      CXSA_RELEASE_GLOBAL_LOCK(CXSAccessor_lock);
-      return (I32)SvIVX(*index_sv);
-    }
-  }
-  else /* does not exist */
+  index = CXSA_HashTable_fetch(CXSAccessor_reverse_hashkeys, key, (STRLEN)len);
+  if ( index == -1 ) { /* does not exist */
     index = _new_hashkey();
-
-  /* store the new hash key in the reverse lookup table */
-  hv_store(CXSAccessor_reverse_hashkeys, key, len, newSViv(index), 0);
+    /* store the new hash key in the reverse lookup table */
+    CXSA_HashTable_store(CXSAccessor_reverse_hashkeys, key, len, index);
+  }
 
   CXSA_RELEASE_GLOBAL_LOCK(CXSAccessor_lock);
 

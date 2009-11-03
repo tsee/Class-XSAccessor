@@ -7,7 +7,7 @@
  *
  * - Taken from chocolateboy's B-Hooks-OP-Annotation.
  * - Added string-to-PTRV conversion using MurmurHash2.
- * - Converted to storing U32s (Class::XSAccessor indexes of the key name storage)
+ * - Converted to storing I32s (Class::XSAccessor indexes of the key name storage)
  *   instead of OP structures (pointers).
  * - Plenty of renaming and prefixing with CXSA_.
  */
@@ -19,7 +19,7 @@ typedef struct HashTableEntry {
     struct HashTableEntry* next;
     const char* key;
     STRLEN len;
-    U32 value;
+    I32 value;
 } HashTableEntry;
 
 typedef struct {
@@ -30,9 +30,9 @@ typedef struct {
 } HashTable;
 
 STATIC U32 CXSA_string_hash(const char* str, STRLEN len);
-STATIC U32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len);
-STATIC U32 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len);
-STATIC U32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, U32 value);
+STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len);
+STATIC I32 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len);
+STATIC I32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, I32 value);
 STATIC HashTableEntry* CXSA_HashTable_find(HashTable* table, const char* key, STRLEN len);
 STATIC HashTable* CXSA_HashTable_new(UV size, NV threshold);
 STATIC void CXSA_HashTable_clear(HashTable* table);
@@ -90,11 +90,11 @@ STATIC HashTableEntry* CXSA_HashTable_find(HashTable* table, const char* key, ST
     return entry;
 }
 
-STATIC U32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) {
+STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) {
     HashTableEntry *entry, *prev = NULL;
     UV index = CXSA_string_hash(key, len) & (table->size - 1);
 
-    U32 retval = 0;
+    I32 retval = -1;
     for (entry = table->array[index]; entry; prev = entry, entry = entry->next) {
         if (strcmp(entry->key, key) == 0) {
 
@@ -115,13 +115,13 @@ STATIC U32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) 
     return retval;
 }
 
-STATIC U32 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len) {
+STATIC I32 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len) {
     HashTableEntry const * const entry = CXSA_HashTable_find(table, key, len);
-    return entry ? entry->value : 0;
+    return entry ? entry->value : -1;
 }
 
-STATIC U32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, U32 value) {
-    U32 retval = 0;
+STATIC I32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, I32 value) {
+    I32 retval = -1;
     HashTableEntry* entry = CXSA_HashTable_find(table, key, len);
 
     if (entry) {
