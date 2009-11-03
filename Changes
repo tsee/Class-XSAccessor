@@ -1,15 +1,22 @@
 Revision history for Perl extension Class-XSAccessor.
 
-1.04_03  to be released
+  ** This release features some very radical changes. Test well. **
+  - Replace use of perl hashes in the global hash key name storage with
+    a full-blown, separate implementation of a hash table
+    (Steffen, Chocolateboy)
+  - Similarly, throw out the SV's for simple C strings.
+  - Add a global lock for all modifications to global data structures:
+  - The above three items apparently fix RT #50454 (serious threading issues).
   - Add support for alternate use Class::XSAccessor { ... } syntax
+    (Adam K)
 
 1.04_02  Mon Sep  7 11:35 2009
-  ** This release features some fairly radical changes. Test well. **
+  ** This release features some very radical changes. Test well. **
   - Significant optimization by replacing the relevant entersub ops
     with stripped down versions (Chocolateboy)
 
 1.04_01  Mon Sep  7 11:35 2009
-  ** This release features some fairly radical changes. Test well. **
+  ** This release features some very radical changes. Test well. **
   - More aggressive OPTIMIZE flags if possible (Chocolateboy)
   - Added shorthand syntax for getters, setters, accessors, and predicates
     where the attribute has the same name as the method (Chocolateboy)
