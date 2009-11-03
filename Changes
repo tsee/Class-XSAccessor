@@ -1,12 +1,13 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.04_03  Tue Nov  3 22:32 2009
   ** This release features some very radical changes. Test well. **
   - Replace use of perl hashes in the global hash key name storage with
     a full-blown, separate implementation of a hash table
     (Steffen, Chocolateboy)
   - Similarly, throw out the SV's for simple C strings.
   - Add a global lock for all modifications to global data structures:
-  - The above three items apparently fix RT #50454 (serious threading issues).
+  - The above three items fix RT #50454 (serious threading issues).
   - Add support for alternate use Class::XSAccessor { ... } syntax
     (Adam K)
 

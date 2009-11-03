@@ -5,8 +5,9 @@ NAME
 SYNOPSIS
       package MyClass;
       use Class::XSAccessor
+        replace     => 1,   # Replace existing methods (if any)
         constructor => 'new',
-        getters => {
+        getters     => {
           get_foo => 'foo', # 'foo' is the hash key to access
           get_bar => 'bar',
         },
@@ -22,12 +23,24 @@ SYNOPSIS
           has_foo => 'foo',
           has_bar => 'bar',
         }
-        true => [ 'is_token', 'is_whitespace' ],
+        true  => [ 'is_token', 'is_whitespace' ],
         false => [ 'significant' ];
-
+  
       # The imported methods are implemented in fast XS.
   
       # normal class code here.
+
+    As of version 1.05, some alternative syntax forms are available:
+
+      package MyClass;
+  
+      # Options can be passed as a HASH reference if you prefer it,
+      # which can also help PerlTidy to flow the statement correctly.
+      use Class::XSAccessor {
+         # If the name => key values are always identical,
+         # you can use the following shorthand.
+         accessors => [ 'foo', 'bar' ],
+      };
 
 DESCRIPTION
     Class::XSAccessor implements fast read, write and read/write accessors
@@ -66,11 +79,11 @@ DESCRIPTION
     accessors (mutators) do the same. You can change this behaviour with the
     "chained" option, see below. The predicates obviously return a boolean.
 
-    Since version 1.01, you can generate extremely simply methods which
-    simply return true or false (and always do so). If that seems like a
-    really superfluous thing to you, then think of a large class hierarchy
-    with interfaces such as PPI. This is implemented as the "true" and
-    "false" options, see synopsis.
+    Since version 1.01, you can generate extremely simple methods which just
+    return true or false (and always do so). If that seems like a really
+    superfluous thing to you, then consider a large class hierarchy with
+    interfaces such as PPI. This is implemented as the "true" and "false"
+    options, see synopsis.
 
 OPTIONS
     In addition to specifying the types and names of accessors, you can add
@@ -131,9 +144,9 @@ SEE ALSO
     AutoXS
 
 AUTHOR
-    Steffen Mueller, <smueller@cpan.org>
+    Steffen Mueller <smueller@cpan.org>
 
-    Chocolateboy, <chocolate@cpan.org>
+    Chocolateboy <chocolate@cpan.org>
 
 COPYRIGHT AND LICENSE
     Copyright (C) 2008-2009 by Steffen Mueller
