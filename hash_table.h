@@ -7,11 +7,13 @@
  *
  * - Taken from chocolateboy's B-Hooks-OP-Annotation.
  * - Added string-to-PTRV conversion using MurmurHash2.
- * - Converted to storing ints (Class::XSAccessor indexes of the key name storage)
+ * - Converted to storing U32s (Class::XSAccessor indexes of the key name storage)
  *   instead of OP structures (pointers).
+ * - Plenty of renaming and prefixing with CXSA_.
  */
 
 #include "ppport.h"
+#include "MurmurHashNeutral2.h"
 
 typedef struct HashTableEntry {
     struct HashTableEntry* next;
