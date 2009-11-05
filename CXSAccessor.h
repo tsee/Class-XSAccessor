@@ -9,11 +9,13 @@ typedef struct {
               -- man, these things can take you by surprise */
 } autoxs_hashkey;
 
+#ifdef USE_ITHREADS
 typedef struct {
   perl_mutex mutex;
   perl_cond cond;
   unsigned int locks;
 } cxsa_global_lock;
+#endif /* USE_ITHREADS */
 
 /********************
  * prototype section 
