@@ -326,7 +326,9 @@ PROTOTYPES: DISABLE
 
 BOOT:
 CXA_DEFAULT_ENTERSUB = PL_ppaddr[OP_ENTERSUB];
+#ifdef USE_ITHREADS
 _init_cxsa_lock(&CXSAccessor_lock); /* cf. CXSAccessor.h */
+#endif /* USE_ITHREADS */
 /*
  * testing the hashtable implementation...
  */

@@ -27,7 +27,9 @@ void _resize_array_init(I32** array, U32* len, U32 newlen, I32 init);
 I32 _new_internal_arrayindex();
 I32 get_internal_array_index(I32 object_ary_idx);
 
+#ifdef USE_ITHREADS
 void _init_cxsa_lock(cxsa_global_lock* theLock);
+#endif /* USE_ITHREADS */
 
 /*************************
  * initialization section 
@@ -45,30 +47,33 @@ I32* CXSAccessor_arrayindices = NULL;
 U32 CXSAccessor_reverse_arrayindices_length = 0;
 I32* CXSAccessor_reverse_arrayindices = NULL;
 
+#ifdef USE_ITHREADS
 static cxsa_global_lock CXSAccessor_lock;
+#endif /* USE_ITHREADS */
 
 /*************************
  * implementation section 
  *************************/
 
+#ifdef USE_ITHREADS
 /* implement locking for thread-safety */
 
-#define CXSA_ACQUIRE_GLOBAL_LOCK(theLock) \
-STMT_START { \
-  MUTEX_LOCK(&theLock.mutex); \
-  while (theLock.locks != 0) { \
+#define CXSA_ACQUIRE_GLOBAL_LOCK(theLock)     \
+STMT_START {                                  \
+  MUTEX_LOCK(&theLock.mutex);                 \
+  while (theLock.locks != 0) {                \
     COND_WAIT(&theLock.cond, &theLock.mutex); \
-  } \
-  theLock.locks = 1; \
-  MUTEX_UNLOCK(&theLock.mutex); \
+  }                                           \
+  theLock.locks = 1;                          \
+  MUTEX_UNLOCK(&theLock.mutex);               \
 } STMT_END
 
-#define CXSA_RELEASE_GLOBAL_LOCK(theLock) \
-STMT_START { \
-  MUTEX_LOCK(&theLock.mutex); \
-  theLock.locks = 0; \
-  COND_SIGNAL(&theLock.cond); \
-  MUTEX_UNLOCK(&theLock.mutex); \
+#define CXSA_RELEASE_GLOBAL_LOCK(theLock)     \
+STMT_START {                                  \
+  MUTEX_LOCK(&theLock.mutex);                 \
+  theLock.locks = 0;                          \
+  COND_SIGNAL(&theLock.cond);                 \
+  MUTEX_UNLOCK(&theLock.mutex);               \
 } STMT_END
 
 void _init_cxsa_lock(cxsa_global_lock* theLock) {
@@ -77,6 +82,11 @@ void _init_cxsa_lock(cxsa_global_lock* theLock) {
   COND_INIT(&theLock->cond);
   theLock->locks = 0;
 }
+
+#else /* no USE_ITHREADS */
+#define CXSA_RELEASE_GLOBAL_LOCK(theLock)
+#define CXSA_ACQUIRE_GLOBAL_LOCK(theLock)
+#endif /* USE_ITHREADS */
 
 /* implement hash containers */
 
