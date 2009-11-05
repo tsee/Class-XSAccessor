@@ -1,5 +1,9 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.04_04  Thu Nov  5 18:00 2009
+  - Fixes for non-threaded perls
+    (no need for locks, perl_mutex not even defined).
+
 1.04_03  Tue Nov  3 22:32 2009
   ** This release features some very radical changes. Test well. **
   - Replace use of perl hashes in the global hash key name storage with
