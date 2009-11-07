@@ -15,6 +15,8 @@
 #include "ppport.h"
 #include "MurmurHashNeutral2.h"
 
+#define CXSA_string_hash(str, len) CXSA_MurmurHashNeutral2(str, len, 12345678)
+
 typedef struct HashTableEntry {
     struct HashTableEntry* next;
     const char* key;
@@ -29,7 +31,6 @@ typedef struct {
     NV threshold;
 } HashTable;
 
-STATIC U32 CXSA_string_hash(const char* str, STRLEN len);
 STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len);
 STATIC I32 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len);
 STATIC I32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, I32 value);
@@ -38,23 +39,6 @@ STATIC HashTable* CXSA_HashTable_new(UV size, NV threshold);
 STATIC void CXSA_HashTable_clear(HashTable* table);
 STATIC void CXSA_HashTable_free(HashTable* table);
 STATIC void CXSA_HashTable_grow(HashTable* table);
-
-STATIC U32 CXSA_string_hash(const char* str, STRLEN len) {
-  U32 u = CXSA_MurmurHashNeutral2(str, len, 12345678);
-
-  /*
-   * This is one of Bob Jenkins' hash functions for 32-bit integers
-   * from: http://burtleburtle.net/bob/hash/integer.html
-   */
-  u = (u + 0x7ed55d16) + (u << 12);
-  u = (u ^ 0xc761c23c) ^ (u >> 19);
-  u = (u + 0x165667b1) + (u << 5);
-  u = (u + 0xd3a2646c) ^ (u << 9);
-  u = (u + 0xfd7046c5) + (u << 3);
-  u = (u ^ 0xb55a4f09) ^ (u >> 16);
-  return u;
-}
-
 
 STATIC HashTable* CXSA_HashTable_new(UV size, NV threshold) {
     HashTable* table;
