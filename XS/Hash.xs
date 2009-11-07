@@ -1,4 +1,3 @@
-
 ## we want hv_fetch but with the U32 hash argument of hv_fetch_ent, so do it ourselves...
 
 #define CXSA_HASH_FETCH(hv, key, len, hash) hv_common_key_len((hv), (key), (len), HV_FETCH_JUST_SV, NULL, (hash))

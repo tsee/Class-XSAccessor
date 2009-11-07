@@ -1,3 +1,4 @@
+#include "ppport.h"
 #include "perl.h"
 
 #include "hash_table.h"
