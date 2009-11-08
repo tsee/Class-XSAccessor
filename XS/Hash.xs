@@ -341,7 +341,7 @@ test_init(self, ...)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
-    warn("cxah: inside optimizing accessor");
+    warn("cxah: accessor: inside test_init");
     CXAH_OPTIMIZE_ENTERSUB_TEST(test);
     if (items > 1) {
       SV* newvalue = ST(1);
@@ -367,7 +367,7 @@ test(self, ...)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
-    warn("cxah: inside non-optimizing accessor");
+    warn("cxah: accessor: inside test");
     if (items > 1) {
       SV* newvalue = ST(1);
       if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
