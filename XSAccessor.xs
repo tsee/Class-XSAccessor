@@ -247,7 +247,7 @@ static OP * cxah_entersub_ ## name(pTHX) {                                      
         } else if (SvTYPE(sv) != SVt_PVCV) {                                     \
             warn("cxah: entersub: disabling optimization: sv is not a CV");      \
         } else {                                                                 \
-            warn("cxah: entersub: disabling optimization: XSUB is not " # name); \
+            warn("cxah: entersub: disabling optimization: CV is not " # name);   \
         }                                                                        \
         CXA_DISABLE_OPTIMIZATION(PL_op); /* make sure it's not reinstated */     \
         PL_op->op_ppaddr = CXA_DEFAULT_ENTERSUB;                                 \
