@@ -70,13 +70,13 @@
  *
  *     INSTALL_NEW_CV_HASH_OBJ(name, CXAH(getter_init), key);
  *
- * where "name" is the name of the getter sub, key is the name of the key to look up
+ * where "name" is the name of the getter sub in perl, key is the name of the key to look up
  * in the hash, and CXAH(getter_init) is the full name of the C function that
  * implements the getter - on most platforms, it's something like:
  *
  *     XS_Class__XSAccessor_getter_init 
  *
- * On VMS the names are mangled to fit in 31 characters. So, for instance, getter_init becomes:
+ * On VMS, the names are mangled to fit in 31 characters. So, for instance, getter_init becomes:
  *
  *     XS_Class_XSAccessor_getter_init
  *
@@ -92,18 +92,18 @@
  *
  * There are a number of situations in which optimization is disabled.
  *
- * 1) if the entersub is not perl's default enntersub i.e. if another module has
+ * 1) if the entersub is not perl's default entersub i.e. if another module has
  * provided its own implementation, then we don't replace it.
  *
  * 2) if the call site is dynamic. the optimized entersub is optimized for a particular
- * type of Class::XSAccessor accessor (e.g. getter, setter, predicate &c.) if
+ * type of Class::XSAccessor accessor (e.g. getter, setter, predicate &c.). if
  * an optimized entersub finds itself invoking a subroutine other than the
  * type of XSUB it's tailored for, then the entersub optimization is disabled.
  * This also applies if a method is redefined so that an optimized
- * entersub calls a different type of CV than the specific type of XSUB it's tailored for.
+ * entersub calls a different type of CV than the specific type of XSUB it's optimized for.
  *
  * In both of these cases, we reinstate perl's generic entersub and 
- * flip a switch on the OP which ensures the accessor (if ever called again) doesn't
+ * flip a switch on the OP which ensures the *_init XSUB (if ever called again) doesn't
  * try to reinstate the optimized version.
  *
  * Note: Class::XSAccessor XSUBs continue to optimize "new" call sites, regardless of what may
@@ -111,7 +111,7 @@
  *
  *     1: package Example;
  *     2:
- *     3: use Class::XSAccessor { getter => 'foo' };
+ *     3: use Class::XSAccessor { getters => 'foo' };
  *     4:
  *     5: for (1 .. 10) {
  *     6:     $self->foo();
