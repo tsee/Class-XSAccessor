@@ -183,7 +183,7 @@ The XS accessor methods are between 2 and 3 times faster than typical
 pure-Perl accessors in some simple benchmarking.
 The lower factor applies to the potentially slightly obscure
 C<sub set_foo_pp {$_[0]-E<gt>{foo} = $_[1]}>, so if you usually
-write clear code, a factor of three speed-up is a good estimate.
+write clear code, a factor of 2.5 speed-up is a good estimate.
 
 The method names may be fully qualified. The example in the synopsis could
 have been written as C<MyClass::get_foo> instead
