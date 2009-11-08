@@ -259,7 +259,11 @@ constructor_init(class, ...)
         croak("Uneven number of argument to constructor.");
 
       for (iStack = 1; iStack < items; iStack += 2) {
-        hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
+	HE *he;
+        he = hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
+        if (!he) {
+          croak("Failed to write value to hash.");
+	}
       }
     }
     XPUSHs(sv_2mortal(obj));
@@ -291,7 +295,11 @@ constructor(class, ...)
         croak("Uneven number of argument to constructor.");
 
       for (iStack = 1; iStack < items; iStack += 2) {
-        hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
+	HE *he;
+        he = hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
+        if (!he) {
+          croak("Failed to write value to hash.");
+	}
       }
     }
     XPUSHs(sv_2mortal(obj));

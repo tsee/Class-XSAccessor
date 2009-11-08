@@ -179,6 +179,9 @@ STMT_START {                                                                    
 #define CXAH_OPTIMIZE_ENTERSUB_TEST(name)
 #define CXAH_OPTIMIZE_ENTERSUB(name)
 #define CXAA_OPTIMIZE_ENTERSUB(name)
+#define CXAH_GENERATE_ENTERSUB_TEST(name)
+#define CXAH_GENERATE_ENTERSUB(name)
+#define CXAA_GENERATE_ENTERSUB(name)
 #endif
 
 /*
@@ -228,6 +231,7 @@ STMT_START {                                                                    
 #define Class__XSAccessor__Array_constant_true Cs_XSAs_Ay_csnt_true
 #endif
 
+#if (PERL_BCDVERSION >= 0x5010000)
 #define CXAH_GENERATE_ENTERSUB_TEST(name)                                        \
 static OP * cxah_entersub_ ## name(pTHX) {                                       \
     dVAR; dSP; dTOPss;                                                           \
@@ -293,6 +297,7 @@ static OP * cxaa_entersub_ ## name(pTHX) {                                      
         return CALL_FPTR(CXA_DEFAULT_ENTERSUB)(aTHX);                                   \
     }                                                                                   \
 }
+#endif /* perl >= 5.10.0 */
 
 /* Install a new XSUB under 'name' and automatically set the file name */
 #define INSTALL_NEW_CV(name, xsub)                                            \
@@ -441,6 +446,14 @@ _init_cxsa_lock(&CXSAccessor_lock); /* cf. CXSAccessor.h */
   warn("0==%u\n", CXSA_HashTable_fetch(tb, "test123", 7));
 }
 */
+
+void
+END()
+    PROTOTYPE:
+    CODE:
+        if (CXSAccessor_reverse_hashkeys) {
+	    CXSA_HashTable_free(CXSAccessor_reverse_hashkeys);
+	}
 
 INCLUDE: XS/Hash.xs
 

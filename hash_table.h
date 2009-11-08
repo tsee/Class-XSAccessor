@@ -31,7 +31,7 @@ typedef struct {
     NV threshold;
 } HashTable;
 
-STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len);
+/* STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len); */
 STATIC I32 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len);
 STATIC I32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, I32 value);
 STATIC HashTableEntry* CXSA_HashTable_find(HashTable* table, const char* key, STRLEN len);
@@ -74,6 +74,8 @@ STATIC HashTableEntry* CXSA_HashTable_find(HashTable* table, const char* key, ST
     return entry;
 }
 
+/* currently unused */
+/*
 STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) {
     HashTableEntry *entry, *prev = NULL;
     UV index = CXSA_string_hash(key, len) & (table->size - 1);
@@ -98,6 +100,7 @@ STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) 
 
     return retval;
 }
+*/
 
 STATIC I32 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len) {
     HashTableEntry const * const entry = CXSA_HashTable_find(table, key, len);
