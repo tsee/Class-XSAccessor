@@ -233,7 +233,7 @@ STMT_START {                                                                    
 
 #if (PERL_BCDVERSION >= 0x5010000)
 #define CXAH_GENERATE_ENTERSUB_TEST(name)                                        \
-static OP * cxah_entersub_ ## name(pTHX) {                                       \
+OP * cxah_entersub_ ## name(pTHX) {                                              \
     dVAR; dSP; dTOPss;                                                           \
     warn("cxah: entersub: inside optimized entersub");                           \
                                                                                  \
@@ -241,7 +241,7 @@ static OP * cxah_entersub_ ## name(pTHX) {                                      
         && (SvTYPE(sv) == SVt_PVCV)                                              \
         && (CvXSUB((CV *)sv) == CXAH(name ## _init))                             \
     ) {                                                                          \
-        POPs;                                                                    \
+        (void)POPs;                                                              \
         PUTBACK;                                                                 \
         (void)CXAH(name)(aTHX_ (CV *)sv);                                        \
         return NORMAL;                                                           \
@@ -260,14 +260,14 @@ static OP * cxah_entersub_ ## name(pTHX) {                                      
 }
 
 #define CXAH_GENERATE_ENTERSUB(name)                                                    \
-static OP * cxah_entersub_ ## name(pTHX) {                                              \
+OP * cxah_entersub_ ## name(pTHX) {                                                     \
     dVAR; dSP; dTOPss;                                                                  \
                                                                                         \
     if (sv                                                                              \
         && (SvTYPE(sv) == SVt_PVCV)                                                     \
         && (CvXSUB((CV *)sv) == CXAH(name ## _init))                                    \
     ) {                                                                                 \
-        POPs;                                                                           \
+        (void)POPs;                                                                     \
         PUTBACK;                                                                        \
         (void)CXAH(name)(aTHX_ (CV *)sv);                                               \
         return NORMAL;                                                                  \
@@ -279,15 +279,14 @@ static OP * cxah_entersub_ ## name(pTHX) {                                      
 }
 
 #define CXAA_GENERATE_ENTERSUB(name)                                                    \
-static OP * cxaa_entersub_ ## name(pTHX) {                                              \
+OP * cxaa_entersub_ ## name(pTHX) {                                                     \
     dVAR; dSP; dTOPss;                                                                  \
-    void (*xsub)(pTHX_ CV *);                                                           \
                                                                                         \
     if (sv                                                                              \
         && (SvTYPE(sv) == SVt_PVCV)                                                     \
         && (CvXSUB((CV *)sv) == CXAA(name ## _init))                                    \
     ) {                                                                                 \
-        POPs;                                                                           \
+        (void)POPs;                                                                     \
         PUTBACK;                                                                        \
         (void)CXAA(name)(aTHX_ (CV *)sv);                                               \
         return NORMAL;                                                                  \
@@ -345,6 +344,7 @@ STMT_START {                                                                 \
   CXSAccessor_hashkeys[function_index] = hashkey;                            \
 } STMT_END
 
+#if (PERL_BCDVERSION >= 0x5010000)
 static Perl_ppaddr_t CXA_DEFAULT_ENTERSUB = NULL;
 
 /* predeclare the XSUBs so we can refer to them in the optimized entersubs */
@@ -424,12 +424,15 @@ CXAA_GENERATE_ENTERSUB(constant_false);
 XS(CXAA(constant_true));
 XS(CXAA(constant_true_init));
 CXAA_GENERATE_ENTERSUB(constant_true);
+#endif /* perl >= 5.10.0 */
 
 MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor
 PROTOTYPES: DISABLE
 
 BOOT:
+#if (PERL_BCDVERSION >= 0x5010000)
 CXA_DEFAULT_ENTERSUB = PL_ppaddr[OP_ENTERSUB];
+#endif
 #ifdef USE_ITHREADS
 _init_cxsa_lock(&CXSAccessor_lock); /* cf. CXSAccessor.h */
 #endif /* USE_ITHREADS */
@@ -452,8 +455,8 @@ END()
     PROTOTYPE:
     CODE:
         if (CXSAccessor_reverse_hashkeys) {
-	    CXSA_HashTable_free(CXSAccessor_reverse_hashkeys);
-	}
+            CXSA_HashTable_free(CXSAccessor_reverse_hashkeys);
+        }
 
 INCLUDE: XS/Hash.xs
 

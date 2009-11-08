@@ -234,7 +234,6 @@ predicate(self)
 void
 constructor_init(class, ...)
     SV* class;
-  ALIAS:
   PREINIT:
     int iStack;
     HV* hash;
@@ -271,7 +270,6 @@ constructor_init(class, ...)
 void
 constructor(class, ...)
     SV* class;
-  ALIAS:
   PREINIT:
     int iStack;
     HV* hash;
@@ -306,8 +304,9 @@ constructor(class, ...)
 
 void
 constant_false_init(self)
-    SV* self;
+  SV *self;
   PPCODE:
+    PERL_UNUSED_VAR(self);
     CXAH_OPTIMIZE_ENTERSUB(constant_false);
     {
       XSRETURN_NO;
@@ -315,8 +314,9 @@ constant_false_init(self)
 
 void
 constant_false(self)
-    SV* self;
+  SV *self;
   PPCODE:
+    PERL_UNUSED_VAR(self);
     {
       XSRETURN_NO;
     }
@@ -325,6 +325,7 @@ void
 constant_true_init(self)
     SV* self;
   PPCODE:
+    PERL_UNUSED_VAR(self);
     CXAH_OPTIMIZE_ENTERSUB(constant_true);
     {
       XSRETURN_YES;
@@ -334,6 +335,7 @@ void
 constant_true(self)
     SV* self;
   PPCODE:
+    PERL_UNUSED_VAR(self);
     {
       XSRETURN_YES;
     }
