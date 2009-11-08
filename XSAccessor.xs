@@ -133,6 +133,10 @@
  */
 
 #if (PERL_BCDVERSION >= 0x5010000)
+#define CXA_ENABLE_ENTERSUB_OPTIMIZATION
+#endif
+
+#ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
 #define CXA_OPTIMIZATION_OK(op) ((op->op_spare & 1) != 1)
 #define CXA_DISABLE_OPTIMIZATION(op) (op->op_spare |= 1)
 
@@ -231,7 +235,7 @@ STMT_START {                                                                    
 #define Class__XSAccessor__Array_constant_true Cs_XSAs_Ay_csnt_true
 #endif
 
-#if (PERL_BCDVERSION >= 0x5010000)
+#ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
 #define CXAH_GENERATE_ENTERSUB_TEST(name)                                        \
 OP * cxah_entersub_ ## name(pTHX) {                                              \
     dVAR; dSP; dTOPss;                                                           \
@@ -344,7 +348,7 @@ STMT_START {                                                                 \
   CXSAccessor_hashkeys[function_index] = hashkey;                            \
 } STMT_END
 
-#if (PERL_BCDVERSION >= 0x5010000)
+#ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
 static Perl_ppaddr_t CXA_DEFAULT_ENTERSUB = NULL;
 
 /* predeclare the XSUBs so we can refer to them in the optimized entersubs */
@@ -430,7 +434,7 @@ MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor
 PROTOTYPES: DISABLE
 
 BOOT:
-#if (PERL_BCDVERSION >= 0x5010000)
+#ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
 CXA_DEFAULT_ENTERSUB = PL_ppaddr[OP_ENTERSUB];
 #endif
 #ifdef USE_ITHREADS
@@ -457,6 +461,16 @@ END()
         if (CXSAccessor_reverse_hashkeys) {
             CXSA_HashTable_free(CXSAccessor_reverse_hashkeys);
         }
+
+void
+__entersub_optimized__()
+    PROTOTYPE:
+    CODE:
+#ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
+        XSRETURN(1);
+#else
+        XSRETURN(0);
+#endif
 
 INCLUDE: XS/Hash.xs
 
