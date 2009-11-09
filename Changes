@@ -1,5 +1,13 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.04_05  Mon Nov  9 18:00 2009
+  - Fixes for perls < 5.10:
+    => No entersub optimization
+    => Do no use precalculated hashes
+  - Updated entersub optimization
+  - Remove brain-damaged double-hashing
+  - Minor portability fixlets
+
 1.04_04  Thu Nov  5 18:00 2009
   - Fixes for non-threaded perls
     (no need for locks, perl_mutex not even defined).
