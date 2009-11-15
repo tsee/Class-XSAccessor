@@ -279,44 +279,6 @@ constructor(class, ...)
     XPUSHs(sv_2mortal(obj));
 
 void
-constant_false_init(self)
-  SV *self;
-  PPCODE:
-    PERL_UNUSED_VAR(self);
-    CXAA_OPTIMIZE_ENTERSUB(constant_false);
-    {
-      XSRETURN_NO;
-    }
-
-void
-constant_false(self)
-  SV *self;
-  PPCODE:
-    PERL_UNUSED_VAR(self);
-    {
-      XSRETURN_NO;
-    }
-
-void
-constant_true_init(self)
-  SV *self;
-  PPCODE:
-    PERL_UNUSED_VAR(self);
-    CXAA_OPTIMIZE_ENTERSUB(constant_true);
-    {
-      XSRETURN_YES;
-    }
-
-void
-constant_true(self)
-  SV *self;
-  PPCODE:
-    PERL_UNUSED_VAR(self);
-    {
-      XSRETURN_YES;
-    }
-
-void
 newxs_getter(name, index)
   char* name;
   U32 index;
@@ -358,14 +320,3 @@ newxs_constructor(name)
   char* name;
   PPCODE:
     INSTALL_NEW_CV(name, CXAA(constructor_init));
-
-void
-newxs_boolean(name, truth)
-  char* name;
-  bool truth;
-  PPCODE:
-    if (truth)
-      INSTALL_NEW_CV(name, CXAA(constant_true_init));
-    else
-      INSTALL_NEW_CV(name, CXAA(constant_false_init));
-

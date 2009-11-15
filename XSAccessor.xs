@@ -242,10 +242,6 @@ STMT_START {                                                                    
 #define Class__XSAccessor__Array_predicate Clas_XSAcesor_Aray_predicate
 #define Class__XSAccessor__Array_constructor_init Cs_XSAs_Ay_csuor_init
 #define Class__XSAccessor__Array_constructor Cs_XSAs_Ay_constructor
-#define Class__XSAccessor__Array_constant_false_init Cs_XSAs_Ay_csnt_fse_init
-#define Class__XSAccessor__Array_constant_false Cs_XSAs_Ay_csnt_false
-#define Class__XSAccessor__Array_constant_true_init Cs_XSAs_Ay_csnt_te_init
-#define Class__XSAccessor__Array_constant_true Cs_XSAs_Ay_csnt_true
 #endif
 
 #ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
@@ -434,13 +430,6 @@ XS(CXAA(constructor));
 XS(CXAA(constructor_init));
 CXAA_GENERATE_ENTERSUB(constructor);
 
-XS(CXAA(constant_false));
-XS(CXAA(constant_false_init));
-CXAA_GENERATE_ENTERSUB(constant_false);
-
-XS(CXAA(constant_true));
-XS(CXAA(constant_true_init));
-CXAA_GENERATE_ENTERSUB(constant_true);
 #endif /* CXA_ENABLE_ENTERSUB_OPTIMIZATION */
 
 MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor

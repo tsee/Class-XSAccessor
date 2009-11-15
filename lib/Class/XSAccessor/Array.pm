@@ -73,10 +73,10 @@ sub _generate_method {
     newxs_constructor($subname);
   }
   elsif ($type eq 'true') {
-    newxs_boolean($subname, 1);
+    Class::XSAccessor::newxs_boolean($subname, 1);
   }
   elsif ($type eq 'false') {
-    newxs_boolean($subname, 0);
+    Class::XSAccessor::newxs_boolean($subname, 0);
   }
   else {
     newxs_accessor($subname, $array_index, $opts->{chained}||0);
