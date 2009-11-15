@@ -45,7 +45,7 @@
  * different types of CV.
  *
  * For our XSUB accessors, we don't need most of that. We don't need to open a new scope;
- * the subroutine is almost always a CV (that's what OP_METHOD and OP_METHOD_NAMED usually return)
+ * the subroutine is almost always a CV (that's what OP_METHOD and OP_METHOD_NAMED usually return);
  * and we don't need to deal with all the non-XSUB cases. This allows us to replace the
  * OP's implementation (op_ppaddr) with a version optimized for our simple XSUBs. (This
  * is inspired by B::XSUB::Dumber: nothingmuch++)
@@ -56,7 +56,7 @@
  *
  * in practice, this is rarely the case. the vast majority of method calls in perl,
  * and in most dynamic languages (cf. Google's v8), behave like method calls in static
- * languages. for instance, 97% of method calls in perl 5.10.0's test suite are monomorphic
+ * languages. for instance, 97% of the method call sites in perl 5.10.0's test suite are monomorphic
  *
  * We only replace the op_ppaddr pointer of entersub OPs that use the default pp_entersub.
  * this ensures we don't interfere with any modules that assign a new op_ppaddr e.g.
