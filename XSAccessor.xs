@@ -192,7 +192,7 @@ STMT_START {                                                                    
         }                                                                          \
     }                                                                              \
 } STMT_END
-#else /* perl <= 5.10.0 */
+#else /* CXA_ENABLE_ENTERSUB_OPTIMIZATION */
 #define CXAH_OPTIMIZE_ENTERSUB_TEST(name)
 #define CXAH_OPTIMIZE_ENTERSUB(name)
 #define CXAA_OPTIMIZE_ENTERSUB(name)
@@ -313,7 +313,7 @@ OP * cxaa_entersub_ ## name(pTHX) {                                             
         return CALL_FPTR(CXA_DEFAULT_ENTERSUB)(aTHX);                                   \
     }                                                                                   \
 }
-#endif /* perl >= 5.10.0 */
+#endif /* CXA_ENABLE_ENTERSUB_OPTIMIZATION */
 
 /* Install a new XSUB under 'name' and automatically set the file name */
 #define INSTALL_NEW_CV(name, xsub)                                            \
@@ -441,7 +441,7 @@ CXAA_GENERATE_ENTERSUB(constant_false);
 XS(CXAA(constant_true));
 XS(CXAA(constant_true_init));
 CXAA_GENERATE_ENTERSUB(constant_true);
-#endif /* perl >= 5.10.0 */
+#endif /* CXA_ENABLE_ENTERSUB_OPTIMIZATION */
 
 MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor
 PROTOTYPES: DISABLE
