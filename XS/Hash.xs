@@ -259,7 +259,7 @@ constructor_init(class, ...)
 
     if (items > 1) {
       if (!(items % 2))
-        croak("Uneven number of argument to constructor.");
+        croak("Uneven number of arguments to constructor.");
 
       for (iStack = 1; iStack < items; iStack += 2) {
 	HE *he;
@@ -294,7 +294,7 @@ constructor(class, ...)
 
     if (items > 1) {
       if (!(items % 2))
-        croak("Uneven number of argument to constructor.");
+        croak("Uneven number of arguments to constructor.");
 
       for (iStack = 1; iStack < items; iStack += 2) {
 	HE *he;

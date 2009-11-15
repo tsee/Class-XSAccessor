@@ -12,13 +12,13 @@ use blib;
 use Class::XSAccessor
     constructor => 'new',
     accessors   => { myattr => 'myattr' },
-    getters => { get_myattr => 'myattr' },
-    setters => { set_myattr => 'myattr' },
+    getters     => { get_myattr => 'myattr' },
+    setters     => { set_myattr => 'myattr' },
 ;
 
 package WithStdClass;
 
-sub new { my $c = shift; bless {@_}, $c}
+sub new { my $c = shift; bless {@_}, ref($c) || $c }
 
 sub myattr {
     my $self = shift;
@@ -32,7 +32,7 @@ sub myattr {
 
 package WithStdClassFast;
 
-sub new { my $c = shift; bless {@_}, $c}
+sub new { my $c = shift; bless {@_}, ref($c) || $c }
 
 sub myattr { (@_ > 1) ?  $_[0]->{myattr} = $_[1] : $_[0]->{myattr} }
 
