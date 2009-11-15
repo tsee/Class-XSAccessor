@@ -56,7 +56,8 @@
  *
  * in practice, this is rarely the case. the vast majority of method calls in perl,
  * and in most dynamic languages (cf. Google's v8), behave like method calls in static
- * languages. for instance, 97% of the method call sites in perl 5.10.0's test suite are monomorphic
+ * languages. for instance, 97% of the call sites exercised by perl 5.10.0's test suite are
+ * monomorphic
  *
  * We only replace the op_ppaddr pointer of entersub OPs that use the default pp_entersub.
  * this ensures we don't interfere with any modules that assign a new op_ppaddr e.g.
