@@ -14,7 +14,7 @@ getter_init(self)
   PPCODE:
     CXAA_OPTIMIZE_ENTERSUB(getter);
     if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-      XPUSHs(elem[0]);
+      PUSHs(elem[0]);
     else
       XSRETURN_UNDEF;
 
@@ -30,7 +30,7 @@ getter(self)
     SV** elem;
   PPCODE:
     if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-      XPUSHs(elem[0]);
+      PUSHs(elem[0]);
     else
       XSRETURN_UNDEF;
 
@@ -48,7 +48,7 @@ setter_init(self, newvalue)
     CXAA_OPTIMIZE_ENTERSUB(setter);
     if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
       croak("Failed to write new value to array.");
-    XPUSHs(newvalue);
+    PUSHs(newvalue);
 
 void
 setter(self, newvalue)
@@ -63,7 +63,7 @@ setter(self, newvalue)
   PPCODE:
     if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
       croak("Failed to write new value to array.");
-    XPUSHs(newvalue);
+    PUSHs(newvalue);
 
 void
 chained_setter_init(self, newvalue)
@@ -79,7 +79,7 @@ chained_setter_init(self, newvalue)
     CXAA_OPTIMIZE_ENTERSUB(chained_setter);
     if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
       croak("Failed to write new value to array.");
-    XPUSHs(self);
+    PUSHs(self);
 
 void
 chained_setter(self, newvalue)
@@ -94,7 +94,7 @@ chained_setter(self, newvalue)
   PPCODE:
     if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
       croak("Failed to write new value to array.");
-    XPUSHs(self);
+    PUSHs(self);
 
 void
 accessor_init(self, ...)
@@ -112,11 +112,11 @@ accessor_init(self, ...)
       SV* newvalue = ST(1);
       if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
         croak("Failed to write new value to array.");
-      XPUSHs(newvalue);
+      PUSHs(newvalue);
     }
     else {
       if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-        XPUSHs(elem[0]);
+        PUSHs(elem[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -136,11 +136,11 @@ accessor(self, ...)
       SV* newvalue = ST(1);
       if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
         croak("Failed to write new value to array.");
-      XPUSHs(newvalue);
+      PUSHs(newvalue);
     }
     else {
       if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-        XPUSHs(elem[0]);
+        PUSHs(elem[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -161,11 +161,11 @@ chained_accessor_init(self, ...)
       SV* newvalue = ST(1);
       if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
         croak("Failed to write new value to array.");
-      XPUSHs(self);
+      PUSHs(self);
     }
     else {
       if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-        XPUSHs(elem[0]);
+        PUSHs(elem[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -185,11 +185,11 @@ chained_accessor(self, ...)
       SV* newvalue = ST(1);
       if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
         croak("Failed to write new value to array.");
-      XPUSHs(self);
+      PUSHs(self);
     }
     else {
       if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-        XPUSHs(elem[0]);
+        PUSHs(elem[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -251,7 +251,7 @@ constructor_init(class, ...)
     /* we ignore arguments. See Class::XSAccessor's XS code for
      * how we'd use them in case of bless {@_} => $class.
      */
-    XPUSHs(sv_2mortal(obj));
+    PUSHs(sv_2mortal(obj));
 
 void
 constructor(class, ...)
@@ -276,7 +276,7 @@ constructor(class, ...)
     /* we ignore arguments. See Class::XSAccessor's XS code for
      * how we'd use them in case of bless {@_} => $class.
      */
-    XPUSHs(sv_2mortal(obj));
+    PUSHs(sv_2mortal(obj));
 
 void
 newxs_getter(name, index)

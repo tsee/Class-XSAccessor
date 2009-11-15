@@ -22,7 +22,7 @@ getter_init(self)
   PPCODE:
     CXAH_OPTIMIZE_ENTERSUB(getter);
     if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-      XPUSHs(*he);
+      PUSHs(*he);
     else
       XSRETURN_UNDEF;
 
@@ -38,7 +38,7 @@ getter(self)
     SV** he;
   PPCODE:
     if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-      XPUSHs(*he);
+      PUSHs(*he);
     else
       XSRETURN_UNDEF;
 
@@ -56,7 +56,7 @@ setter_init(self, newvalue)
     CXAH_OPTIMIZE_ENTERSUB(setter);
     if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
-    XPUSHs(newvalue);
+    PUSHs(newvalue);
 
 void
 setter(self, newvalue)
@@ -71,7 +71,7 @@ setter(self, newvalue)
   PPCODE:
     if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
-    XPUSHs(newvalue);
+    PUSHs(newvalue);
 
 void
 chained_setter_init(self, newvalue)
@@ -87,7 +87,7 @@ chained_setter_init(self, newvalue)
     CXAH_OPTIMIZE_ENTERSUB(chained_setter);
     if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
-    XPUSHs(self);
+    PUSHs(self);
 
 void
 chained_setter(self, newvalue)
@@ -102,7 +102,7 @@ chained_setter(self, newvalue)
   PPCODE:
     if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
-    XPUSHs(self);
+    PUSHs(self);
 
 void
 accessor_init(self, ...)
@@ -120,11 +120,11 @@ accessor_init(self, ...)
       SV* newvalue = ST(1);
       if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
-      XPUSHs(newvalue);
+      PUSHs(newvalue);
     }
     else {
       if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        XPUSHs(*he);
+        PUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
@@ -144,11 +144,11 @@ accessor(self, ...)
       SV* newvalue = ST(1);
       if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
-      XPUSHs(newvalue);
+      PUSHs(newvalue);
     }
     else {
       if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        XPUSHs(*he);
+        PUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
@@ -169,11 +169,11 @@ chained_accessor_init(self, ...)
       SV* newvalue = ST(1);
       if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
-      XPUSHs(self);
+      PUSHs(self);
     }
     else {
       if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        XPUSHs(*he);
+        PUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
@@ -193,11 +193,11 @@ chained_accessor(self, ...)
       SV* newvalue = ST(1);
       if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
-      XPUSHs(self);
+      PUSHs(self);
     }
     else {
       if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        XPUSHs(*he);
+        PUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
@@ -269,7 +269,7 @@ constructor_init(class, ...)
 	}
       }
     }
-    XPUSHs(sv_2mortal(obj));
+    PUSHs(sv_2mortal(obj));
 
 void
 constructor(class, ...)
@@ -304,7 +304,7 @@ constructor(class, ...)
 	}
       }
     }
-    XPUSHs(sv_2mortal(obj));
+    PUSHs(sv_2mortal(obj));
 
 void
 constant_false_init(self)
@@ -361,11 +361,11 @@ test_init(self, ...)
       SV* newvalue = ST(1);
       if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
-      XPUSHs(newvalue);
+      PUSHs(newvalue);
     }
     else {
       if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        XPUSHs(*he);
+        PUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
@@ -386,11 +386,11 @@ test(self, ...)
       SV* newvalue = ST(1);
       if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
         croak("Failed to write new value to hash.");
-      XPUSHs(newvalue);
+      PUSHs(newvalue);
     }
     else {
       if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        XPUSHs(*he);
+        PUSHs(*he);
       else
         XSRETURN_UNDEF;
     }
