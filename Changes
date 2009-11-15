@@ -1,6 +1,10 @@
 Revision history for Perl extension Class-XSAccessor.
 
-1.04_05  Mon Nov  9 18:00 2009
+1.05  Sun Nov 15 12:54 2009
+  - Minor developer doc tweaks.
+  - Minor XS refactoring
+
+1.04_05  Mon Nov  9 20:10 2009
   - Fixes for perls < 5.10:
     => No entersub optimization
     => Do no use precalculated hashes
