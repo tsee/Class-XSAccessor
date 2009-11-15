@@ -11,7 +11,7 @@
 #define CXAH(name) XS_Class__XSAccessor_ ## name
 
 /*
- * chocolateboy: 2009-09-06:
+ * chocolateboy: 2009-09-06 - 2009-11-14:
  *
  * entersub ops that call our accessors are optimized (i.e. replaced with optimized versions)
  * in versions of perl >= 5.10.0. This section describes the implementation.
@@ -19,13 +19,13 @@
  * TL;DR: the first time one of our fast (XS) accessors is called, we reach up into the
  * calling OP (OP_ENTERSUB) and change its implementation (PL_op->op_ppaddr) to an optimized
  * version that takes advantage of the fact that our accessors are straightforward hash/array lookups.
- * 5.10.0+ is required because earlier versions of perl don't have any spare (i.e. unused) flags
+ * 5.10.0+ is required because earlier versions of perl lack any spare (i.e. unused) flags
  * we can use to indicate that an OP has had entersub optimization disabled. perls >= 5.10.0 have
  * a new OP member called op_spare that gives us 3 whole bits to play with!
  *
- * First some preliminaries: a method call is performed as a subroutine call at the OP
+ * First, some preliminaries: a method call is performed as a subroutine call at the OP
  * level. there's some additional work to look up the method CV and push the invocant
- * on the stack, but the current OP inside an XSUB is the subroutine call OP, OP_ENTERSUB.
+ * on the stack, but the current OP inside a method call is the subroutine call OP, OP_ENTERSUB.
  *
  * two distinct invocations of the same method will have two entersub OPs and will receive
  * the same CV on the stack:
@@ -33,12 +33,12 @@
  *     $foo->bar(...); # OP 1: CV 1
  *     $foo->bar(...); # OP 2: CV 1
  *
- * There are also situations in which the same entersub OP calls one or more CVs: 
+ * There are also situations in which the same entersub OP calls more than one CV: 
  *
  *     $foo->$_() for (foo bar); # OP 1: CV 1, CV 2
  *
  * Inside each Class::XSAccessor XSUB, we can access the current entersub OP (PL_op).
- * The default entersub implementation (pp_entersub) has a lot of boilerplate for
+ * The default entersub implementation (pp_entersub in pp_hot.c) has a lot of boilerplate for
  * dealing with all the different ways in which subroutines can be called. It sets up
  * and tears down a new scope; it deals with the fact that the code ref can be passed
  * in as a GV or CV; and it has numerous conditional statements to deal with the various
@@ -52,26 +52,26 @@
  *
  * We do this inside the accessor i.e. at runtime. We can also back out the optimization
  * if a call site proves to be dynamic e.g. if a method is redefined or the method is
- * called with multiple CVs (see below).
+ * called with multiple different CVs (see below).
  *
  * in practice, this is rarely the case. the vast majority of method calls in perl,
  * and in most dynamic languages (cf. Google's v8), behave like method calls in static
  * languages. for instance, 97% of method calls in perl 5.10.0's test suite are monomorphic
  *
- * We only replace the op_ppaddr of entersub OPs that use the default pp_entersub.
+ * We only replace the op_ppaddr pointer of entersub OPs that use the default pp_entersub.
  * this ensures we don't interfere with any modules that assign a new op_ppaddr e.g.
  * Data::Alias, Faster. it also ensures we don't tread on our own toes and repeatedly
  * re-assign the same optimized entersub
  *
- * There are two versions of every accessor e.g. two versions of the getter/setter/predicate &c.
- * XSUBs. The first version is called <accessor_name>_init (e.g. "getter_init") and the second
- * version is called <accessor_name> e.g. "getter". The first version is assigned for
+ * This module provides two XSUBs for each accessor e.g. two versions of the getter/setter/predicate &c.
+ * XSUBs. The first version is called <accessor_type>_init (e.g. "getter_init") and the second
+ * version is called <accessor_type> e.g. "getter". The first version is assigned for
  * every new accessor by code that looks something like this:
  *
  *     INSTALL_NEW_CV_HASH_OBJ(name, CXAH(getter_init), key);
  *
- * where "name" is the name of the getter sub in perl, key is the name of the key to look up
- * in the hash, and CXAH(getter_init) is the full name of the C function that
+ * where "name" is the name of the getter sub in perl (e.g. "foo"), key is the name of the key to look up
+ * in the hash (e.g. "FOO"), and CXAH(getter_init) is the full name of the C function that
  * implements the getter - on most platforms, it's something like:
  *
  *     XS_Class__XSAccessor_getter_init 
@@ -83,31 +83,43 @@
  * (note the snipped underscore to keep the name under 32 characters).
  *
  * The XSUB with the _init suffix is the optimizing version, and the XSUB without
- * the _init suffix is the slightly faster non-optimizing version. The optimized
- * entersub calls the non-optimizing XSUB.
+ * the _init suffix is the slightly faster non-optimizing version. The optimized entersub
+ * does something like the following (imagine the coderef is in $cv):
+ *
+ *     if ($cv->xsub == CLASS_XS_ACCESSOR_GETTER_INIT) {
+ *         return CLASS_XS_ACCESSOR_GETTER(@args);
+ *     } # else restore the op's default entersub implementation and call that
+ *
+ * i.e. the optimized entersub calls the non-optimizing XSUB. There's one optimized
+ * entersub for each type of Class::XSAccessor accessor. To save typing, they're
+ * generated by C preprocessor macros i.e. poor man's generic programming.
  *
  * If, for some reason, the entersub should not be optimized, a flag is set on the
- * entersub OP. This flag is detected by the _init accessor. If the flag is set,
+ * entersub OP. This flag is detected by the (default) _init accessor. If the flag is set,
  * the entersub OP will never be optimized.
  *
  * There are a number of situations in which optimization is disabled.
  *
  * 1) if the entersub is not perl's default entersub i.e. if another module has
- * provided its own implementation, then we don't replace it.
+ * provided its own entersub implementation, then we don't replace it.
  *
  * 2) if the call site is dynamic. the optimized entersub is optimized for a particular
  * type of Class::XSAccessor accessor (e.g. getter, setter, predicate &c.). if
- * an optimized entersub finds itself invoking a subroutine other than the
- * type of XSUB it's tailored for, then the entersub optimization is disabled.
+ * an optimized entersub finds itself invoking a function other than the
+ * specific XSUB it's tailored for, then the entersub optimization is disabled.
  * This also applies if a method is redefined so that an optimized
- * entersub calls a different type of CV than the specific type of XSUB it's optimized for.
+ * entersub is passed a different type of CV than the one it's optimized for.
  *
- * In both of these cases, we reinstate perl's generic entersub and 
- * flip a switch on the OP which ensures the *_init XSUB (if ever called again) doesn't
- * try to reinstate the optimized version.
+ * The first case is detected inside the _init accessor. The second case is detected inside
+ * the optimized entersub.
+ *
+ * In the second case, we reinstate the previous entersub, which by 1) was perl's pp_entersub.
+ * In both cases, we flip a switch on the OP which ensures the *_init XSUB (if ever called again)
+ * doesn't try to reinstate the optimized entersub.
  *
  * Note: Class::XSAccessor XSUBs continue to optimize "new" call sites, regardless of what may
- * have happened to a particular OP. Take the following example:
+ * have happened to a "previous" OP or what may happen to a "subsequent" OP. Take the following
+ * example:
  *
  *     1: package Example;
  *     2:
@@ -119,16 +131,16 @@
  *     8:     $self->foo();
  *     9: }
  *
- * Here, line 6 is optimized as normal. Line 7 is optimized for the first call, when $_ is "foo",
- * but the optimization is disabled for the second call, when $_ is "bar", because &Example::bar
+ * Here, line 6 is optimized as normal. Line 7 is optimized on the first call, when $_ is "foo",
+ * but the optimization is disabled on the second call, when $_ is "bar", because &Example::bar
  * is not a Class::XSAccessor getter. All subsequent calls on line 7, use perl's default entersub.
  * Line 8 is optimized as normal. i.e. the disabled optimization on line 7 doesn't affect subsequent
- * optimizations. On line 7, only the entersub OP is "pessimized". &Example::foo continues to "look" for
+ * optimizations. On line 7, only the entersub OP is "pessimized". &Example::foo continues to "look for"
  * "new" entersub OPs to optimize. Indeed, any calls to &Example::foo will get the optimization treatment,
  * even call sites outside the Example package/file.
  *
  * The following CXAH_OPTIMIZE_ENTERSUB* macros are called from within our *_init accessors
- * to install the optimized entersub. And the CXAH_GENERATE_ENTERSUB* macros
+ * to install the optimized entersub (or disable optimization for that OP). And the CXAH_GENERATE_ENTERSUB* macros
  * further down generate optimized entersubs for the accessors defined in XS/Hash.xs and XS/Array.xs.
  */
 
