@@ -13,7 +13,7 @@ BEGIN {
 }
 
 use Test::More tests => 103;
-use Data::Dumper; $Data::Dumper::Terse = $Data::Dumper::Indent = 1;
+# use Data::Dumper; $Data::Dumper::Terse = $Data::Dumper::Indent = 1;
 
 our @WARNINGS = ();
 
@@ -61,9 +61,9 @@ sub test3 {
 }
 
 # dynamic with a twist: the second sub isn't a Class::XSAccessor XSUB.
-# this should a) disable the optimization for the two entersub calls
-# b) switch foo over to non-optimizing mode and c) (of course) still
-# work as expected for foo and baz. the bar accessor should still be optimizing
+# this should disable the optimization for the two entersub calls,
+# and (of course) still work as expected for foo and baz.
+# the bar accessor should still be optimizing
 sub test4 {
     my $self = shift;
     for my $name (qw(foo baz)) {
@@ -76,7 +76,7 @@ sub test4 {
     is($self->{bar}, 'bar4');
 }
 
-# call the methods as subs to see how this impacts the optimized entersub
+# call the methods as subs to see how this impacts the optimized entersub. XXX: passed as GVs
 sub test5 {
     my $self = shift;
     is(foo($self, 'foo5'), 'foo5');
@@ -87,8 +87,8 @@ sub test5 {
     is($self->{bar}, 'bar5');
 }
 
-# call the methods as subs with & - this sets a flag in the entersub's op_private
-# XXX: these are passed in as GVs rather than CVs
+# call the methods as subs with & (this sets a flag in the entersub's op_private)
+# XXX: these are passed in as GVs rather than CVs, which the optimization doesn't currently support
 sub test6 {
     my $self = shift;
     is(&foo($self, 'foo6'), 'foo6');
@@ -118,7 +118,7 @@ $SIG{__WARN__} = sub {
     if ($warning =~ m{^cxah: (.+)\n$}) {
         push @WARNINGS, $1;
     } else {
-        warn @_; # from perldoc -f warn: __WARN__ hooks are not called from inside one.
+        warn @_; # from perldoc -f warn: "__WARN__ hooks are not called from inside one"
     }
 };
 
