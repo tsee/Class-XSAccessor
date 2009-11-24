@@ -209,7 +209,7 @@ predicate_init(self)
     if ( (elem = av_fetch((AV *)SvRV(self), index, 1)) && SvOK(elem[0]) )
       XSRETURN_YES;
     else
-      XSRETURN_NO;
+      XSRETURN_EMPTY;
 
 void
 predicate(self)
@@ -225,7 +225,7 @@ predicate(self)
     if ( (elem = av_fetch((AV *)SvRV(self), index, 1)) && SvOK(elem[0]) )
       XSRETURN_YES;
     else
-      XSRETURN_NO;
+      XSRETURN_EMPTY;
 
 void
 constructor_init(class, ...)
