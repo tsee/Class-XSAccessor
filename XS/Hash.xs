@@ -217,7 +217,7 @@ predicate_init(self)
     if ( ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*he) )
        XSRETURN_YES;
     else
-      XSRETURN_EMPTY;
+      XSRETURN_NO;
 
 void
 predicate(self)
@@ -233,7 +233,7 @@ predicate(self)
     if ( ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*he) )
        XSRETURN_YES;
     else
-      XSRETURN_EMPTY;
+      XSRETURN_NO;
 
 void
 constructor_init(class, ...)
@@ -313,7 +313,7 @@ constant_false_init(self)
     PERL_UNUSED_VAR(self);
     CXAH_OPTIMIZE_ENTERSUB(constant_false);
     {
-      XSRETURN_EMPTY;
+      XSRETURN_NO;
     }
 
 void
@@ -322,7 +322,7 @@ constant_false(self)
   PPCODE:
     PERL_UNUSED_VAR(self);
     {
-      XSRETURN_EMPTY;
+      XSRETURN_NO;
     }
    
 void
