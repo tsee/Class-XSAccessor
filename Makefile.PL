@@ -33,7 +33,7 @@ WriteMakefile1(
     PREREQ_PM         => {
         'XSLoader' => 0,
     }, # e.g., Module::Name => 1.1
-    LICENSE => 'perl'
+    LICENSE => 'perl',
     ABSTRACT_FROM => 'lib/Class/XSAccessor.pm',
     AUTHOR => 'Steffen Mueller <smueller@cpan.org>',
     LIBS              => [''], # e.g., '-lm'
