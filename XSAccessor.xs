@@ -10,12 +10,12 @@
 #define CXAA(name) XS_Class__XSAccessor__Array_ ## name
 #define CXAH(name) XS_Class__XSAccessor_ ## name
 
-#define CXA_CHECK_HASH(items, self)                                                     \
+#define CXA_CHECK_HASH(self)                                                            \
 if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVHV)) {                                 \
     croak("Class::XSAccessor: invalid instance method invocant: no hash ref supplied"); \
 }
 
-#define CXA_CHECK_ARRAY(items, self)                                                     \
+#define CXA_CHECK_ARRAY(self)                                                            \
 if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                                  \
     croak("Class::XSAccessor: invalid instance method invocant: no array ref supplied"); \
 }
