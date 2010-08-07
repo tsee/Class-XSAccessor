@@ -46,7 +46,7 @@ eval { Hash::foo( [] ) };
 
 like $@, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
 
-eval { Hash::foo( '' ) };
+eval { Hash::bar( '' ) };
 
 like $@, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
 
