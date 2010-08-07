@@ -20,6 +20,7 @@ getter_init(self)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     CXAH_OPTIMIZE_ENTERSUB(getter);
     if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
       PUSHs(*he);
@@ -37,6 +38,7 @@ getter(self)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
       PUSHs(*he);
     else
@@ -53,6 +55,7 @@ setter_init(self, newvalue)
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     CXAH_OPTIMIZE_ENTERSUB(setter);
     if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
@@ -69,6 +72,7 @@ setter(self, newvalue)
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
     PUSHs(newvalue);
@@ -84,6 +88,7 @@ chained_setter_init(self, newvalue)
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     CXAH_OPTIMIZE_ENTERSUB(chained_setter);
     if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
@@ -115,6 +120,7 @@ accessor_init(self, ...)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     CXAH_OPTIMIZE_ENTERSUB(accessor);
     if (items > 1) {
       SV* newvalue = ST(1);
@@ -140,6 +146,7 @@ accessor(self, ...)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     if (items > 1) {
       SV* newvalue = ST(1);
       if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
@@ -164,6 +171,7 @@ chained_accessor_init(self, ...)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     CXAH_OPTIMIZE_ENTERSUB(chained_accessor);
     if (items > 1) {
       SV* newvalue = ST(1);
@@ -189,6 +197,7 @@ chained_accessor(self, ...)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     if (items > 1) {
       SV* newvalue = ST(1);
       if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
@@ -213,6 +222,7 @@ predicate_init(self)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     CXAH_OPTIMIZE_ENTERSUB(predicate);
     if ( ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*he) )
        XSRETURN_YES;
@@ -230,6 +240,7 @@ predicate(self)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     if ( ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*he) )
        XSRETURN_YES;
     else
@@ -355,6 +366,7 @@ test_init(self, ...)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     warn("cxah: accessor: inside test_init");
     CXAH_OPTIMIZE_ENTERSUB_TEST(test);
     if (items > 1) {
@@ -381,6 +393,7 @@ test(self, ...)
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
     SV** he;
   PPCODE:
+    CXA_CHECK_HASH(items, self);
     warn("cxah: accessor: inside test");
     if (items > 1) {
       SV* newvalue = ST(1);

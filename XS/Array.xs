@@ -12,6 +12,7 @@ getter_init(self)
     const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     CXAA_OPTIMIZE_ENTERSUB(getter);
     if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
       PUSHs(elem[0]);
@@ -29,6 +30,7 @@ getter(self)
     const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
       PUSHs(elem[0]);
     else
@@ -45,6 +47,7 @@ setter_init(self, newvalue)
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     CXAA_OPTIMIZE_ENTERSUB(setter);
     if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
       croak("Failed to write new value to array.");
@@ -61,6 +64,7 @@ setter(self, newvalue)
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
       croak("Failed to write new value to array.");
     PUSHs(newvalue);
@@ -76,6 +80,7 @@ chained_setter_init(self, newvalue)
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     CXAA_OPTIMIZE_ENTERSUB(chained_setter);
     if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
       croak("Failed to write new value to array.");
@@ -92,6 +97,7 @@ chained_setter(self, newvalue)
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
       croak("Failed to write new value to array.");
     PUSHs(self);
@@ -107,6 +113,7 @@ accessor_init(self, ...)
     const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     CXAA_OPTIMIZE_ENTERSUB(accessor);
     if (items > 1) {
       SV* newvalue = ST(1);
@@ -132,6 +139,7 @@ accessor(self, ...)
     const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     if (items > 1) {
       SV* newvalue = ST(1);
       if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
@@ -156,6 +164,7 @@ chained_accessor_init(self, ...)
     const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     CXAA_OPTIMIZE_ENTERSUB(chained_accessor);
     if (items > 1) {
       SV* newvalue = ST(1);
@@ -181,6 +190,7 @@ chained_accessor(self, ...)
     const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     if (items > 1) {
       SV* newvalue = ST(1);
       if (NULL == av_store((AV*)SvRV(self), index, newSVsv(newvalue)))
@@ -205,6 +215,7 @@ predicate_init(self)
     const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     CXAA_OPTIMIZE_ENTERSUB(predicate);
     if ( (elem = av_fetch((AV *)SvRV(self), index, 1)) && SvOK(elem[0]) )
       XSRETURN_YES;
@@ -222,6 +233,7 @@ predicate(self)
     const I32 index = CXSAccessor_arrayindices[ix];
     SV** elem;
   PPCODE:
+    CXA_CHECK_ARRAY(items, self);
     if ( (elem = av_fetch((AV *)SvRV(self), index, 1)) && SvOK(elem[0]) )
       XSRETURN_YES;
     else
