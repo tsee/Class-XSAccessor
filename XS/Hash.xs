@@ -105,6 +105,7 @@ chained_setter(self, newvalue)
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
+    CXA_CHECK_HASH(self);
     if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
       croak("Failed to write new value to hash.");
     PUSHs(self);
