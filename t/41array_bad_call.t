@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 13;
 
 BEGIN { use_ok('Class::XSAccessor') };
 
@@ -32,11 +32,24 @@ eval { Array->foo };
 
 like $@, qr{Class::XSAccessor: invalid instance method invocant: no array ref supplied };
 
+eval { Array->bar };
+
+like $@, qr{Class::XSAccessor: invalid instance method invocant: no array ref supplied };
+
 eval { Array::foo() };
 
-like $@, qr{Usage: Array::foo\(self, \.\.\.\) };
+# package name introduced in 5.10.1
+like $@, qr{Usage: (Array::)?foo\(self, \.\.\.\) };
+
+eval { Array::bar() };
+
+like $@, qr{Usage: (Array::)?bar\(self, \.\.\.\) };
 
 eval { Array::foo( {} ) };
+
+like $@, qr{Class::XSAccessor: invalid instance method invocant: no array ref supplied };
+
+eval { Array::bar( '' ) };
 
 like $@, qr{Class::XSAccessor: invalid instance method invocant: no array ref supplied };
 

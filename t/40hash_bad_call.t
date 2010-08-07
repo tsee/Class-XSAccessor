@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 13;
 
 BEGIN { use_ok('Class::XSAccessor') };
 
@@ -29,11 +29,24 @@ eval { Hash->foo };
 
 like $@, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
 
+eval { Hash->bar };
+
+like $@, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
+
 eval { Hash::foo() };
 
-like $@, qr{Usage: Hash::foo\(self, \.\.\.\) };
+# package name introduced in 5.10.1
+like $@, qr{Usage: (Hash::)?foo\(self, \.\.\.\) };
+
+eval { Hash::bar() };
+
+like $@, qr{Usage: (Hash::)?bar\(self, \.\.\.\) };
 
 eval { Hash::foo( [] ) };
+
+like $@, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
+
+eval { Hash::foo( '' ) };
 
 like $@, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
 
