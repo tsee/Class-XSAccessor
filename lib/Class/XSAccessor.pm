@@ -7,7 +7,7 @@ use warnings;
 
 use Carp qw/croak/;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);

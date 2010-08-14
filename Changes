@@ -1,5 +1,11 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.06  Sat Aug 14 20:21 2010
+  - Add sanity checks in the optimized (5.10 and up)
+    implementations to make sure we don't segfault on
+    $not_a_hashref->accessor
+    (Chocolateboy
+
 1.05  Sun Nov 15 12:54 2009
   - Minor developer doc tweaks.
   - Minor XS refactoring
