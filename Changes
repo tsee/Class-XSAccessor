@@ -1,10 +1,9 @@
 Revision history for Perl extension Class-XSAccessor.
 
 1.06  Sat Aug 14 20:21 2010
-  - Add sanity checks in the optimized (5.10 and up)
-    implementations to make sure we don't segfault on
+  - Add sanity checks to make sure we don't segfault on
     $not_a_hashref->accessor
-    (Chocolateboy
+    (chocolateboy)
 
 1.05  Sun Nov 15 12:54 2009
   - Minor developer doc tweaks.
@@ -26,7 +25,7 @@ Revision history for Perl extension Class-XSAccessor.
   ** This release features some very radical changes. Test well. **
   - Replace use of perl hashes in the global hash key name storage with
     a full-blown, separate implementation of a hash table
-    (Steffen, Chocolateboy)
+    (Steffen, chocolateboy)
   - Similarly, throw out the SV's for simple C strings.
   - Add a global lock for all modifications to global data structures:
   - The above three items fix RT #50454 (serious threading issues).
@@ -36,19 +35,19 @@ Revision history for Perl extension Class-XSAccessor.
 1.04_02  Mon Sep  7 11:35 2009
   ** This release features some very radical changes. Test well. **
   - Significant optimization by replacing the relevant entersub ops
-    with stripped down versions (Chocolateboy)
+    with stripped down versions (chocolateboy)
 
 1.04_01  Mon Sep  7 11:35 2009
   ** This release features some very radical changes. Test well. **
-  - More aggressive OPTIMIZE flags if possible (Chocolateboy)
+  - More aggressive OPTIMIZE flags if possible (chocolateboy)
   - Added shorthand syntax for getters, setters, accessors, and predicates
-    where the attribute has the same name as the method (Chocolateboy)
+    where the attribute has the same name as the method (chocolateboy)
   - Remove dependency on AutoXS::Header.
   - Merge Class::XSAccessor::Array into this distribution.
   - Refactored the XS to remove duplicate code.
   - Refactored the perl code in XSAccessor.pm and Array.pm to remove
     duplicate code (=> Heavy.pm).
-  - Upgrade Devel::PPPort/ppport.h (Chocolateboy)
+  - Upgrade Devel::PPPort/ppport.h (chocolateboy)
 
 1.04  Thu Jun 11 16:40 2009
   - Fix a bunch of warnings thanks to a heads up from
@@ -100,8 +99,8 @@ Revision history for Perl extension Class-XSAccessor.
   - Copy input scalars on setter/mutator calls (RT #38573)
 
 0.05  Sat Jun 21 18:06 2008
-  - Add read/write accessors. (Chocolateboy)
-  - By default, return the new value from setters. (Chocolateboy)
+  - Add read/write accessors. (chocolateboy)
+  - By default, return the new value from setters. (chocolateboy)
   - Add predicates, i.e. "has_foo".
 
 0.04  Mon May  3 19:12 2008
