@@ -4,7 +4,7 @@ Revision history for Perl extension Class-XSAccessor.
   - Include two new test files for the fix in 1.06.
   - Define PERL_CORE, but *only* while including XSUB.h to get
     a significant speed-up (see XSAccessor.xs for an explanation).
-    Idea from Chocolateboy. Complaints from rightfully annoyed
+    Idea from chocolateboy. Complaints from rightfully annoyed
     perl5-porters (in particular but not limited to Nicholas)
     go to Steffen.
 
@@ -65,7 +65,7 @@ Revision history for Perl extension Class-XSAccessor.
 
 1.02  Sun May 17 11:18 2009
   - Require new AutoXS header version in order to fix
-    rototyping issue.
+    prototyping issue.
 
 1.01  Sat May 16 16:11 2009
   - XS boolean constants for PPI
