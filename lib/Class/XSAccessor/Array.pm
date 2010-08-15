@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 require Class::XSAccessor;
 require Class::XSAccessor::Heavy;
