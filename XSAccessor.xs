@@ -1,7 +1,33 @@
 #define PERL_NO_GET_CONTEXT
 #include "EXTERN.h"
 #include "perl.h"
+
+/*
+ * Quoting chocolateboy from his Method::Lexical module at 2009-02-08:
+ *
+ * for binary compatibility (see perlapi.h), XS modules perform a function call to
+ * access each and every interpreter variable. So, for instance, an innocuous-looking
+ * reference to PL_op becomes:
+ *
+ *     (*Perl_Iop_ptr(my_perl))
+ *
+ * This (obviously) impacts performance. Internally, PL_op is accessed as:
+ *
+ *     my_perl->Iop
+ *
+ * (in threaded/multiplicity builds (see intrpvar.h)), which is significantly faster.
+ *
+ * defining PERL_CORE gets us the fast version, at the expense of a future maintenance release
+ * possibly breaking things: http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2008-04/msg00171.html
+ *
+ * Rather than globally defining PERL_CORE, which pokes its fingers into various headers, exposing
+ * internals we'd rather not see, just define it for XSUB.h, which includes
+ * perlapi.h, which imposes the speed limit.
+ */
+
+#define PERL_CORE
 #include "XSUB.h"
+#undef PERL_CORE
 
 #include "ppport.h"
 
