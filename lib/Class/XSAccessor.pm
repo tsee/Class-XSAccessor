@@ -179,11 +179,12 @@ That means they can be called on objects and classes but will not
 clone objects entirely. Parameters to C<new()> are added to the
 object.
 
-The XS accessor methods are between 2 and 3 times faster than typical
+The XS accessor methods are between 3 and 4 times faster than typical
 pure-Perl accessors in some simple benchmarking.
 The lower factor applies to the potentially slightly obscure
 C<sub set_foo_pp {$_[0]-E<gt>{foo} = $_[1]}>, so if you usually
-write clear code, a factor of 2.5 speed-up is a good estimate.
+write clear code, a factor of 3.5 speed-up is a good estimate.
+If in doubt, do your own benchmarking!
 
 The method names may be fully qualified. The example in the synopsis could
 have been written as C<MyClass::get_foo> instead
@@ -273,7 +274,7 @@ Chocolateboy E<lt>chocolate@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2009 by Steffen Mueller
+Copyright (C) 2008-2010 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,

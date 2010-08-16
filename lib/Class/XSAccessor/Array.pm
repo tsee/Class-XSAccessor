@@ -141,7 +141,7 @@ that are implemented as B<arrays>. Using it on hash-based objects is
 bound to make your life miserable. Refer to L<Class::XSAccessor> for
 an implementation that works with hash-based objects.
 
-A simple benchmark showed more than a factor of two performance
+A simple benchmark showed a significant performance
 advantage over writing accessors in Perl.
 
 Since version 0.10, the module can also generate simple constructors
