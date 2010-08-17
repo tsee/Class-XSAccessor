@@ -115,8 +115,8 @@ Class::XSAccessor::Array - Generate fast XS accessors without runtime compilatio
     predicates => { # test for definedness
       has_buz => 2,
     },
-    lvalue_accessors => {
-      baz => 3, # see below for explanation
+    lvalue_accessors => { # see below
+      baz => 3,
     },
     true => [ 'is_token', 'is_whitespace' ],
     false => [ 'significant' ];
