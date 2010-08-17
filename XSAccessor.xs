@@ -17,7 +17,7 @@
  * (in threaded/multiplicity builds (see intrpvar.h)), which is significantly faster.
  *
  * defining PERL_CORE gets us the fast version, at the expense of a future maintenance release
- * possibly breaking things: http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2008-04/msg00171.html
+ * possibly breaking things: https://groups.google.com/group/perl.perl5.porters/browse_thread/thread/9ec0da3f02b3b5a
  *
  * Rather than globally defining PERL_CORE, which pokes its fingers into various headers, exposing
  * internals we'd rather not see, just define it for XSUB.h, which includes
