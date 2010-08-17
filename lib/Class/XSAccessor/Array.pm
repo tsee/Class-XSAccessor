@@ -22,6 +22,7 @@ sub import {
   my $read_subs      = $opts{getters} || {};
   my $set_subs       = $opts{setters} || {};
   my $acc_subs       = $opts{accessors} || {};
+  my $lvacc_subs     = $opts{lvalue_accessors} || {};
   my $pred_subs      = $opts{predicates} || {};
   my $construct_subs = $opts{constructors} || [defined($opts{constructor}) ? $opts{constructor} : ()];  
   my $true_subs      = $opts{true} || [];
@@ -31,6 +32,7 @@ sub import {
   foreach my $subtype ( ["getter", $read_subs],
                         ["setter", $set_subs],
                         ["accessor", $acc_subs],
+                        ["lvalue_accessor", $lvacc_subs],
                         ["pred_subs", $pred_subs] )
   {
     my $subs = $subtype->[1];
@@ -62,6 +64,9 @@ sub _generate_method {
 
   if ($type eq 'getter') {
     newxs_getter($subname, $array_index);
+  }
+  if ($type eq 'lvalue_accessor') {
+    newxs_lvalue_accessor($subname, $array_index);
   }
   elsif ($type eq 'setter') {
     newxs_setter($subname, $array_index, $opts->{chained}||0);
@@ -109,6 +114,9 @@ Class::XSAccessor::Array - Generate fast XS accessors without runtime compilatio
     },
     predicates => { # test for definedness
       has_buz => 2,
+    },
+    lvalue_accessors => {
+      baz => 3, # see below for explanation
     },
     true => [ 'is_token', 'is_whitespace' ],
     false => [ 'significant' ];
@@ -213,6 +221,26 @@ By default, the accessors are generated in the calling class. Using
 the C<class> option, you can explicitly specify where the methods
 are to be generated.
 
+=head1 LVALUES
+
+The support for lvalue accessors via the keyword C<lvalue_accessors>
+was added in version 1.08. At this point, B<THEY ARE CONSIDERED HIGHLY
+EXPERIMENTAL>. Furthermore, their performance hasn't been benchmarked
+yet.
+
+The following example demonstrates an lvalue accessor:
+
+  package Adress;
+  use Class::XSAccessor
+    constructor => 'new',
+    lvalue_accessors => { zip_code => 0 };
+  
+  package main;
+  my $address = Adress->new(2);
+  print $address->zip_code, "\n"; # prints 2
+  $address->zip_code = 76135; # <--- This is it!
+  print $address->zip_code, "\n"; # prints 76135
+
 =head1 CAVEATS
 
 Probably wouldn't work if your objects are I<tied>. But that's a strange thing to do anyway.
@@ -244,9 +272,11 @@ L<AutoXS>
 
 Steffen Mueller E<lt>smueller@cpan.orgE<gt>
 
+Chocolateboy E<lt>chocolate@cpan.orgE<gt>
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2009 by Steffen Mueller
+Copyright (C) 2008-2010 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,

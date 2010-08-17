@@ -44,6 +44,63 @@ getter(self)
     else
       XSRETURN_UNDEF;
 
+
+void
+lvalue_accessor_init(self)
+    SV* self;
+  ALIAS:
+  INIT:
+    /* Get the const hash key struct from the global storage */
+    /* ix is the magic integer variable that is set by the perl guts for us.
+     * We uses it to identify the currently running alias of the accessor. Gollum! */
+    const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
+    SV** he;
+    SV* sv;
+  PPCODE:
+    CXA_CHECK_HASH(self);
+    CXAH_OPTIMIZE_ENTERSUB(lvalue_accessor);
+    if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) {
+      sv = *he;
+      sv_upgrade(sv, SVt_PVLV);
+      sv_magic(sv, 0, PERL_MAGIC_ext, Nullch, 0);
+      SvSMAGICAL_on(sv);
+      LvTYPE(sv) = '~';
+      LvTARG(sv) = SvREFCNT_inc(sv);
+      SvMAGIC(sv)->mg_virtual = &cxsa_lvalue_acc_magic_vtable;
+      ST(0) = sv;
+      XSRETURN(1);
+    }
+    else
+      XSRETURN_UNDEF;
+
+void
+lvalue_accessor(self)
+    SV* self;
+  ALIAS:
+  INIT:
+    /* Get the const hash key struct from the global storage */
+    /* ix is the magic integer variable that is set by the perl guts for us.
+     * We uses it to identify the currently running alias of the accessor. Gollum! */
+    const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
+    SV** he;
+    SV* sv;
+  PPCODE:
+    CXA_CHECK_HASH(self);
+    if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) {
+      sv = *he;
+      sv_upgrade(sv, SVt_PVLV);
+      sv_magic(sv, 0, PERL_MAGIC_ext, Nullch, 0);
+      SvSMAGICAL_on(sv);
+      LvTYPE(sv) = '~';
+      SvREFCNT_inc(sv);
+      LvTARG(sv) = SvREFCNT_inc(sv);
+      SvMAGIC(sv)->mg_virtual = &cxsa_lvalue_acc_magic_vtable;
+      ST(0) = sv;
+      XSRETURN(1);
+    }
+    else
+      XSRETURN_UNDEF;
+
 void
 setter_init(self, newvalue)
     SV* self;
@@ -415,6 +472,17 @@ newxs_getter(name, key)
   char* key;
   PPCODE:
     INSTALL_NEW_CV_HASH_OBJ(name, CXAH(getter_init), key);
+
+void
+newxs_lvalue_accessor(name, key)
+    char* name;
+    char* key;
+  INIT:
+    CV *cv;
+  PPCODE:
+    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(lvalue_accessor_init), key);
+    // Make the CV lvalue-able. "cv" was set by the previous macro
+    CvLVALUE_on(cv);
 
 void
 newxs_setter(name, key, chained)

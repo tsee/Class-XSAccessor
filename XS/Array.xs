@@ -37,6 +37,63 @@ getter(self)
       XSRETURN_UNDEF;
 
 void
+lvalue_accessor_init(self)
+    SV* self;
+  ALIAS:
+  INIT:
+    /* Get the array index from the global storage */
+    /* ix is the magic integer variable that is set by the perl guts for us.
+     * We uses it to identify the currently running alias of the accessor. Gollum! */
+    const I32 index = CXSAccessor_arrayindices[ix];
+    SV** elem;
+    SV* sv;
+  PPCODE:
+    CXA_CHECK_ARRAY(self);
+    CXAA_OPTIMIZE_ENTERSUB(lvalue_accessor);
+    if ((elem = av_fetch((AV *)SvRV(self), index, 1))) {
+      sv = *elem;
+      sv_upgrade(sv, SVt_PVLV);
+      sv_magic(sv, 0, PERL_MAGIC_ext, Nullch, 0);
+      SvSMAGICAL_on(sv);
+      LvTYPE(sv) = '~';
+      SvREFCNT_inc(sv);
+      LvTARG(sv) = SvREFCNT_inc(sv);
+      SvMAGIC(sv)->mg_virtual = &cxsa_lvalue_acc_magic_vtable;
+      ST(0) = sv;
+      XSRETURN(1);
+    }
+    else
+      XSRETURN_UNDEF;
+
+void
+lvalue_accessor(self)
+    SV* self;
+  ALIAS:
+  INIT:
+    /* Get the array index from the global storage */
+    /* ix is the magic integer variable that is set by the perl guts for us.
+     * We uses it to identify the currently running alias of the accessor. Gollum! */
+    const I32 index = CXSAccessor_arrayindices[ix];
+    SV** elem;
+    SV* sv;
+  PPCODE:
+    CXA_CHECK_ARRAY(self);
+    if ((elem = av_fetch((AV *)SvRV(self), index, 1))) {
+      sv = *elem;
+      sv_upgrade(sv, SVt_PVLV);
+      sv_magic(sv, 0, PERL_MAGIC_ext, Nullch, 0);
+      SvSMAGICAL_on(sv);
+      LvTYPE(sv) = '~';
+      SvREFCNT_inc(sv);
+      LvTARG(sv) = SvREFCNT_inc(sv);
+      SvMAGIC(sv)->mg_virtual = &cxsa_lvalue_acc_magic_vtable;
+      ST(0) = sv;
+      XSRETURN(1);
+    }
+    else
+      XSRETURN_UNDEF;
+
+void
 setter_init(self, newvalue)
     SV* self;
     SV* newvalue;
@@ -297,6 +354,14 @@ newxs_getter(name, index)
   PPCODE:
     INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(getter_init), index);
 
+void
+newxs_lvalue_accessor(name, index)
+  char* name;
+  U32 index;
+  PPCODE:
+    INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(getter_init), index);
+    // Make the CV lvalue-able. "cv" was set by the previous macro
+    CvLVALUE_on(cv);
 
 void
 newxs_setter(name, index, chained)

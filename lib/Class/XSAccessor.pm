@@ -41,6 +41,7 @@ sub import {
   my $read_subs      = _make_hash($opts{getters} || {});
   my $set_subs       = _make_hash($opts{setters} || {});
   my $acc_subs       = _make_hash($opts{accessors} || {});
+  my $lvacc_subs     = _make_hash($opts{lvalue_accessors} || {});
   my $pred_subs      = _make_hash($opts{predicates} || {});
   my $test_subs      = _make_hash($opts{__tests__} || {});
   my $construct_subs = $opts{constructors} || [defined($opts{constructor}) ? $opts{constructor} : ()];
@@ -50,6 +51,7 @@ sub import {
   foreach my $subtype ( ["getter", $read_subs],
                         ["setter", $set_subs],
                         ["accessor", $acc_subs],
+                        ["lvalue_accessor", $lvacc_subs],
                         ["test", $test_subs],
                         ["pred_subs", $pred_subs] )
   {
@@ -82,6 +84,9 @@ sub _generate_method {
 
   if ($type eq 'getter') {
     newxs_getter($subname, $hashkey);
+  }
+  elsif ($type eq 'lvalue_accessor') {
+    newxs_lvalue_accessor($subname, $hashkey);
   }
   elsif ($type eq 'setter') {
     newxs_setter($subname, $hashkey, $opts->{chained}||0);
@@ -135,7 +140,10 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
     predicates => {
       has_foo => 'foo',
       has_bar => 'bar',
-    }
+    },
+    lvalue_accessors => { # see below
+      baz => 'baz', # ...
+    },
     true  => [ 'is_token', 'is_whitespace' ],
     false => [ 'significant' ];
   
@@ -235,6 +243,26 @@ in the same C<use Class::XSAccessor ...> statement.
 
 By default, the accessors are generated in the calling class. The
 the C<class> option allows the target class to be specified.
+
+=head1 LVALUES
+
+The support for lvalue accessors via the keyword C<lvalue_accessors>
+was added in version 1.08. At this point, B<THEY ARE CONSIDERED HIGHLY
+EXPERIMENTAL>. Furthermore, their performance hasn't been benchmarked
+yet.
+
+The following example demonstrates an lvalue accessor:
+
+  package Adress;
+  use Class::XSAccessor
+    constructor => 'new',
+    lvalue_accessors => { zip_code => 'zip' };
+  
+  package main;
+  my $address = Adress->new(zip => 2);
+  print $address->zip_code, "\n"; # prints 2
+  $address->zip_code = 76135; # <--- This is it!
+  print $address->zip_code, "\n"; # prints 76135
 
 =head1 CAVEATS
 
