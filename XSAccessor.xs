@@ -250,7 +250,8 @@ STMT_START {                                                                    
 /* FIXME: redo this to include new names */
 #ifdef VMS
 #define Class__XSAccessor_getter_init Class_XSAccessor_getter_init
-/* FIXME add lvalue variants */
+#define Class__XSAccessor_lvalue_accessor_init Class_XSAcc_lvacc_init
+#define Class__XSAccessor_lvalue_accessor Class_XSAcc_lvacc
 #define Class__XSAccessor_setter_init Class_XSAccessor_setter_init
 #define Class__XSAccessor_chained_setter_init Cs_XSAs_cid_ser_init
 #define Class__XSAccessor_chained_setter Clas_XSAcesor_chained_seter
@@ -266,6 +267,8 @@ STMT_START {                                                                    
 #define Class__XSAccessor_constant_true Clas_XSAcesor_constant_true
 #define Class__XSAccessor__Array_getter_init Cs_XSAs_Ay_ger_init
 #define Class__XSAccessor__Array_getter Clas_XSAcesor_Aray_geter
+#define Class__XSAccessor__Array_lvalue_accessor_init Class_XSAcc_Ay_lvacc_init
+#define Class__XSAccessor__Array_lvalue_accessor Class_XSAcc_Ay_lvacc
 #define Class__XSAccessor__Array_setter_init Cs_XSAs_Ay_ser_init
 #define Class__XSAccessor__Array_setter Clas_XSAcesor_Aray_seter
 #define Class__XSAccessor__Array_chained_setter_init Cs_XSAs_Ay_cid_ser_init
