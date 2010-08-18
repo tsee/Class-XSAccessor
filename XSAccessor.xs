@@ -479,25 +479,32 @@ CXAA_GENERATE_ENTERSUB(constructor);
 
 #endif /* CXA_ENABLE_ENTERSUB_OPTIMIZATION */
 
-
 /* magic vtable and setter function for lvalue accessors */
-int
+STATIC int
+setter_for_lvalues(pTHX_ SV *sv, MAGIC* mg);
+
+STATIC int
 setter_for_lvalues(pTHX_ SV *sv, MAGIC* mg)
 {
+  PERL_UNUSED_VAR(mg);
   sv_setsv(LvTARG(sv), sv);
   return TRUE;
 }
 
-static struct mgvtbl cxsa_lvalue_acc_magic_vtable = {
-  0,  setter_for_lvalues,
-  0,  0,  0,
-#if defined(PERL_REVISION) && PERL_VERSION >= 8
-  0,  0,
-#endif
+STATIC struct mgvtbl cxsa_lvalue_acc_magic_vtable = {
+     0                               /* get   */
+    ,setter_for_lvalues              /* set   */
+    ,0                               /* len   */
+    ,0                               /* clear */
+    ,0                               /* free  */
+#if (PERL_BCDVERSION >= 0x5008000)
+    ,0                               /* copy  */
+    ,0                               /* dup   */
+#if (PERL_BCDVERSION >= 0x5008009)
+    ,0                               /* local */
+#endif /* perl >= 5.8.0 */
+#endif /* perl >= 5.8.9 */
 };
-
-
-
 
 MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor
 PROTOTYPES: DISABLE
