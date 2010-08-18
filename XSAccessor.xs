@@ -70,7 +70,7 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
  *
  * There are also situations in which the same entersub OP calls more than one CV: 
  *
- *     $foo->$_() for (foo bar); # OP 1: CV 1, CV 2
+ *     $foo->$_() for ('foo', 'bar'); # OP 1: CV 1, CV 2
  *
  * Inside each Class::XSAccessor XSUB, we can access the current entersub OP (PL_op).
  * The default entersub implementation (pp_entersub in pp_hot.c) has a lot of boilerplate for
@@ -151,7 +151,7 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
  *
  * In the second case, we reinstate the previous entersub, which by 1) was perl's pp_entersub.
  * In both cases, we flip a switch on the OP which ensures the *_init XSUB (if ever called again)
- * doesn't try to reinstate the optimized entersub.
+ * doesn't try to reinstate the optimized entersub for that OP.
  *
  * Note: Class::XSAccessor XSUBs continue to optimize "new" call sites, regardless of what may
  * have happened to a "previous" OP or what may happen to a "subsequent" OP. Take the following
@@ -163,7 +163,7 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
  *     4:
  *     5: for (1 .. 10) {
  *     6:     $self->foo();
- *     7:     $self->$_ for qw(foo bar);
+ *     7:     $self->$_ for ('foo', 'bar');
  *     8:     $self->foo();
  *     9: }
  *
