@@ -10,10 +10,11 @@ package WithClassXSAccessor;
 use blib;
 
 use Class::XSAccessor
-    constructor => 'new',
-    accessors   => { myattr => 'myattr' },
-    getters     => { get_myattr => 'myattr' },
-    setters     => { set_myattr => 'myattr' },
+    constructor      => 'new',
+    accessors        => { myattr => 'myattr' },
+    getters          => { get_myattr => 'myattr' },
+    setters          => { set_myattr => 'myattr' },
+    lvalue_accessors => { lv_myattr => 'myattr' },
 ;
 
 package WithStdClass;
@@ -120,6 +121,32 @@ cmpthese(timethese($count, {
         $std_class_fast->myattr($std_class_fast->myattr);
         $std_class_fast->myattr($std_class_fast->myattr);
         die unless ($std_class_fast->myattr == 42);
+    },
+    class_xs_accessor_lvalue => sub {
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->myattr;
+        die unless ($class_xs_accessor->myattr == 42);
+    },
+    class_xs_accessor_lvalue_double => sub {
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->lv_myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->lv_myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->lv_myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->lv_myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->lv_myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->lv_myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->lv_myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->lv_myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->lv_myattr;
+        $class_xs_accessor->lv_myattr = $class_xs_accessor->lv_myattr;
+        die unless ($class_xs_accessor->myattr == 42);
     },
 }));
 
