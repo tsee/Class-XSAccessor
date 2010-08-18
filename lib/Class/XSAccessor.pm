@@ -81,6 +81,7 @@ sub _generate_method {
   $subname = "${caller_pkg}::$subname" if $subname !~ /::/;
 
   Class::XSAccessor::Heavy::check_sub_existence($subname) if not $opts->{replace};
+  no warnings 'redefine'; # don't warn about an explicitly requested redefine
 
   if ($type eq 'getter') {
     newxs_getter($subname, $hashkey);
@@ -246,20 +247,20 @@ the C<class> option allows the target class to be specified.
 
 =head1 LVALUES
 
-The support for lvalue accessors via the keyword C<lvalue_accessors>
+Support for lvalue accessors via the keyword C<lvalue_accessors>
 was added in version 1.08. At this point, B<THEY ARE CONSIDERED HIGHLY
 EXPERIMENTAL>. Furthermore, their performance hasn't been benchmarked
 yet.
 
 The following example demonstrates an lvalue accessor:
 
-  package Adress;
+  package Address;
   use Class::XSAccessor
     constructor => 'new',
     lvalue_accessors => { zip_code => 'zip' };
   
   package main;
-  my $address = Adress->new(zip => 2);
+  my $address = Address->new(zip => 2);
   print $address->zip_code, "\n"; # prints 2
   $address->zip_code = 76135; # <--- This is it!
   print $address->zip_code, "\n"; # prints 76135
