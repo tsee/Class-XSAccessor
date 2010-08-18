@@ -491,7 +491,7 @@ setter_for_lvalues(pTHX_ SV *sv, MAGIC* mg)
   return TRUE;
 }
 
-STATIC struct mgvtbl cxsa_lvalue_acc_magic_vtable = {
+STATIC MGVTBL cxsa_lvalue_acc_magic_vtable = {
      0                               /* get   */
     ,setter_for_lvalues              /* set   */
     ,0                               /* len   */
