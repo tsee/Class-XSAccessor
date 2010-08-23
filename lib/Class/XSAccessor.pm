@@ -299,7 +299,7 @@ but it will be recycled when the same class, or a similar class, is loaded again
 
 Steffen Mueller E<lt>smueller@cpan.orgE<gt>
 
-Chocolateboy E<lt>chocolate@cpan.orgE<gt>
+chocolateboy E<lt>chocolate@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
