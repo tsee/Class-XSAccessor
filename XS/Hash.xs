@@ -320,12 +320,13 @@ constructor_init(class, ...)
     obj = sv_bless(newRV_noinc((SV *)hash), gv_stashpv(classname, 1));
 
     if (items > 1) {
-      if (!(items & 1)) /* i.e. @_ is not odd: most compilers probably do this, but just in case */
+      if (items & 1) { /* i.e. @_ - 1 (for $class) is even: most compilers probably do this, but just in case */
+        for (iStack = 1; iStack < items; iStack += 2) {
+          /* we could check for the hv_store_ent return value, but perl doesn't in this situation (see pp_anonhash) */
+          (void)hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
+        }
+      } else {
         croak("Uneven number of arguments to constructor.");
-
-      for (iStack = 1; iStack < items; iStack += 2) {
-        /* we could check for the hv_store_ent return value, but perl doesn't in this situation (see pp_anonhash) */
-        (void)hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
       }
     }
 
@@ -345,12 +346,13 @@ constructor(class, ...)
     obj = sv_bless(newRV_noinc((SV *)hash), gv_stashpv(classname, 1));
 
     if (items > 1) {
-      if (!(items & 1)) /* i.e. @_ is not odd: most compilers probably do this, but just in case */
+      if (items & 1) { /* i.e. @_ - 1 (for $class) is even: most compilers probably do this, but just in case */
+        for (iStack = 1; iStack < items; iStack += 2) {
+          /* we could check for the hv_store_ent return value, but perl doesn't in this situation (see pp_anonhash) */
+          (void)hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
+        }
+      } else {
         croak("Uneven number of arguments to constructor.");
-
-      for (iStack = 1; iStack < items; iStack += 2) {
-        /* we could check for the hv_store_ent return value, but perl doesn't in this situation (see pp_anonhash) */
-        (void)hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
       }
     }
 
