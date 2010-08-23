@@ -1,5 +1,9 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.07_02  Mon Aug 23 20:30 2010
+  - Various warning fixes and small cleanups over previous
+    dev. version.
+
 1.07_01  Wed Aug 18 20:30 2010
   - Experimental support for lvalue accessors:
     $obj->foo = 12
