@@ -11,7 +11,7 @@ use Class::XSAccessor::Array
 
 package main;
 
-use Test::More tests => 14;
+use Test::More tests => 17;
 
 ok (Class::XSAccessor::Test->can('new'));
 
@@ -33,3 +33,14 @@ is ($obj2->bar('quux'), 'quux');
 is ($obj2->bar(), 'quux');
 ok (!defined($obj2->blubber()));
 
+# make sure the object refcount is valid (i.e. it's not reaped at the end of an inner scope if it's
+# referenced in an outer scope)
+{
+    my $obj3;
+    {
+        $obj3 = do { Class::XSAccessor::Test->new(bar => 'baz', 'blubber' => 'blabber') };
+    }
+    ok($obj3, 'object not reaped in outer scope');
+    isa_ok($obj3, 'Class::XSAccessor::Test');
+    can_ok($obj3, qw(bar blubber get_foo set_foo));
+}
