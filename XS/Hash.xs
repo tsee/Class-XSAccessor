@@ -314,30 +314,21 @@ constructor_init(class, ...)
     const char* classname;
   PPCODE:
     CXAH_OPTIMIZE_ENTERSUB(constructor);
-    if (sv_isobject(class)) {
-      classname = sv_reftype(SvRV(class), 1);
-    }
-    else {
-      if (!SvPOK(class))
-        croak("Need an object or class name as first argument to the constructor.");
-      classname = SvPV_nolen(class);
-    }
-    
-    hash = (HV *)sv_2mortal((SV *)newHV());
-    obj = sv_bless( newRV_inc((SV*)hash), gv_stashpv(classname, 1) );
+
+    classname = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen_const(class);
+    hash = newHV();
+    obj = sv_bless(newRV_noinc((SV *)hash), gv_stashpv(classname, 1));
 
     if (items > 1) {
-      if (!(items % 2))
+      if (!(items & 1)) /* i.e. @_ + 1 is not odd: most compilers probably do this, but just in case */
         croak("Uneven number of arguments to constructor.");
 
       for (iStack = 1; iStack < items; iStack += 2) {
-        HE *he;
-        he = hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
-        if (!he) {
-          croak("Failed to write value to hash.");
-        }
+        /* we could check for the hv_store_ent return value, but perl doesn't in this situation (see pp_anonhash) */
+        (void)hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
       }
     }
+
     PUSHs(sv_2mortal(obj));
 
 void
@@ -349,30 +340,20 @@ constructor(class, ...)
     SV* obj;
     const char* classname;
   PPCODE:
-    if (sv_isobject(class)) {
-      classname = sv_reftype(SvRV(class), 1);
-    }
-    else {
-      if (!SvPOK(class))
-        croak("Need an object or class name as first argument to the constructor.");
-      classname = SvPV_nolen(class);
-    }
-    
-    hash = (HV *)sv_2mortal((SV *)newHV());
-    obj = sv_bless( newRV_inc((SV*)hash), gv_stashpv(classname, 1) );
+    classname = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen_const(class);
+    hash = newHV();
+    obj = sv_bless(newRV_noinc((SV *)hash), gv_stashpv(classname, 1));
 
     if (items > 1) {
-      if (!(items % 2))
+      if (!(items & 1)) /* i.e. @_ + 1 is not odd: most compilers probably do this, but just in case */
         croak("Uneven number of arguments to constructor.");
 
       for (iStack = 1; iStack < items; iStack += 2) {
-        HE *he;
-        he = hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
-        if (!he) {
-          croak("Failed to write value to hash.");
-        }
+        /* we could check for the hv_store_ent return value, but perl doesn't in this situation (see pp_anonhash) */
+        (void)hv_store_ent(hash, ST(iStack), newSVsv(ST(iStack+1)), 0);
       }
     }
+
     PUSHs(sv_2mortal(obj));
 
 void

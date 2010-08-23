@@ -36,4 +36,3 @@ is ($obj2->blubber(), 'blabber');
 
 eval 'Class::XSAccessor::Test->new("uneven_no_of_args")';
 ok ($@);
-
