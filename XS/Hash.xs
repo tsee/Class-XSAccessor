@@ -320,7 +320,7 @@ constructor_init(class, ...)
     obj = sv_bless(newRV_noinc((SV *)hash), gv_stashpv(classname, 1));
 
     if (items > 1) {
-      if (!(items & 1)) /* i.e. @_ + 1 is not odd: most compilers probably do this, but just in case */
+      if (!(items & 1)) /* i.e. @_ is not odd: most compilers probably do this, but just in case */
         croak("Uneven number of arguments to constructor.");
 
       for (iStack = 1; iStack < items; iStack += 2) {
@@ -345,7 +345,7 @@ constructor(class, ...)
     obj = sv_bless(newRV_noinc((SV *)hash), gv_stashpv(classname, 1));
 
     if (items > 1) {
-      if (!(items & 1)) /* i.e. @_ + 1 is not odd: most compilers probably do this, but just in case */
+      if (!(items & 1)) /* i.e. @_ is not odd: most compilers probably do this, but just in case */
         croak("Uneven number of arguments to constructor.");
 
       for (iStack = 1; iStack < items; iStack += 2) {
