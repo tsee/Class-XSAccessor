@@ -3,15 +3,19 @@ use warnings;
 
 package Class::XSAccessor::Test;
 
+our $DESTROYED = 0;
+
 use Class::XSAccessor
   constructor => 'new',
   accessors => { bar => 'bar', blubber => 'blubber' },
   getters   => { get_foo => 'foo' },
   setters   => { set_foo => 'foo' };
 
+sub DESTROY { $DESTROYED = 1 }
+
 package main;
 
-use Test::More tests => 7*2+2+3;
+use Test::More tests => 23;
 
 ok (Class::XSAccessor::Test->can('new'));
 
@@ -42,9 +46,14 @@ ok ($@);
 {
     my $obj3;
     {
+        is($Class::XSAccessor::Test::DESTROYED, 0);
         $obj3 = do { Class::XSAccessor::Test->new(bar => 'baz', 'blubber' => 'blabber') };
+        is($Class::XSAccessor::Test::DESTROYED, 0);
     }
+    is($Class::XSAccessor::Test::DESTROYED, 0);
     ok($obj3, 'object not reaped in outer scope');
     isa_ok($obj3, 'Class::XSAccessor::Test');
     can_ok($obj3, qw(bar blubber get_foo set_foo));
 }
+
+is($Class::XSAccessor::Test::DESTROYED, 1);
