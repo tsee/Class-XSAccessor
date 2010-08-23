@@ -305,18 +305,10 @@ constructor_init(class, ...)
     const char* classname;
   PPCODE:
     CXAA_OPTIMIZE_ENTERSUB(constructor);
-    if (sv_isobject(class)) {
-      classname = sv_reftype(SvRV(class), 1);
-    }
-    else {
-      if (!SvPOK(class))
-        croak("Need an object or class name as first argument to the constructor.");
-      classname = SvPV_nolen(class);
-    }
-    
-    array = (AV *)sv_2mortal((SV *)newAV());
-    obj = sv_bless( newRV_inc((SV*)array), gv_stashpv(classname, 1) );
 
+    classname = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen_const(class);
+    array = newAV();
+    obj = sv_bless( newRV_noinc((SV*)array), gv_stashpv(classname, 1) );
     /* we ignore arguments. See Class::XSAccessor's XS code for
      * how we'd use them in case of bless {@_} => $class.
      */
@@ -330,18 +322,9 @@ constructor(class, ...)
     SV* obj;
     const char* classname;
   PPCODE:
-    if (sv_isobject(class)) {
-      classname = sv_reftype(SvRV(class), 1);
-    }
-    else {
-      if (!SvPOK(class))
-        croak("Need an object or class name as first argument to the constructor.");
-      classname = SvPV_nolen(class);
-    }
-    
-    array = (AV *)sv_2mortal((SV *)newAV());
-    obj = sv_bless( newRV_inc((SV*)array), gv_stashpv(classname, 1) );
-
+    classname = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen_const(class);
+    array = newAV();
+    obj = sv_bless( newRV_noinc((SV*)array), gv_stashpv(classname, 1) );
     /* we ignore arguments. See Class::XSAccessor's XS code for
      * how we'd use them in case of bless {@_} => $class.
      */

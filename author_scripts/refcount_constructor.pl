@@ -9,16 +9,29 @@ use Devel::Peek;
 use blib;
 
 use Class::XSAccessor {
-    constructor => 'cxa',
+    constructor => 'hash_cxa',
 };
 
-sub normal {
+use Class::XSAccessor::Array {
+    constructor => 'array_cxa',
+};
+
+sub hash_normal {
     my $class = shift;
     bless { @_ }, ref($class) || $class;
 }
 
+sub array_normal {
+    my $class = shift;
+    bless [], ref($class) || $class;
+}
+
 {
-    Dump(__PACKAGE__->cxa(foo => 'bar'));
+    Dump(__PACKAGE__->hash_cxa(foo => 'bar'));
     warn $/;
-    Dump(__PACKAGE__->normal(foo => 'bar'));
+    Dump(__PACKAGE__->hash_normal(foo => 'bar'));
+    warn $/;
+    Dump(__PACKAGE__->array_cxa());
+    warn $/;
+    Dump(__PACKAGE__->array_normal());
 }
