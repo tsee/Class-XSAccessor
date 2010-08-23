@@ -1,4 +1,5 @@
-package Class::XSAccessor::Heavy;
+package # hide from PAUSE
+    Class::XSAccessor::Heavy;
 
 use 5.006;
 use strict;
