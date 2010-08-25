@@ -18,12 +18,12 @@ getter_init(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
     CXAH_OPTIMIZE_ENTERSUB(getter);
-    if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-      PUSHs(*he);
+    if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+      PUSHs(*svp);
     else
       XSRETURN_UNDEF;
 
@@ -36,11 +36,11 @@ getter(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
-    if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-      PUSHs(*he);
+    if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+      PUSHs(*svp);
     else
       XSRETURN_UNDEF;
 
@@ -54,13 +54,13 @@ lvalue_accessor_init(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
     SV* sv;
   PPCODE:
     CXA_CHECK_HASH(self);
     CXAH_OPTIMIZE_ENTERSUB(lvalue_accessor);
-    if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) {
-      sv = *he;
+    if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) {
+      sv = *svp;
       sv_upgrade(sv, SVt_PVLV);
       sv_magic(sv, 0, PERL_MAGIC_ext, Nullch, 0);
       SvSMAGICAL_on(sv);
@@ -82,12 +82,12 @@ lvalue_accessor(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
     SV* sv;
   PPCODE:
     CXA_CHECK_HASH(self);
-    if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) {
-      sv = *he;
+    if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) {
+      sv = *svp;
       sv_upgrade(sv, SVt_PVLV);
       sv_magic(sv, 0, PERL_MAGIC_ext, Nullch, 0);
       SvSMAGICAL_on(sv);
@@ -176,7 +176,7 @@ accessor_init(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
     CXAH_OPTIMIZE_ENTERSUB(accessor);
@@ -187,8 +187,8 @@ accessor_init(self, ...)
       PUSHs(newvalue);
     }
     else {
-      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        PUSHs(*he);
+      if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        PUSHs(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -202,7 +202,7 @@ accessor(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
     if (items > 1) {
@@ -212,8 +212,8 @@ accessor(self, ...)
       PUSHs(newvalue);
     }
     else {
-      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        PUSHs(*he);
+      if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        PUSHs(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -227,7 +227,7 @@ chained_accessor_init(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
     CXAH_OPTIMIZE_ENTERSUB(chained_accessor);
@@ -238,8 +238,8 @@ chained_accessor_init(self, ...)
       PUSHs(self);
     }
     else {
-      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        PUSHs(*he);
+      if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        PUSHs(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -253,7 +253,7 @@ chained_accessor(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
     if (items > 1) {
@@ -263,8 +263,8 @@ chained_accessor(self, ...)
       PUSHs(self);
     }
     else {
-      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        PUSHs(*he);
+      if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        PUSHs(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -278,11 +278,11 @@ predicate_init(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
     CXAH_OPTIMIZE_ENTERSUB(predicate);
-    if ( ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*he) )
+    if ( ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*svp) )
        XSRETURN_YES;
     else
       XSRETURN_NO;
@@ -296,10 +296,10 @@ predicate(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
-    if ( ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*he) )
+    if ( ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*svp) )
        XSRETURN_YES;
     else
       XSRETURN_NO;
@@ -407,7 +407,7 @@ test_init(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
     warn("cxah: accessor: inside test_init");
@@ -419,8 +419,8 @@ test_init(self, ...)
       PUSHs(newvalue);
     }
     else {
-      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        PUSHs(*he);
+      if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        PUSHs(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -434,7 +434,7 @@ test(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
-    SV** he;
+    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
     warn("cxah: accessor: inside test");
@@ -445,8 +445,8 @@ test(self, ...)
       PUSHs(newvalue);
     }
     else {
-      if ((he = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
-        PUSHs(*he);
+      if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash)))
+        PUSHs(*svp);
       else
         XSRETURN_UNDEF;
     }

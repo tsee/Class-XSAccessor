@@ -10,12 +10,12 @@ getter_init(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
-    SV** elem;
+    SV** svp;
   PPCODE:
     CXA_CHECK_ARRAY(self);
     CXAA_OPTIMIZE_ENTERSUB(getter);
-    if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-      PUSHs(elem[0]);
+    if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
+      PUSHs(svp[0]);
     else
       XSRETURN_UNDEF;
 
@@ -28,11 +28,11 @@ getter(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
-    SV** elem;
+    SV** svp;
   PPCODE:
     CXA_CHECK_ARRAY(self);
-    if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-      PUSHs(elem[0]);
+    if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
+      PUSHs(svp[0]);
     else
       XSRETURN_UNDEF;
 
@@ -45,13 +45,13 @@ lvalue_accessor_init(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
-    SV** elem;
+    SV** svp;
     SV* sv;
   PPCODE:
     CXA_CHECK_ARRAY(self);
     CXAA_OPTIMIZE_ENTERSUB(lvalue_accessor);
-    if ((elem = av_fetch((AV *)SvRV(self), index, 1))) {
-      sv = *elem;
+    if ((svp = av_fetch((AV *)SvRV(self), index, 1))) {
+      sv = *svp;
       sv_upgrade(sv, SVt_PVLV);
       sv_magic(sv, 0, PERL_MAGIC_ext, Nullch, 0);
       SvSMAGICAL_on(sv);
@@ -74,12 +74,12 @@ lvalue_accessor(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
-    SV** elem;
+    SV** svp;
     SV* sv;
   PPCODE:
     CXA_CHECK_ARRAY(self);
-    if ((elem = av_fetch((AV *)SvRV(self), index, 1))) {
-      sv = *elem;
+    if ((svp = av_fetch((AV *)SvRV(self), index, 1))) {
+      sv = *svp;
       sv_upgrade(sv, SVt_PVLV);
       sv_magic(sv, 0, PERL_MAGIC_ext, Nullch, 0);
       SvSMAGICAL_on(sv);
@@ -168,7 +168,7 @@ accessor_init(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
-    SV** elem;
+    SV** svp;
   PPCODE:
     CXA_CHECK_ARRAY(self);
     CXAA_OPTIMIZE_ENTERSUB(accessor);
@@ -179,8 +179,8 @@ accessor_init(self, ...)
       PUSHs(newvalue);
     }
     else {
-      if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-        PUSHs(elem[0]);
+      if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
+        PUSHs(svp[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -194,7 +194,7 @@ accessor(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
-    SV** elem;
+    SV** svp;
   PPCODE:
     CXA_CHECK_ARRAY(self);
     if (items > 1) {
@@ -204,8 +204,8 @@ accessor(self, ...)
       PUSHs(newvalue);
     }
     else {
-      if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-        PUSHs(elem[0]);
+      if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
+        PUSHs(svp[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -219,7 +219,7 @@ chained_accessor_init(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
-    SV** elem;
+    SV** svp;
   PPCODE:
     CXA_CHECK_ARRAY(self);
     CXAA_OPTIMIZE_ENTERSUB(chained_accessor);
@@ -230,8 +230,8 @@ chained_accessor_init(self, ...)
       PUSHs(self);
     }
     else {
-      if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-        PUSHs(elem[0]);
+      if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
+        PUSHs(svp[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -245,7 +245,7 @@ chained_accessor(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
-    SV** elem;
+    SV** svp;
   PPCODE:
     CXA_CHECK_ARRAY(self);
     if (items > 1) {
@@ -255,8 +255,8 @@ chained_accessor(self, ...)
       PUSHs(self);
     }
     else {
-      if ((elem = av_fetch((AV *)SvRV(self), index, 1)))
-        PUSHs(elem[0]);
+      if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
+        PUSHs(svp[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -270,11 +270,11 @@ predicate_init(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
-    SV** elem;
+    SV** svp;
   PPCODE:
     CXA_CHECK_ARRAY(self);
     CXAA_OPTIMIZE_ENTERSUB(predicate);
-    if ( (elem = av_fetch((AV *)SvRV(self), index, 1)) && SvOK(elem[0]) )
+    if ( (svp = av_fetch((AV *)SvRV(self), index, 1)) && SvOK(svp[0]) )
       XSRETURN_YES;
     else
       XSRETURN_NO;
@@ -288,10 +288,10 @@ predicate(self)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     const I32 index = CXSAccessor_arrayindices[ix];
-    SV** elem;
+    SV** svp;
   PPCODE:
     CXA_CHECK_ARRAY(self);
-    if ( (elem = av_fetch((AV *)SvRV(self), index, 1)) && SvOK(elem[0]) )
+    if ( (svp = av_fetch((AV *)SvRV(self), index, 1)) && SvOK(svp[0]) )
       XSRETURN_YES;
     else
       XSRETURN_NO;

@@ -3,13 +3,13 @@ use warnings;
 
 package Class::XSAccessor::Test;
 
-our $DESTROYED = 0;
-
 use Class::XSAccessor
   constructor => 'new',
   accessors => { bar => 'bar', blubber => 'blubber' },
   getters   => { get_foo => 'foo' },
   setters   => { set_foo => 'foo' };
+
+our $DESTROYED = 0;
 
 sub DESTROY { $DESTROYED = 1 }
 
