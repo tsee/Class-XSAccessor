@@ -24,9 +24,11 @@
  * perlapi.h, which imposes the speed limit.
  */
 
+#ifndef WIN32 /* thanks to Andy Grundman for pointing out problems with this on ActivePerl >= 5.10 */
 #define PERL_CORE
 #include "XSUB.h"
 #undef PERL_CORE
+#endif
 
 #include "ppport.h"
 
