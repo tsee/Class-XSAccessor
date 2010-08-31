@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 35;
+use Test::More tests => 37;
 BEGIN { use_ok('Class::XSAccessor') };
 
 package Foo;
@@ -10,6 +10,14 @@ use Class::XSAccessor
     get_foo => 'foo',
     get_bar => 'bar',
   };
+
+# test run-time generation, too
+Class::XSAccessor->import(
+  getters => {
+    get_c => 'c',
+  }
+);
+
 package main;
 
 BEGIN {pass();}
@@ -28,10 +36,11 @@ BEGIN {pass();}
 ok( Foo->can('get_foo') );
 ok( Foo->can('get_bar') );
 
-my $foo = bless  {foo => 'a', bar => 'b'} => 'Foo';
+my $foo = bless  {foo => 'a', bar => 'b', c => 'd'} => 'Foo';
 ok($foo->get_foo() eq 'a');
 ok($foo->get_bar() eq 'b');
-
+can_ok($foo, 'get_c');
+is($foo->get_c(), 'd');
 
 package Foo;
 use Class::XSAccessor
