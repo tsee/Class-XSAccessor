@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 37;
+use Test::More tests => 39;
 BEGIN { use_ok('Class::XSAccessor') };
 
 package Foo;
@@ -132,4 +132,15 @@ is($FOO->b(), '1b');
 is($FOO->barfle(), 'works');
 $FOO->set_barfle("elfrab");
 is($FOO->barfle(), "elfrab");
+
+
+# test fully qualified name in other class
+Class::XSAccessor->import(
+  getters => {
+    "Foo::also_get_c" => 'c'
+  },
+);
+
+can_ok($FOO, 'also_get_c');
+is($FOO->also_get_c(), $FOO->{c});
 
