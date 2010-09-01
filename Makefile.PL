@@ -22,7 +22,7 @@ WriteMakefile1(
     MIN_PERL_VERSION => '5.008',
     META_MERGE => {
         resources => {
-            repository => 'http://svn.ali.as/cpan/trunk/Class-XSAccessor',
+            repository => 'git://github.com/tsee/Class-XSAccessor.git'
         },
     },
     BUILD_REQUIRES => {
