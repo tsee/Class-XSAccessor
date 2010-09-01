@@ -1,7 +1,7 @@
 package # hide from PAUSE
     Class::XSAccessor::Heavy;
 
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use Carp;

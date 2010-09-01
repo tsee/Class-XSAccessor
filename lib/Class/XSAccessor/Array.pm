@@ -1,6 +1,5 @@
 package Class::XSAccessor::Array;
-
-use 5.006;
+use 5.008;
 use strict;
 use warnings;
 use Carp qw/croak/;
