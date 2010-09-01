@@ -283,7 +283,7 @@ predicate_init(self)
     CXA_CHECK_HASH(self);
     CXAH_OPTIMIZE_ENTERSUB(predicate);
     if ( ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*svp) )
-       XSRETURN_YES;
+      XSRETURN_YES;
     else
       XSRETURN_NO;
 
@@ -300,7 +300,7 @@ predicate(self)
   PPCODE:
     CXA_CHECK_HASH(self);
     if ( ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom.key, readfrom.len, readfrom.hash))) && SvOK(*svp) )
-       XSRETURN_YES;
+      XSRETURN_YES;
     else
       XSRETURN_NO;
 
