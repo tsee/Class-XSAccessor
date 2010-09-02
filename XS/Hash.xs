@@ -163,7 +163,8 @@ array_setter_init(self, ...)
       AV* tmp = newAV();
       av_extend(tmp, items-1);
       for (i = 1; i < items; ++i) {
-        if (!av_store(tmp, i-1, newSVsv(ST(i)))) {
+        newvalue = newSVsv(ST(i));
+        if (!av_store(tmp, i-1, newvalue)) {
           SvREFCNT_dec(newvalue);
           croak("Failure to store value in array");
         }
@@ -205,7 +206,8 @@ array_setter(self, ...)
       AV* tmp = newAV();
       av_extend(tmp, items-1);
       for (i = 1; i < items; ++i) {
-        if (!av_store(tmp, i-1, newSVsv(ST(i)))) {
+        newvalue = newSVsv(ST(i));
+        if (!av_store(tmp, i-1, newvalue)) {
           SvREFCNT_dec(newvalue);
           croak("Failure to store value in array");
         }
@@ -340,7 +342,8 @@ array_accessor_init(self, ...)
         AV* tmp = newAV();
         av_extend(tmp, items-1);
         for (i = 1; i < items; ++i) {
-          if (!av_store(tmp, i-1, newSVsv(ST(i)))) {
+          newvalue = newSVsv(ST(i));
+          if (!av_store(tmp, i-1, newvalue)) {
             SvREFCNT_dec(newvalue);
             croak("Failure to store value in array");
           }
@@ -388,7 +391,8 @@ array_accessor(self, ...)
         AV* tmp = newAV();
         av_extend(tmp, items-1);
         for (i = 1; i < items; ++i) {
-          if (!av_store(tmp, i-1, newSVsv(ST(i)))) {
+          newvalue = newSVsv(ST(i));
+          if (!av_store(tmp, i-1, newvalue)) {
             SvREFCNT_dec(newvalue);
             croak("Failure to store value in array");
           }
