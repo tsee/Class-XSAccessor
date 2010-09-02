@@ -16,6 +16,10 @@ if ($Config{gccversion}) {
     $OPTIMIZE = $Config{optimize};
 }
 
+if ($ENV{DEBUG}) {
+  $OPTIMIZE .= ' -g';
+}
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile1(
