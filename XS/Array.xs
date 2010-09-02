@@ -1,3 +1,6 @@
+#define NEED_sv_2pv_flags_GLOBAL
+#include "ppport.h"
+
 MODULE = Class::XSAccessor		PACKAGE = Class::XSAccessor::Array
 PROTOTYPES: DISABLE
 
@@ -343,7 +346,7 @@ newxs_lvalue_accessor(name, index)
   U32 index;
   PPCODE:
     INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(getter_init), index);
-    // Make the CV lvalue-able. "cv" was set by the previous macro
+    /* Make the CV lvalue-able. "cv" was set by the previous macro */
     CvLVALUE_on(cv);
 
 void

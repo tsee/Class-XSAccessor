@@ -1,3 +1,4 @@
+#include "ppport.h"
 ## we want hv_fetch but with the U32 hash argument of hv_fetch_ent, so do it ourselves...
 
 #ifdef hv_common_key_len
@@ -145,7 +146,7 @@ array_setter_init(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     SV* newvalue;
-    HE* hashAssignRes;
+    SV ** hashAssignRes;
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
     CXA_CHECK_HASH(self);
@@ -154,7 +155,7 @@ array_setter_init(self, ...)
       newvalue = newSVsv(ST(1));
     }
     else if (items > 2) {
-      UV i;
+      I32 i;
       AV* tmp = newAV();
       av_extend(tmp, items-1);
       for (i = 1; i < items; ++i) {
@@ -169,8 +170,8 @@ array_setter_init(self, ...)
       croak_xs_usage(cv, "self, newvalue(s)");
     }
 
-    if (hashAssignRes = hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newvalue, readfrom.hash)) {
-      PUSHs(HeVAL(hashAssignRes));
+    if ((hashAssignRes = hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newvalue, readfrom.hash))) {
+      PUSHs(*hashAssignRes);
     }
     else {
       SvREFCNT_dec(newvalue);
@@ -188,7 +189,7 @@ array_setter(self, ...)
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
     SV* newvalue;
-    HE* hashAssignRes;
+    SV ** hashAssignRes;
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
     CXA_CHECK_HASH(self);
@@ -196,7 +197,7 @@ array_setter(self, ...)
       newvalue = newSVsv(ST(1));
     }
     else if (items > 2) {
-      UV i;
+      I32 i;
       AV* tmp = newAV();
       av_extend(tmp, items-1);
       for (i = 1; i < items; ++i) {
@@ -211,8 +212,8 @@ array_setter(self, ...)
       croak_xs_usage(cv, "self, newvalue(s)");
     }
 
-    if (hashAssignRes = hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newvalue, readfrom.hash)) {
-      PUSHs(HeVAL(hashAssignRes));
+    if ((hashAssignRes = hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newvalue, readfrom.hash))) {
+      PUSHs(*hashAssignRes);
     }
     else {
       SvREFCNT_dec(newvalue);
@@ -313,7 +314,7 @@ array_accessor_init(self, ...)
     /* Get the const hash key struct from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    HE* hashAssignRes;
+    SV ** hashAssignRes;
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
     CXA_CHECK_HASH(self);
@@ -331,7 +332,7 @@ array_accessor_init(self, ...)
         newvalue = newSVsv(ST(1));
       }
       else { /* items > 2 */
-        UV i;
+        I32 i;
         AV* tmp = newAV();
         av_extend(tmp, items-1);
         for (i = 1; i < items; ++i) {
@@ -343,8 +344,8 @@ array_accessor_init(self, ...)
         newvalue = newRV_noinc((SV*) tmp);
       }
 
-      if (hashAssignRes = hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newvalue, readfrom.hash)) {
-        PUSHs(HeVAL(hashAssignRes));
+      if ((hashAssignRes = hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newvalue, readfrom.hash))) {
+        PUSHs(*hashAssignRes);
       }
       else {
         SvREFCNT_dec(newvalue);
@@ -362,7 +363,7 @@ array_accessor(self, ...)
     /* Get the const hash key struct from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    HE* hashAssignRes;
+    SV ** hashAssignRes;
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
     CXA_CHECK_HASH(self);
@@ -379,7 +380,7 @@ array_accessor(self, ...)
         newvalue = newSVsv(ST(1));
       }
       else { /* items > 2 */
-        UV i;
+        I32 i;
         AV* tmp = newAV();
         av_extend(tmp, items-1);
         for (i = 1; i < items; ++i) {
@@ -391,8 +392,8 @@ array_accessor(self, ...)
         newvalue = newRV_noinc((SV*) tmp);
       }
 
-      if (hashAssignRes = hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newvalue, readfrom.hash)) {
-        PUSHs(HeVAL(hashAssignRes));
+      if ((hashAssignRes = hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newvalue, readfrom.hash))) {
+        PUSHs(*hashAssignRes);
       }
       else {
         SvREFCNT_dec(newvalue);
@@ -648,7 +649,7 @@ newxs_lvalue_accessor(name, key)
     CV *cv;
   PPCODE:
     INSTALL_NEW_CV_HASH_OBJ(name, CXAH(lvalue_accessor_init), key);
-    // Make the CV lvalue-able. "cv" was set by the previous macro
+    /* Make the CV lvalue-able. "cv" was set by the previous macro */
     CvLVALUE_on(cv);
 
 void
