@@ -1,17 +1,14 @@
 package Class::XSAccessor;
 use 5.008;
-
 use strict;
 use warnings;
-
 use Carp qw/croak/;
+use Class::XSAccessor::Heavy;
+use XSLoader;
 
 our $VERSION = '1.07_02';
 
-require XSLoader;
 XSLoader::load('Class::XSAccessor', $VERSION);
-
-require Class::XSAccessor::Heavy;
 
 sub _make_hash {
   my $ref = shift;

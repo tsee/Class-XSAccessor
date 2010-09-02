@@ -3,11 +3,10 @@ use 5.008;
 use strict;
 use warnings;
 use Carp qw/croak/;
+use Class::XSAccessor;
+use Class::XSAccessor::Heavy;
 
 our $VERSION = '1.07_02';
-
-require Class::XSAccessor;
-require Class::XSAccessor::Heavy;
 
 sub import {
   my $own_class = shift;
@@ -283,4 +282,3 @@ it under the same terms as Perl itself, either Perl version 5.8 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
-
