@@ -150,7 +150,7 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
  * This also applies if a method is redefined so that an optimized
  * entersub is passed a different type of CV than the one it's optimized for.
  *
- * The first case is detected inside the _init accessor. The second case is detected inside
+ * 1) is detected inside the _init accessor. 2) is detected inside
  * the optimized entersub.
  *
  * In the second case, we reinstate the previous entersub, which by 1) was perl's pp_entersub.
@@ -179,9 +179,10 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
  * "new" entersub OPs to optimize. Indeed, any calls to &Example::foo will get the optimization treatment,
  * even call sites outside the Example package/file.
  *
- * The following CXAH_OPTIMIZE_ENTERSUB* macros are called from within our *_init accessors
- * to install the optimized entersub (or disable optimization for that OP). And the CXAH_GENERATE_ENTERSUB* macros
- * further down generate optimized entersubs for the accessors defined in XS/Hash.xs and XS/Array.xs.
+ * The following CXAA_OPTIMIZE_ENTERSUB* (Array) and CXAH_OPTIMIZE_ENTERSUB* (Hash) macros are
+ * called from within our *_init accessors to install the optimized entersub (or disable optimization
+ * for that OP). And the CXAA_GENERATE_ENTERSUB* and CXAH_GENERATE_ENTERSUB* macros further down
+ * generate optimized entersubs for the accessors defined in XS/Array.xs and XS/Hash.xs.
  */
 
 #if (PERL_BCDVERSION >= 0x5010000)
@@ -192,10 +193,11 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
 #define CXA_OPTIMIZATION_OK(op) ((op->op_spare & 1) != 1)
 #define CXA_DISABLE_OPTIMIZATION(op) (op->op_spare |= 1)
 
+/* see t/08hash_entersub.t */
 #define CXAH_OPTIMIZE_ENTERSUB_TEST(name)                                          \
 STMT_START {                                                                       \
     /* print op_spare so that we get failing tests if perl starts using it */      \
-    warn("cxah: accessor: op_spare: %03b\n", PL_op->op_spare);                     \
+    warn("cxah: accessor: op_spare: %u\n", PL_op->op_spare);                       \
                                                                                    \
     if (CXA_OPTIMIZATION_OK(PL_op)) {                                              \
         if (PL_op->op_ppaddr == CXA_DEFAULT_ENTERSUB) {                            \
@@ -231,13 +233,13 @@ STMT_START {                                                                    
         }                                                                          \
     }                                                                              \
 } STMT_END
-#else /* CXA_ENABLE_ENTERSUB_OPTIMIZATION */
-#define CXAH_OPTIMIZE_ENTERSUB_TEST(name)
-#define CXAH_OPTIMIZE_ENTERSUB(name)
-#define CXAA_OPTIMIZE_ENTERSUB(name)
-#define CXAH_GENERATE_ENTERSUB_TEST(name)
-#define CXAH_GENERATE_ENTERSUB(name)
+#else /* CXA_ENABLE_ENTERSUB_OPTIMIZATION is not defined */
 #define CXAA_GENERATE_ENTERSUB(name)
+#define CXAA_OPTIMIZE_ENTERSUB(name)
+#define CXAH_GENERATE_ENTERSUB(name)
+#define CXAH_OPTIMIZE_ENTERSUB(name)
+#define CXAH_GENERATE_ENTERSUB_TEST(name)
+#define CXAH_OPTIMIZE_ENTERSUB_TEST(name)
 #endif
 
 /*
@@ -315,7 +317,7 @@ OP * cxah_entersub_ ## name(pTHX) {                                             
         }                                                                        \
         CXA_DISABLE_OPTIMIZATION(PL_op); /* make sure it's not reinstated */     \
         PL_op->op_ppaddr = CXA_DEFAULT_ENTERSUB;                                 \
-        return CALL_FPTR(CXA_DEFAULT_ENTERSUB)(aTHX);                            \
+        return CXA_DEFAULT_ENTERSUB(aTHX);                                       \
     }                                                                            \
 }
 
@@ -334,7 +336,7 @@ OP * cxah_entersub_ ## name(pTHX) {                                             
     } else { /* not static: disable optimization */                                     \
         CXA_DISABLE_OPTIMIZATION(PL_op); /* make sure it's not reinstated */            \
         PL_op->op_ppaddr = CXA_DEFAULT_ENTERSUB;                                        \
-        return CALL_FPTR(CXA_DEFAULT_ENTERSUB)(aTHX);                                   \
+        return CXA_DEFAULT_ENTERSUB(aTHX);                                              \
     }                                                                                   \
 }
 
@@ -353,7 +355,7 @@ OP * cxaa_entersub_ ## name(pTHX) {                                             
     } else { /* not static: disable optimization */                                     \
         CXA_DISABLE_OPTIMIZATION(PL_op); /* make sure it's not reinstated */            \
         PL_op->op_ppaddr = CXA_DEFAULT_ENTERSUB;                                        \
-        return CALL_FPTR(CXA_DEFAULT_ENTERSUB)(aTHX);                                   \
+        return CXA_DEFAULT_ENTERSUB(aTHX);                                              \
     }                                                                                   \
 }
 #endif /* CXA_ENABLE_ENTERSUB_OPTIMIZATION */
