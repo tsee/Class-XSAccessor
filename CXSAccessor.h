@@ -80,7 +80,7 @@ STMT_START {                                  \
 } STMT_END
 
 void _init_cxsa_lock(cxsa_global_lock* theLock) {
-  Zero(theLock, 1, cxsa_global_lock);
+  cxa_memzero((void*)theLock, sizeof(cxsa_global_lock));
   MUTEX_INIT(&theLock->mutex);
   COND_INIT(&theLock->cond);
   theLock->locks = 0;
@@ -119,11 +119,10 @@ I32 _new_hashkey() {
   if (CXSAccessor_no_hashkeys == CXSAccessor_free_hashkey_no) {
     U32 extend = 1 + CXSAccessor_no_hashkeys * 2;
     /*printf("extending hashkey storage by %u\n", extend);*/
-    autoxs_hashkey* tmphashkeys;
-    Newx(tmphashkeys, CXSAccessor_no_hashkeys + extend, autoxs_hashkey);
-    Copy(CXSAccessor_hashkeys, tmphashkeys, CXSAccessor_no_hashkeys, autoxs_hashkey);
-    Safefree(CXSAccessor_hashkeys);
-    CXSAccessor_hashkeys = tmphashkeys;
+    CXSAccessor_hashkeys = (autoxs_hashkey*)cxa_realloc(
+      (void*)CXSAccessor_hashkeys,
+      (CXSAccessor_no_hashkeys + extend) * sizeof(autoxs_hashkey)
+    );
     CXSAccessor_no_hashkeys += extend;
   }
   return CXSAccessor_free_hashkey_no++;
@@ -133,21 +132,13 @@ I32 _new_hashkey() {
 /* implement array containers */
 
 void _resize_array(I32** array, U32* len, U32 newlen) {
-  I32* tmparraymap;
-  Newx(tmparraymap, newlen * sizeof(I32), I32);
-  Copy(*array, tmparraymap, *len, I32);
-  Safefree(*array);
-  *array = tmparraymap;
+  *array = (I32*)cxa_realloc((void*)(*array), newlen*sizeof(I32));
   *len = newlen;
 }
 
 void _resize_array_init(I32** array, U32* len, U32 newlen, I32 init) {
   U32 i;
-  I32* tmparraymap;
-  Newx(tmparraymap, newlen * sizeof(I32), I32);
-  Copy(*array, tmparraymap, *len, I32);
-  Safefree(*array);
-  *array = tmparraymap;
+  *array = (I32*)cxa_realloc((void*)(*array), newlen*sizeof(I32));
   for (i = *len; i < newlen; ++i)
     (*array)[i] = init;
   *len = newlen;
