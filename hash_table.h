@@ -51,13 +51,13 @@ STATIC HashTable* CXSA_HashTable_new(UV size, NV threshold) {
         croak("invalid threshold: expected 0.0 < threshold < 1.0, got %f", threshold);
     }
 
-    Newxz(table, 1, HashTable);
+    table = (HashTable*)cxa_zmalloc(sizeof(HashTable));
 
     table->size = size;
     table->threshold = threshold;
     table->items = 0;
 
-    Newxz(table->array, size, HashTableEntry*);
+    table->array = (HashTableEntry**)cxa_zmalloc(size * sizeof(HashTableEntry*));
 
     return table;
 }
@@ -116,10 +116,11 @@ STATIC I32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, I
         entry->value = value;
     } else {
         const UV index = CXSA_string_hash(key, len) & (table->size - 1);
-        Newx(entry, 1, HashTableEntry);
+        entry = (HashTableEntry*)cxa_malloc(sizeof(HashTableEntry));
 
-        Newx(entry->key, len+1, char);
-        Copy(key, entry->key, len+1, char);
+        entry->key = (char*)cxa_malloc( (len+1) );
+        cxa_memcpy((void*)entry->key, (void*)key, len+1);
+        /*Copy(key, entry->key, len+1, char);*/
         entry->len   = len;
         entry->value = value;
         entry->next  = table->array[index];
@@ -141,8 +142,12 @@ STATIC void CXSA_HashTable_grow(HashTable* table) {
     UV newsize = oldsize * 2;
     UV i;
 
-    Renew(array, newsize, HashTableEntry*);
+    array = (HashTableEntry**)cxa_realloc((void*)array, sizeof(HashTableEntry*)*newsize);
+    cxa_memzero(&array[oldsize], (newsize-oldsize)*sizeof(HashTableEntry*));
+
+    /*Renew(array, newsize, HashTableEntry*);
     Zero(&array[oldsize], newsize - oldsize, HashTableEntry*);
+    */
     table->size = newsize;
     table->array = array;
 
@@ -181,8 +186,8 @@ STATIC void CXSA_HashTable_clear(HashTable *table) {
                 HashTableEntry* const temp = entry;
                 entry = entry->next;
                 if (temp->key)
-                    Safefree(temp->key);
-                Safefree(temp);
+                    cxa_free((void*)temp->key);
+                cxa_free(temp);
             }
 
             /* chocolateboy 2008-01-08
@@ -200,8 +205,8 @@ STATIC void CXSA_HashTable_clear(HashTable *table) {
 STATIC void CXSA_HashTable_free(HashTable* table) {
     if (table) {
         CXSA_HashTable_clear(table);
-        Safefree(table->array);
-        Safefree(table);
+        cxa_free(table->array);
+        cxa_free(table);
     }
 }
 
