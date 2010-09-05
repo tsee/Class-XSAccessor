@@ -31,9 +31,9 @@
 #ifdef WIN32 /* thanks to Andy Grundman for pointing out problems with this on ActivePerl >= 5.10 */
 #include "XSUB.h"
 #else /* not WIN32 */
-#define PERL_CORE
+/*#define PERL_CORE*/
 #include "XSUB.h"
-#undef PERL_CORE
+/*#undef PERL_CORE*/
 #endif
 
 #include "ppport.h"
