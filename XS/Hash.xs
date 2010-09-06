@@ -149,7 +149,7 @@ array_setter_init(self, ...)
     /* Get the const hash key struct from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    SV* newvalue;
+    SV* newvalue = NULL; /* squelch may-be-used-uninitialized warning that doesn't apply */
     SV ** hashAssignRes;
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
@@ -193,7 +193,7 @@ array_setter(self, ...)
     /* Get the const hash key struct from the global storage */
     /* ix is the magic integer variable that is set by the perl guts for us.
      * We uses it to identify the currently running alias of the accessor. Gollum! */
-    SV* newvalue;
+    SV* newvalue = NULL; /* squelch may-be-used-uninitialized warning that doesn't apply */
     SV ** hashAssignRes;
     const autoxs_hashkey readfrom = CXSAccessor_hashkeys[ix];
   PPCODE:
