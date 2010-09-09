@@ -7,6 +7,7 @@ Revision history for Perl extension Class-XSAccessor.
   - Class::Accessor::Fast compatibility code added (not
     for public consumption!)
   - Clear requirement of Perl 5.8 everywhere.
+  - Fix minor (constant as in O(1)) memory leak.
 
 1.07_02  Mon Aug 23 20:30 2010
   - Various warning fixes and small cleanups over previous
