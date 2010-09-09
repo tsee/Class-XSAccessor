@@ -1,3 +1,6 @@
+#ifdef WIN32 /* Win32 doesn't get PERL_CORE, so use the next best thing */
+#define PERL_NO_GET_CONTEXT
+#endif
 #include "EXTERN.h"
 #include "perl.h"
 
