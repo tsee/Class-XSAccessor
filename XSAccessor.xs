@@ -55,15 +55,16 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
 /*
  * chocolateboy: 2009-09-06 - 2009-11-14:
  *
- * entersub ops that call our accessors are optimized (i.e. replaced with optimized versions)
+ * entersub OPs that call our accessors are optimized (i.e. replaced with optimized versions)
  * in versions of perl >= 5.10.0. This section describes the implementation.
  *
  * TL;DR: the first time one of our fast (XS) accessors is called, we reach up into the
  * calling OP (OP_ENTERSUB) and change its implementation (PL_op->op_ppaddr) to an optimized
  * version that takes advantage of the fact that our accessors are straightforward hash/array lookups.
- * 5.10.0+ is required because earlier versions of perl lack any spare (i.e. unused) flags
- * we can use to indicate that an OP has had entersub optimization disabled. perls >= 5.10.0 have
- * a new OP member called op_spare that gives us 3 whole bits to play with!
+ * In order for this to work safely, we need to be able to disable/prevent this optimization
+ * in some circumstances. This is done by setting a "don't optimize me" flag on the entersub OP.
+ * Prior to 5.10.0, there were no spare bits available on entersub OPs we could use for this, but
+ * perls >= 5.10.0 have a new OP member called op_spare that gives us 3 whole bits to play with!
  *
  * First, some preliminaries: a method call is performed as a subroutine call at the OP
  * level. there's some additional work to look up the method CV and push the invocant
@@ -131,7 +132,7 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
  *
  *     if ($cv->xsub == CLASS_XS_ACCESSOR_GETTER_INIT) {
  *         return CLASS_XS_ACCESSOR_GETTER(@args);
- *     } # else restore the op's default entersub implementation and call that
+ *     } # else restore the OP's default entersub implementation and call that
  *
  * i.e. the optimized entersub calls the non-optimizing XSUB. There's one optimized
  * entersub for each type of Class::XSAccessor accessor. To save typing, they're
