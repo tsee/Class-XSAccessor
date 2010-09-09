@@ -200,6 +200,7 @@ STATIC void CXSA_HashTable_clear(HashTable *table) {
 STATIC void CXSA_HashTable_free(HashTable* table) {
     if (table) {
         CXSA_HashTable_clear(table);
+        Safefree(table->array);
         Safefree(table);
     }
 }
