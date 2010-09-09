@@ -1,5 +1,13 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.07_03  Thu Sep  9 20:30 2010
+  - Minor constructor optimization/cleanup.
+  - Various built-time warning fixes.
+  - PERL_CORE optimization now disabled on WIN32.
+  - Class::Accessor::Fast compatibility code added (not
+    for public consumption!)
+  - Clear requirement of Perl 5.8 everywhere.
+
 1.07_02  Mon Aug 23 20:30 2010
   - Various warning fixes and small cleanups over previous
     dev. version.
