@@ -1,5 +1,12 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.07_04  Sun Sep 12 10:30 2010
+  - Since WIN32 doesn't have the PERL_CORE optimization,
+    it gets the PERL_NO_GET_CONTEXT optimization back.
+  - Add threading test that would previously crash on win32
+    and perls compiled with track-mempool.
+  - Use the system's malloc/etc for the shared memory, not perl's.
+
 1.07_03  Thu Sep  9 20:30 2010
   - Minor constructor optimization/cleanup.
   - Various built-time warning fixes.
