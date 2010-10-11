@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 use Class::XSAccessor;
-use Test::More;
+use Test::More tests => 14;
 
 my $shim_calls;
 
@@ -33,7 +33,7 @@ sub install_accessor_with_shim {
 }
 
 TODO: {
-    local $TODO = 'bug in perls < 5.8.9';
+    todo_skip 'bug in perls < 5.8.9', 14;
 
     for my $name (qw/bar baz/) {
       for my $pass (1..2) {
@@ -57,5 +57,3 @@ TODO: {
       }
     }
 }
-
-done_testing;
