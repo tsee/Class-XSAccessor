@@ -33,7 +33,7 @@ sub install_accessor_with_shim {
 }
 
 TODO: {
-    todo_skip 'bug in perls < 5.8.9', 14;
+    todo_skip 'bug in perls < 5.8.9', 14, $] < 5.008009;
 
     for my $name (qw/bar baz/) {
       for my $pass (1..2) {
