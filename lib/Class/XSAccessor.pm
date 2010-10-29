@@ -49,7 +49,7 @@ sub import {
                         ["accessor", $acc_subs],
                         ["lvalue_accessor", $lvacc_subs],
                         ["test", $test_subs],
-                        ["pred_subs", $pred_subs] )
+                        ["predicate", $pred_subs] )
   {
     my $subs = $subtype->[1];
     foreach my $subname (keys %$subs) {

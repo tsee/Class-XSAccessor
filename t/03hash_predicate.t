@@ -5,9 +5,9 @@ package Class::XSAccessor::Test;
 
 use Class::XSAccessor
   accessors  => { bar => 'bar' },
-  getters    => { get_foo => 'foo' },
+  getters    => { get_foo => 'foo', get_zero => 'zero' },
   setters    => { set_foo => 'foo' },
-  predicates => { has_foo => 'foo', has_bar => 'bar' };
+  predicates => { has_foo => 'foo', has_bar => 'bar', has_zero => 'zero' };
 
 use Class::XSAccessor
   predicates => 'single';
@@ -16,12 +16,12 @@ use Class::XSAccessor
 
 sub new {
   my $class = shift;
-  bless { bar => 'baz' }, $class;
+  bless { bar => 'baz', zero => 0 }, $class;
 }
 
 package main;
 
-use Test::More tests => 18;
+use Test::More tests => 20;
 
 my $obj = Class::XSAccessor::Test->new();
 
@@ -42,6 +42,9 @@ is($obj->bar(undef), undef);
 
 ok(!$obj->has_foo());
 ok(!$obj->has_bar());
+
+is($obj->get_zero, 0);
+ok($obj->has_zero);
 
 ok(!$obj->single);
 ok(!$obj->mult);
