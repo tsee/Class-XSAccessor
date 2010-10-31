@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION  = '1.08';
+our $VERSION  = '1.09';
 our @CARP_NOT = qw(
         Class::XSAccessor
         Class::XSAccessor::Array

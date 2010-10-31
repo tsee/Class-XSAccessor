@@ -1,5 +1,11 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.09  Sun Oct 31 12:45 2010
+  - Fix #62531: Predicates return value, not bool (SJOHNSTON)
+  - TODO test for perl-crashing bug (in perl) that can happen
+    on (arcane) XSUB aliasing on perl's < 5.8.9 (Peter Rabbitson)
+    We're open for work-around patches.
+
 1.08  Fri Sep 17 20:30 2010
   - Promote latest development release to a stable release.
 
