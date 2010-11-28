@@ -578,4 +578,6 @@ __entersub_optimized__()
 
 INCLUDE: XS/Hash.xs
 
+INCLUDE: XS/HashCACompat.xs
+
 INCLUDE: XS/Array.xs
