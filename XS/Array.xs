@@ -335,48 +335,52 @@ constructor(class, ...)
 
 void
 newxs_getter(name, index)
-  char* name;
-  U32 index;
+    char* name;
+    U32 index;
+  ALIAS:
+    Class::XSAccessor::Array::newxs_lvalue_accessor = 1
+    Class::XSAccessor::Array::newxs_predicate       = 2
   PPCODE:
-    INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(getter_init), index);
-
-void
-newxs_lvalue_accessor(name, index)
-  char* name;
-  U32 index;
-  PPCODE:
-    INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(getter_init), index);
-    /* Make the CV lvalue-able. "cv" was set by the previous macro */
-    CvLVALUE_on(cv);
+    switch (ix) {
+    case 0: /* newxs_getter */
+      INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(getter_init), index);
+      break;
+    case 1: /* newxs_lvalue_accessor */
+      {
+        CV* cv;
+        INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(getter_init), index);
+        /* Make the CV lvalue-able. "cv" was set by the previous macro */
+        CvLVALUE_on(cv);
+        break;
+      }
+    case 2: /* newxs_predicate */
+      INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(predicate_init), index);
+      break;
+    default:
+      croak("Invalid alias of newxs_getter called");
+      break;
+    }
 
 void
 newxs_setter(name, index, chained)
-  char* name;
-  U32 index;
-  bool chained;
+    char* name;
+    U32 index;
+    bool chained;
+  ALIAS:
+    Class::XSAccessor::Array::newxs_accessor = 1
   PPCODE:
-    if (chained)
-      INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(chained_setter_init), index);
-    else
-      INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(setter_init), index);
-
-void
-newxs_accessor(name, index, chained)
-  char* name;
-  U32 index;
-  bool chained;
-  PPCODE:
-    if (chained)
-      INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(chained_accessor_init), index);
-    else
-      INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(accessor_init), index);
-
-void
-newxs_predicate(name, index)
-  char* name;
-  U32 index;
-  PPCODE:
-    INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(predicate_init), index);
+    if (ix == 0) { /* newxs_setter */
+      if (chained)
+        INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(chained_setter_init), index);
+      else
+        INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(setter_init), index);
+    }
+    else { /* newxs_accessor */
+      if (chained)
+        INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(chained_accessor_init), index);
+      else
+        INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(accessor_init), index);
+    }
 
 void
 newxs_constructor(name)

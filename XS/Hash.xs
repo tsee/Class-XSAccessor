@@ -646,48 +646,49 @@ void
 newxs_getter(name, key)
   char* name;
   char* key;
+  ALIAS:
+    Class::XSAccessor::newxs_lvalue_accessor = 1
+    Class::XSAccessor::newxs_predicate = 2
   PPCODE:
-    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(getter_init), key);
-
-void
-newxs_lvalue_accessor(name, key)
-    char* name;
-    char* key;
-  INIT:
-    CV *cv;
-  PPCODE:
-    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(lvalue_accessor_init), key);
-    /* Make the CV lvalue-able. "cv" was set by the previous macro */
-    CvLVALUE_on(cv);
+    switch (ix) {
+    case 0: /* newxs_getter */
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(getter_init), key);
+      break;
+    case 1: { /* newxs_lvalue_accessor */
+      CV* cv;
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(lvalue_accessor_init), key);
+        /* Make the CV lvalue-able. "cv" was set by the previous macro */
+        CvLVALUE_on(cv);
+      }
+      break;
+    case 2:
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(predicate_init), key);
+      break;
+    default:
+      croak("Invalid alias of newxs_getter called");
+      break;
+    }
 
 void
 newxs_setter(name, key, chained)
-  char* name;
-  char* key;
-  bool chained;
+    char* name;
+    char* key;
+    bool chained;
+  ALIAS:
+    Class::XSAccessor::newxs_accessor = 1
   PPCODE:
+    if (ix == 0) { /* newxs_setter */
     if (chained)
       INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_setter_init), key);
     else
       INSTALL_NEW_CV_HASH_OBJ(name, CXAH(setter_init), key);
-
-void
-newxs_accessor(name, key, chained)
-  char* name;
-  char* key;
-  bool chained;
-  PPCODE:
-    if (chained)
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_accessor_init), key);
-    else
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(accessor_init), key);
-
-void
-newxs_predicate(name, key)
-  char* name;
-  char* key;
-  PPCODE:
-    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(predicate_init), key);
+    }
+    else { /* newxs_accessor */
+      if (chained)
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_accessor_init), key);
+      else
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(accessor_init), key);
+    }
 
 void
 newxs_constructor(name)
