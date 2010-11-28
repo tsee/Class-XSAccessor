@@ -1,5 +1,7 @@
 Revision history for Perl extension Class-XSAccessor.
 
+  - Tiny refactoring for smaller object size.
+
 1.09  Sun Oct 31 12:45 2010
   - Fix #62531: Predicates return value, not bool (SJOHNSTON)
   - TODO test for perl-crashing bug (in perl) that can happen
