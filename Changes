@@ -1,5 +1,9 @@
 Revision history for Perl extension Class-XSAccessor.
 
+  - Fix RT #63458 and potentially #50454
+    We don't occasionally crash during END any more.
+    Instead, we rely on the OS to reap a bit of memory after
+    perl was shut down anyway.
   - Tiny refactoring for smaller object size.
 
 1.09  Sun Oct 31 12:45 2010
