@@ -563,7 +563,7 @@ END()
     PROTOTYPE:
     CODE:
         if (CXSAccessor_reverse_hashkeys) {
-            CXSA_HashTable_free(CXSAccessor_reverse_hashkeys);
+            /*CXSA_HashTable_free(CXSAccessor_reverse_hashkeys);*/
         }
 
 void
