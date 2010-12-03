@@ -1,5 +1,9 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.11  Fri Dec  3 18:00 2010
+  - Fix assignment to lvalue accessors that
+    point at an uninitialized hash element.
+
 1.10  Wed Dec  1 20:44 2010
   - Fix RT #63458 and potentially #50454
     We don't occasionally crash during END any more.
