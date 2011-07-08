@@ -71,10 +71,10 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
  * perls >= 5.10.0 have a new OP member called op_spare that gives us 3 whole bits to play with!
  *
  * First, some preliminaries: a method call is performed as a subroutine call at the OP
- * level. there's some additional work to look up the method CV and push the invocant
+ * level. There's some additional work to look up the method CV and push the invocant
  * on the stack, but the current OP inside a method call is the subroutine call OP, OP_ENTERSUB.
  *
- * two distinct invocations of the same method will have two entersub OPs and will receive
+ * Two distinct invocations of the same method will have two entersub OPs and will receive
  * the same CV on the stack:
  *
  *     $foo->bar(...); # OP 1: CV 1
@@ -101,15 +101,15 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
  * if a call site proves to be dynamic e.g. if a method is redefined or the method is
  * called with multiple different CVs (see below).
  *
- * in practice, this is rarely the case. the vast majority of method calls in perl,
+ * In practice, this is rarely the case. the vast majority of method calls in perl,
  * and in most dynamic languages (cf. Google's v8), behave like method calls in static
  * languages. for instance, 97% of the call sites exercised by perl 5.10.0's test suite are
- * monomorphic
+ * monomorphic.
  *
  * We only replace the op_ppaddr pointer of entersub OPs that use the default pp_entersub.
  * this ensures we don't interfere with any modules that assign a new op_ppaddr e.g.
  * Data::Alias, Faster. it also ensures we don't tread on our own toes and repeatedly
- * re-assign the same optimized entersub
+ * re-assign the same optimized entersub.
  *
  * This module provides two XSUBs for each accessor e.g. two versions of the getter/setter/predicate &c.
  * XSUBs. The first version is called <accessor_type>_init (e.g. "getter_init") and the second
