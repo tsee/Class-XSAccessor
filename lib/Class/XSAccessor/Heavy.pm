@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION  = '1.11';
+our $VERSION  = '1.12';
 our @CARP_NOT = qw(
         Class::XSAccessor
         Class::XSAccessor::Array
@@ -66,7 +66,7 @@ chocolateboy, E<lt>chocolate@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2010 by Steffen Mueller
+Copyright (C) 2008, 2009, 2010, 2011 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,

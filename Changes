@@ -1,5 +1,10 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.12  Fri Sep  4 19:00 2011
+  - Reclaim compatibility with the most recent versions of
+    ExtUtils::ParseXS.
+  - Explicit tests for wrong-type invocants.
+
 1.11  Fri Dec  3 18:00 2010
   - Fix assignment to lvalue accessors that
     point at an uninitialized hash element.
