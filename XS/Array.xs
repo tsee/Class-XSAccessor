@@ -1,5 +1,6 @@
 #define NEED_sv_2pv_flags_GLOBAL
 #include "ppport.h"
+#include "cxsa_util_macros.h"
 
 MODULE = Class::XSAccessor		PACKAGE = Class::XSAccessor::Array
 PROTOTYPES: DISABLE
