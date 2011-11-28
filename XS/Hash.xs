@@ -455,6 +455,7 @@ newxs_getter(name, key)
   ALIAS:
     Class::XSAccessor::newxs_lvalue_accessor = 1
     Class::XSAccessor::newxs_predicate = 2
+    Class::XSAccessor::newxs_cached_getter = 3
   PPCODE:
     switch (ix) {
     case 0: /* newxs_getter */
@@ -470,6 +471,9 @@ newxs_getter(name, key)
     case 2:
       INSTALL_NEW_CV_HASH_OBJ(name, CXAH(predicate_init), key);
       break;
+    case 3: /* note: cached_getter(_init) implementation lives in HashCached.xs */
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(cached_getter_init), key);
+      break;
     default:
       croak("Invalid alias of newxs_getter called");
       break;
@@ -482,18 +486,25 @@ newxs_setter(name, key, chained)
     bool chained;
   ALIAS:
     Class::XSAccessor::newxs_accessor = 1
+    Class::XSAccessor::newxs_cached_accessor = 2
   PPCODE:
     if (ix == 0) { /* newxs_setter */
-    if (chained)
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_setter_init), key);
-    else
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(setter_init), key);
-    }
-    else { /* newxs_accessor */
+      if (chained)
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_setter_init), key);
+      else
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(setter_init), key);
+      }
+    else if (ix == 1) { /* newxs_accessor */
       if (chained)
         INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_accessor_init), key);
       else
         INSTALL_NEW_CV_HASH_OBJ(name, CXAH(accessor_init), key);
+    }
+    else { /* newxs_cached_accessor, see HashCached.xs for implementation */
+      if (chained)
+        croak("No chained variant of the cached accessor implemented");
+      else
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(cached_accessor_init), key);
     }
 
 void
