@@ -443,10 +443,15 @@ XS(CXAH(getter));
 XS(CXAH(getter_init));
 CXAH_GENERATE_ENTERSUB(getter);
 
-/* for the Class::Accessor compatibility layer only! */
-XS(CXAH(ca_getter));
-XS(CXAH(ca_getter_init));
-CXAH_GENERATE_ENTERSUB(ca_getter);
+/* for hash-cached getters with fallback to generic method call */
+XS(CXAH(cached_getter));
+XS(CXAH(cached_getter_init));
+CXAH_GENERATE_ENTERSUB(cached_getter);
+
+/* for hash-cached accessors with fallback to generic method call */
+XS(CXAH(cached_accessor));
+XS(CXAH(cached_accessor_init));
+CXAH_GENERATE_ENTERSUB(cached_accessor);
 
 XS(CXAH(lvalue_accessor));
 XS(CXAH(lvalue_accessor_init));
@@ -609,6 +614,6 @@ INCLUDE: XS/Hash.xs
 
 INCLUDE: XS/HashCAFCompat.xs
 
-INCLUDE: XS/HashCACompat.xs
+INCLUDE: XS/HashCached.xs
 
 INCLUDE: XS/Array.xs
