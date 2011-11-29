@@ -1,5 +1,9 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.12_01  Tue Nov 29 18:40 2011
+  - Implements cached read-only and read-write accessors.
+    Details on what that means are in the documentation.
+
 1.12  Fri Sep  4 19:00 2011
   - Reclaim compatibility with the most recent versions of
     ExtUtils::ParseXS.
