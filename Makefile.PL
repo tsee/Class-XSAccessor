@@ -30,7 +30,7 @@ WriteMakefile1(
         },
     },
     BUILD_REQUIRES => {
-        'Test::More' => 0,
+        'Test::More' => 0.88,
     },
     NAME              => 'Class::XSAccessor',
     VERSION_FROM      => 'lib/Class/XSAccessor.pm', # finds $VERSION
