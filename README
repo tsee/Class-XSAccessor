@@ -3,6 +3,8 @@ NAME
     compilation
 
 SYNOPSIS
+      # This synopsis just shows all accessor types available,
+      # in reality, you'd typically only use one or few of them.
       package MyClass;
       use Class::XSAccessor
         replace     => 1,   # Replace existing methods (if any)
@@ -25,6 +27,12 @@ SYNOPSIS
         },
         lvalue_accessors => { # see below
           baz => 'baz', # ...
+        },
+        cached_getters => { # see below
+          get_blargl => 'blargl', # ...
+        },
+        cached_accessors => { # see below
+          blargl => 'blargl', # ...
         },
         true  => [ 'is_token', 'is_whitespace' ],
         false => [ 'significant' ];
@@ -67,11 +75,12 @@ DESCRIPTION
     That means they can be called on objects and classes but will not clone
     objects entirely. Parameters to "new()" are added to the object.
 
-    The XS accessor methods are between 3 and 4 times faster than typical
+    The XS accessor methods are between 3 and 5 times faster than typical
     pure-Perl accessors in some simple benchmarking. The lower factor
     applies to the potentially slightly obscure "sub set_foo_pp
-    {$_[0]->{foo} = $_[1]}", so if you usually write clear code, a factor of
-    3.5 speed-up is a good estimate. If in doubt, do your own benchmarking!
+    {$_[0]->{foo} = $_[1]}", so if you usually write clear code, at least a
+    factor of 3.5 speed-up is a good estimate. If in doubt, do your own
+    benchmarking!
 
     The method names may be fully qualified. The example in the synopsis
     could have been written as "MyClass::get_foo" instead of "get_foo". This
@@ -118,6 +127,55 @@ OPTIONS
   class
     By default, the accessors are generated in the calling class. The the
     "class" option allows the target class to be specified.
+
+CACHED ACCESSORS
+    It takes a couple of words to explain what I mean by *cached getter* and
+    *cached accessor*. But most of that can be done away with by telling you
+    what Perl code the *cached getters* implement more efficiently:
+
+      sub get_foo {
+        my $self = shift;
+        if (not exists($self->{foo})) {
+          $self->{foo} = $self->_get("foo");
+        }
+        return $self->{foo};
+      }
+
+    Similarly, *cached accessors* implement the following:
+
+      sub foo {
+        my $self = shift;
+        if (@_) {
+          $self->_set("foo", $_[0]);
+          return $_[0];
+        }
+        else {
+          if (not exists($self->{foo})) {
+            $self->{foo} = $self->_get("foo");
+          }
+          return $self->{foo};
+        }
+      }
+
+    This means that both the read-only accessor/getter "get_foo" and the
+    read-write accessor "foo" will return the value stored in the $self hash
+    as the "foo" entry if it exists (and in the rw case, if called without
+    additional arguments). If that hash entry does not exist, both will call
+    the "_get" method (to be implemented by you) with the hash key name
+    "foo" as argument and set the hash entry "foo" to whatever "_get"
+    returns.
+
+    The rw-accessor will call the "_set" method (again, to be implemented by
+    you) if you provide additional arguments.
+
+    This implements a form of lazy evaluation commonly found in ORMs. The
+    important feature here is that the most common case -- the corresponding
+    hash entry is to be fetched from the very hash -- will be very fast.
+    Only if it doesn't exist, more expensive calculations will be made (such
+    as fetching data from a database). Note that if either "_get" or "_set"
+    needs to be invoked, the overall performance will be similar (slightly
+    faster on my machine in a trivial benchmark) to the pure-Perl
+    implementation since calling into Perl from C is very slow.
 
 LVALUES
     Support for lvalue accessors via the keyword "lvalue_accessors" was

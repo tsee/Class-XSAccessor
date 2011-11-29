@@ -63,8 +63,7 @@ cached_accessor_init(self, ...)
     CXAH_OPTIMIZE_ENTERSUB(cached_accessor);
     if (items > 1) {
       SV* newvalue = ST(1);
-      if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
-        croak("Failed to write new value to hash.");
+      CXSA_CALL_SET_METHOD(readfrom.key, readfrom.len, newvalue);
       PUSHs(newvalue);
     }
     else {
@@ -92,8 +91,7 @@ cached_accessor(self, ...)
     CXA_CHECK_HASH(self);
     if (items > 1) {
       SV* newvalue = ST(1);
-      if (NULL == hv_store((HV*)SvRV(self), readfrom.key, readfrom.len, newSVsv(newvalue), readfrom.hash))
-        croak("Failed to write new value to hash.");
+      CXSA_CALL_SET_METHOD(readfrom.key, readfrom.len, newvalue);
       PUSHs(newvalue);
     }
     else {

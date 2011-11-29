@@ -261,9 +261,9 @@ the C<class> option allows the target class to be specified.
 
 =head1 CACHED ACCESSORS
 
-It takes a couple of words to explain what I mean by I<cached accessor>.
-But most of that can be done away with by telling you what Perl code the
-I<cached accessors> implement more efficiently:
+It takes a couple of words to explain what I mean by I<cached getter>
+and I<cached accessor>. But most of that can be done away with by
+telling you what Perl code the I<cached getters> implement more efficiently:
 
   sub get_foo {
     my $self = shift;
@@ -273,7 +273,41 @@ I<cached accessors> implement more efficiently:
     return $self->{foo};
   }
 
+Similarly, I<cached accessors> implement the following:
 
+  sub foo {
+    my $self = shift;
+    if (@_) {
+      $self->_set("foo", $_[0]);
+      return $_[0];
+    }
+    else {
+      if (not exists($self->{foo})) {
+        $self->{foo} = $self->_get("foo");
+      }
+      return $self->{foo};
+    }
+  }
+
+This means that both the read-only accessor/getter C<get_foo> and the
+read-write accessor C<foo> will return the value stored in the C<$self>
+hash as the "foo" entry if it exists (and in the rw case, if called
+without additional arguments). If that hash entry does not exist, both
+will call the C<_get> method (to be implemented by you) with the hash key
+name "foo" as argument and set the hash entry "foo" to whatever C<_get>
+returns.
+
+The rw-accessor will call the C<_set> method (again, to be implemented by
+you) if you provide additional arguments.
+
+This implements a form of lazy evaluation commonly found in ORMs.
+The important feature here is that the most common case -- the corresponding
+hash entry is to be fetched from the very hash -- will be very fast. Only
+if it doesn't exist, more expensive calculations will be made (such as
+fetching data from a database). Note that if either C<_get> or C<_set>
+needs to be invoked, the overall performance will be similar
+(slightly faster on my machine in a trivial benchmark) 
+to the pure-Perl implementation since calling into Perl from C is very slow.
 
 =head1 LVALUES
 
