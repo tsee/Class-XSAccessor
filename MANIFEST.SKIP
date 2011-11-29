@@ -4,6 +4,10 @@
 \bt\.pl$
 \bt\.c$
 
+\bXSAccessor\.c$
+\bt\.c$
+\bt\.pl$
+
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
