@@ -1,6 +1,10 @@
 # Avoid archives of this distribution
 \bClass-XSAccessor-[\d\.\_]+
 
+\bXSAccessor\.c$
+\bt\.c$
+\bt\.pl$
+
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
