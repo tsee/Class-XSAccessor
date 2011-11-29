@@ -34,22 +34,26 @@ sub import {
   $caller_pkg = $opts{class} if defined $opts{class};
 
   # TODO: Refactor. Move more duplicated code to ::Heavy
-  my $read_subs      = _make_hash($opts{getters} || {});
-  my $set_subs       = _make_hash($opts{setters} || {});
-  my $acc_subs       = _make_hash($opts{accessors} || {});
-  my $lvacc_subs     = _make_hash($opts{lvalue_accessors} || {});
-  my $pred_subs      = _make_hash($opts{predicates} || {});
-  my $test_subs      = _make_hash($opts{__tests__} || {});
-  my $construct_subs = $opts{constructors} || [defined($opts{constructor}) ? $opts{constructor} : ()];
-  my $true_subs      = $opts{true} || [];
-  my $false_subs     = $opts{false} || [];
+  my $read_subs        = _make_hash($opts{getters} || {});
+  my $set_subs         = _make_hash($opts{setters} || {});
+  my $acc_subs         = _make_hash($opts{accessors} || {});
+  my $lvacc_subs       = _make_hash($opts{lvalue_accessors} || {});
+  my $pred_subs        = _make_hash($opts{predicates} || {});
+  my $test_subs        = _make_hash($opts{__tests__} || {});
+  my $cached_read_subs = _make_hash($opts{cached_getters} || {});
+  my $cached_acc_subs  = _make_hash($opts{cached_accessors} || {});
+  my $construct_subs   = $opts{constructors} || [defined($opts{constructor}) ? $opts{constructor} : ()];
+  my $true_subs        = $opts{true} || [];
+  my $false_subs       = $opts{false} || [];
 
   foreach my $subtype ( ["getter", $read_subs],
                         ["setter", $set_subs],
                         ["accessor", $acc_subs],
                         ["lvalue_accessor", $lvacc_subs],
                         ["test", $test_subs],
-                        ["predicate", $pred_subs] )
+                        ["predicate", $pred_subs],
+                        ["cached_getter", $cached_read_subs],
+                        ["cached_accessor", $cached_acc_subs], )
   {
     my $subs = $subtype->[1];
     foreach my $subname (keys %$subs) {
@@ -82,6 +86,9 @@ sub _generate_method {
   if ($type eq 'getter') {
     newxs_getter($subname, $hashkey);
   }
+  elsif ($type eq 'cached_getter') {
+    newxs_cached_getter($subname, $hashkey);
+  }
   elsif ($type eq 'lvalue_accessor') {
     newxs_lvalue_accessor($subname, $hashkey);
   }
@@ -103,6 +110,9 @@ sub _generate_method {
   elsif ($type eq 'test') {
     newxs_test($subname, $hashkey);
   }
+  elsif ($type eq 'cached_accessor') {
+    newxs_cached_accessor($subname, $hashkey, 0); # no chained variant available
+  }
   else {
     newxs_accessor($subname, $hashkey, $opts->{chained}||0);
   }
@@ -118,6 +128,8 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
 
 =head1 SYNOPSIS
 
+  # This synopsis just shows all accessor types available,
+  # in reality, you'd typically only use one or few of them.
   package MyClass;
   use Class::XSAccessor
     replace     => 1,   # Replace existing methods (if any)
@@ -140,6 +152,12 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
     },
     lvalue_accessors => { # see below
       baz => 'baz', # ...
+    },
+    cached_getters => { # see below
+      get_blargl => 'blargl', # ...
+    },
+    cached_accessors => { # see below
+      blargl => 'blargl', # ...
     },
     true  => [ 'is_token', 'is_whitespace' ],
     false => [ 'significant' ];
@@ -184,11 +202,11 @@ That means they can be called on objects and classes but will not
 clone objects entirely. Parameters to C<new()> are added to the
 object.
 
-The XS accessor methods are between 3 and 4 times faster than typical
+The XS accessor methods are between 3 and 5 times faster than typical
 pure-Perl accessors in some simple benchmarking.
 The lower factor applies to the potentially slightly obscure
 C<sub set_foo_pp {$_[0]-E<gt>{foo} = $_[1]}>, so if you usually
-write clear code, a factor of 3.5 speed-up is a good estimate.
+write clear code, at least a factor of 3.5 speed-up is a good estimate.
 If in doubt, do your own benchmarking!
 
 The method names may be fully qualified. The example in the synopsis could
@@ -240,6 +258,22 @@ in the same C<use Class::XSAccessor ...> statement.
 
 By default, the accessors are generated in the calling class. The
 the C<class> option allows the target class to be specified.
+
+=head1 CACHED ACCESSORS
+
+It takes a couple of words to explain what I mean by I<cached accessor>.
+But most of that can be done away with by telling you what Perl code the
+I<cached accessors> implement more efficiently:
+
+  sub get_foo {
+    my $self = shift;
+    if (not exists($self->{foo})) {
+      $self->{foo} = $self->_get("foo");
+    }
+    return $self->{foo};
+  }
+
+
 
 =head1 LVALUES
 
