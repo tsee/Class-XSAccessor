@@ -610,10 +610,11 @@ __entersub_optimized__()
         XSRETURN(0);
 #endif
 
-INCLUDE: XS/Hash.xs
 
 INCLUDE: XS/HashCAFCompat.xs
 
 INCLUDE: XS/HashCached.xs
+
+INCLUDE: XS/Hash.xs
 
 INCLUDE: XS/Array.xs
