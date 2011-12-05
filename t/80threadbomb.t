@@ -9,7 +9,7 @@ BEGIN {
   }
 }
 
-use constant NO_THREADS => 5;
+use constant NUM_THREADS => 5;
 # Not using Test::More simply because it's too much hassle to
 # hack around issues with running in parallel.
 print "1..6\n";
@@ -19,7 +19,7 @@ use Class::XSAccessor;
 my @chars = ('a'..'z', 'A'..'Z');
 
 my @t;
-foreach (1..NO_THREADS()) {
+foreach (1..NUM_THREADS()) {
   push @t, threads->new(sub {
     my $no = shift;
     foreach (1..100) {
