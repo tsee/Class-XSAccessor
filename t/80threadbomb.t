@@ -9,31 +9,92 @@ BEGIN {
   }
 }
 
-use constant NUM_THREADS => 5;
+# The purpose of this test is to check the thread-safety of the module.
+# Since this kind of stuff is highly non-deterministic, it's hard to construct
+# tests that are. The test consists of running several threads in parallel,
+# which all try the two main aspects of the module in a tight loop:
+# - creating methods
+# - calling those methods
+# The former is the type of operation that writes to thread-shared memory
+# and requires locking. The latter should not pose any threat to thread-safety
+# apart from the OP-tree-inlining optimization.
+# Given a certain number of operations per thread, we randomly choose a fraction
+# of method creations and method calls to make sure that there's some overlap of
+# both types of operations among all test threads.
+# The 'common' method below is special cased to ensure that there's some method
+# overwriting going on that likely affects multiple threads trying to modify or
+# read-access the thread-global memory at the same time in the
+# most-likely-colliding manner. The writing-to-shared-memory situation is very
+# likely to cause this to crash if the locking isn't working since the memory
+# is re-allocated with a geometric-growth algorithm.
+# PS: I suspect the whole locking thing is broken on cygwin and thus this test
+#     consistently fails there.
+
+srand(0);
+
+our $NumThreads = 5;
+our $NumOperations = 1000;
+
+if ($ENV{AUTHOR_TESTING}) {
+  $NumThreads = 10;
+  $NumOperations = 100000;
+}
+
 # Not using Test::More simply because it's too much hassle to
 # hack around issues with running in parallel.
-print "1..6\n";
+print "1.." . ($NumThreads*3 + 1) . "\n";
+
 use threads;
 use Class::XSAccessor;
+use Time::HiRes qw(sleep);
 
 my @chars = ('a'..'z', 'A'..'Z');
 
 my @t;
-foreach (1..NUM_THREADS()) {
-  push @t, threads->new(sub {
-    my $no = shift;
-    foreach (1..100) {
-      my $foo = join '', map {$chars[rand(@chars)]} 1..5;
-      Class::XSAccessor->import(
-        replace => 1,
-        class   => 'Foo',
-        getters => {$foo => $foo}
-      );
-    }
-    print "ok - thread $no\n";
-  }, $_);
+foreach (1..$NumThreads) {
+  push @t, threads->new(\&_thread_main, $_);
 }
-
 $_->join for @t;
+
 print "ok - all reaped\n";
+
+# DONE
+
+sub _thread_main {
+  my $no = shift;
+
+  our $obj = bless({} => 'Foo');
+  my $ngen = int( $NumOperations/5 + $NumOperations/3 * rand() );
+  my $ninvoke = $NumOperations - $ngen;
+  # This makes sense only if we plan to do a lot of work in the threads
+  # => AUTHOR_TESTING
+  sleep(rand()) if $ENV{AUTHOR_TESTING};
+  
+  print "ok - starting method generation, thread $no\n";
+  my %fields;
+  foreach (1 .. $ngen) {
+    my $fieldname = (rand > 0.15 ? join('', map {$chars[rand(@chars)]} 1..5) : 'common');
+    $fields{$fieldname} = undef;
+    Class::XSAccessor->import(
+      replace => 1,
+      class   => 'Foo',
+      getters => {$fieldname=> $fieldname}
+    );
+  }
+
+  print "ok - done with method generation, thread $no\n";
+
+  my @methods = keys %fields;
+  foreach (1..$ninvoke) {
+    if (rand() > 0.15) {
+      my $name = $methods[rand @methods];
+      $obj->$name;
+    }
+    else {
+      $obj->common;
+    }
+  }
+
+  print "ok - done, thread $no\n";
+}
 
