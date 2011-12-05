@@ -31,13 +31,21 @@ BEGIN {
 #     consistently fails there.
 
 srand(0);
+$| = 1; # show tests ASAP
 
 our $NumThreads = 5;
 our $NumOperations = 1000;
+our $CreationFractionHard = 0.2;
+our $CreationFractionFuzzy = 0.3;
+our $CommonMethodFraction = 0.15;
 
-if ($ENV{AUTHOR_TESTING}) {
-  $NumThreads = 10;
-  $NumOperations = 100000;
+our $AUTHOR_TESTING = $ENV{AUTHOR_TESTING};
+
+if ($AUTHOR_TESTING) {
+  $NumThreads = 30;
+  $NumOperations = 10000000;
+  $CreationFractionHard = 0.001;
+  $CreationFractionFuzzy = 0.001;
 }
 
 # Not using Test::More simply because it's too much hassle to
@@ -64,35 +72,39 @@ sub _thread_main {
   my $no = shift;
 
   our $obj = bless({} => 'Foo');
-  my $ngen = int( $NumOperations/5 + $NumOperations/3 * rand() );
+  my $ngen = int( $NumOperations*$CreationFractionHard + $NumOperations*$CreationFractionFuzzy * rand() );
   my $ninvoke = $NumOperations - $ngen;
   # This makes sense only if we plan to do a lot of work in the threads
   # => AUTHOR_TESTING
-  sleep(rand()) if $ENV{AUTHOR_TESTING};
+  sleep(rand()) if $AUTHOR_TESTING;
   
   print "ok - starting method generation, thread $no\n";
   my %fields;
   foreach (1 .. $ngen) {
-    my $fieldname = (rand > 0.15 ? join('', map {$chars[rand(@chars)]} 1..5) : 'common');
+    my $fieldname = (rand > $CommonMethodFraction ? join('', map {$chars[rand(@chars)]} 1..5) : 'common');
     $fields{$fieldname} = undef;
     Class::XSAccessor->import(
       replace => 1,
       class   => 'Foo',
       getters => {$fieldname=> $fieldname}
     );
+    print "# thread $no: Generated method $_ of $ngen\n"
+      if $AUTHOR_TESTING and not $_ % 10000;
   }
 
   print "ok - done with method generation, thread $no\n";
 
   my @methods = keys %fields;
   foreach (1..$ninvoke) {
-    if (rand() > 0.15) {
+    if (rand() > $CommonMethodFraction) {
       my $name = $methods[rand @methods];
       $obj->$name;
     }
     else {
       $obj->common;
     }
+    print "# thread $no: Ran method $_ of $ninvoke\n"
+      if $AUTHOR_TESTING and not $_ % 100000;
   }
 
   print "ok - done, thread $no\n";
