@@ -48,7 +48,8 @@
 
 #include "ppport.h"
 
-#include "CXSAccessor.h"
+#include "cxsa_main.h"
+#include "cxsa_locking.h"
 
 #define CXAA(name) XS_Class__XSAccessor__Array_ ## name
 #define CXAH(name) XS_Class__XSAccessor_ ## name

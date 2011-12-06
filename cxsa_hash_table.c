@@ -12,36 +12,12 @@
  * - Plenty of renaming and prefixing with CXSA_.
  */
 
-#include "ppport.h"
+#include "cxsa_hash_table.h"
+
 #include "MurmurHashNeutral2.h"
-#include "cxsa_memory.h"
 
 #define CXSA_string_hash(str, len) CXSA_MurmurHashNeutral2(str, len, 12345678)
 
-typedef struct HashTableEntry {
-    struct HashTableEntry* next;
-    const char* key;
-    STRLEN len;
-    void * value;
-} HashTableEntry;
-
-typedef struct {
-    struct HashTableEntry** array;
-    UV size;
-    UV items;
-    NV threshold;
-} HashTable;
-
-/* STATIC void * CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len); */
-STATIC void * CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len);
-STATIC void * CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, void * value);
-STATIC HashTableEntry* CXSA_HashTable_find(HashTable* table, const char* key, STRLEN len);
-STATIC HashTable* CXSA_HashTable_new(UV size, NV threshold);
-STATIC void CXSA_HashTable_clear(HashTable* table, bool do_release_values);
-STATIC void CXSA_HashTable_free(HashTable* table, bool do_release_values);
-STATIC void CXSA_HashTable_grow(HashTable* table);
-
-STATIC
 HashTable*
 CXSA_HashTable_new(UV size, NV threshold) {
     HashTable* table;
@@ -65,7 +41,6 @@ CXSA_HashTable_new(UV size, NV threshold) {
     return table;
 }
 
-STATIC
 HashTableEntry*
 CXSA_HashTable_find(HashTable* table, const char* key, STRLEN len) {
     HashTableEntry* entry;
@@ -81,7 +56,6 @@ CXSA_HashTable_find(HashTable* table, const char* key, STRLEN len) {
 
 /* currently unused */
 /*
-STATIC
 void *
 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) {
     HashTableEntry *entry, *prev = NULL;
@@ -109,14 +83,12 @@ CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) {
 }
 */
 
-STATIC
 void *
 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len) {
     HashTableEntry const * const entry = CXSA_HashTable_find(table, key, len);
     return entry ? entry->value : NULL;
 }
 
-STATIC
 void *
 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, void * value) {
     void * retval = NULL;
@@ -147,7 +119,6 @@ CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, void * value
 }
 
 /* double the size of the array */
-STATIC
 void
 CXSA_HashTable_grow(HashTable* table) {
     HashTableEntry** array = table->array;
@@ -187,7 +158,6 @@ CXSA_HashTable_grow(HashTable* table) {
     }
 }
 
-STATIC
 void
 CXSA_HashTable_clear(HashTable *table, bool do_release_values) {
     if (table && table->items) {
@@ -220,7 +190,6 @@ CXSA_HashTable_clear(HashTable *table, bool do_release_values) {
     }
 }
 
-STATIC
 void
 CXSA_HashTable_free(HashTable* table, bool do_release_values) {
     if (table) {

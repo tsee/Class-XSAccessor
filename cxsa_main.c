@@ -1,33 +1,6 @@
-#include "ppport.h"
-#include "perl.h"
+#include "cxsa_main.h"
 
-#include "hash_table.h"
 #include "cxsa_locking.h"
-
-typedef struct autoxs_hashkey_str autoxs_hashkey;
-struct autoxs_hashkey_str {
-  U32 hash;
-  char* key;
-  I32 len; /* not STRLEN for perl internal UTF hacks and hv_common_keylen
-              -- man, these things can take you by surprise */
-  autoxs_hashkey * next; /* Alas, this is the node of a linked list */
-};
-
-/********************
- * prototype section 
- ********************/
-
-autoxs_hashkey * get_hashkey(pTHX_ const char* key, const I32 len);
-autoxs_hashkey * _new_hashkey();
-
-void _resize_array(I32** array, U32* len, U32 newlen);
-void _resize_array_init(I32** array, U32* len, U32 newlen, I32 init);
-I32 _new_internal_arrayindex();
-I32 get_internal_array_index(I32 object_ary_idx);
-
-/* Macro to encapsulate fetching of a hashkey struct pointer for the actual
- * XSUBs */
-#define CXAH_GET_HASHKEY ((autoxs_hashkey *) XSANY.any_ptr)
 
 /*************************
  * initialization section 
@@ -37,6 +10,11 @@ autoxs_hashkey * CXSAccessor_last_hashkey = NULL;
 autoxs_hashkey * CXSAccessor_hashkeys = NULL;
 HashTable* CXSAccessor_reverse_hashkeys = NULL;
 
+
+/* TODO the array index storage is still thought to not be 100%
+ * thread-safe during re-allocation and concurrent access by an
+ * implementation XSUB. Requires the same linked-list dance as the
+ * hash case. */
 U32 CXSAccessor_no_arrayindices = 0;
 U32 CXSAccessor_free_arrayindices_no = 0;
 I32* CXSAccessor_arrayindices = NULL;
@@ -49,6 +27,24 @@ I32* CXSAccessor_reverse_arrayindices = NULL;
  *************************/
 
 /* implement hash containers */
+
+STATIC
+autoxs_hashkey *
+_new_hashkey() {
+  autoxs_hashkey * retval;
+  retval = (autoxs_hashkey *) cxa_malloc( sizeof(autoxs_hashkey) );
+  retval->next = NULL;
+
+  if (CXSAccessor_last_hashkey != NULL) { /* apend to list */
+    CXSAccessor_last_hashkey->next = retval;
+  }
+  else { /* init */
+    CXSAccessor_hashkeys = retval;
+  }
+  CXSAccessor_last_hashkey = retval;
+
+  return retval;
+}
 
 autoxs_hashkey *
 get_hashkey(pTHX_ const char* key, const I32 len) {
@@ -72,33 +68,20 @@ get_hashkey(pTHX_ const char* key, const I32 len) {
   return hashkey;
 }
 
-/* this is private, call get_hashkey instead */
-autoxs_hashkey *
-_new_hashkey() {
-  autoxs_hashkey * retval;
-  retval = (autoxs_hashkey *) cxa_malloc( sizeof(autoxs_hashkey) );
-  retval->next = NULL;
-
-  if (CXSAccessor_last_hashkey != NULL) { /* apend to list */
-    CXSAccessor_last_hashkey->next = retval;
-  }
-  else { /* init */
-    CXSAccessor_hashkeys = retval;
-  }
-  CXSAccessor_last_hashkey = retval;
-
-  return retval;
-}
 
 
 /* implement array containers */
 
-void _resize_array(I32** array, U32* len, U32 newlen) {
+STATIC
+void
+_resize_array(I32** array, U32* len, U32 newlen) {
   *array = (I32*)cxa_realloc((void*)(*array), newlen*sizeof(I32));
   *len = newlen;
 }
 
-void _resize_array_init(I32** array, U32* len, U32 newlen, I32 init) {
+STATIC
+void
+_resize_array_init(I32** array, U32* len, U32 newlen, I32 init) {
   U32 i;
   *array = (I32*)cxa_realloc((void*)(*array), newlen*sizeof(I32));
   for (i = *len; i < newlen; ++i)
@@ -107,7 +90,8 @@ void _resize_array_init(I32** array, U32* len, U32 newlen, I32 init) {
 }
 
 /* this is private, call get_internal_array_index instead */
-I32 _new_internal_arrayindex() {
+I32
+_new_internal_arrayindex() {
   if (CXSAccessor_no_arrayindices == CXSAccessor_free_arrayindices_no) {
     U32 extend = 2 + CXSAccessor_no_arrayindices * 2;
     /*printf("extending array index storage by %u\n", extend);*/
