@@ -26,7 +26,7 @@ struct autoxs_hashkey_str {
    *   have to implement full cloning on thread creation. Oh my.
    * - If we didn't share hashkey structs, we'd have to deallocate them when
    *   an accessor method is no longer used. That means detecting when that
-   *   happens. Note that there is not reference counting mechanism we can
+   *   happens. Note that there is no reference counting mechanism we can
    *   use to make this easy. So the sharing/reuse of hashkey structs was a
    *   way to avoid this real or perceived memory leak on re-generation of
    *   accessors for the same object slot.
