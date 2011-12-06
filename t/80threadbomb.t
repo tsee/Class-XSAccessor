@@ -34,7 +34,7 @@ srand(0);
 $| = 1; # show tests ASAP
 
 our $NumThreads = 5;
-our $NumOperations = 1000;
+our $NumOperations = 10000;
 our $CreationFractionHard = 0.2;
 our $CreationFractionFuzzy = 0.3;
 our $CommonMethodFraction = 0.15;
