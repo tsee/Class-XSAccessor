@@ -14,6 +14,7 @@
 
 #include "ppport.h"
 #include "MurmurHashNeutral2.h"
+#include "cxsa_memory.h"
 
 #define CXSA_string_hash(str, len) CXSA_MurmurHashNeutral2(str, len, 12345678)
 
