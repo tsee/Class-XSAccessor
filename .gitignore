@@ -11,3 +11,4 @@ XSAccessor.bs
 XSAccessor.so
 XSAccessor.o
 XSAccessor.c
+*.o
