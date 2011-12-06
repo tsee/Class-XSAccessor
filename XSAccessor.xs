@@ -375,6 +375,7 @@ OP * cxaa_entersub_ ## name(pTHX) {                                             
 }
 #endif /* CXA_ENABLE_ENTERSUB_OPTIMIZATION */
 
+
 /* Install a new XSUB under 'name' and automatically set the file name */
 #define INSTALL_NEW_CV(name, xsub)                                            \
 STMT_START {                                                                  \
@@ -384,6 +385,8 @@ STMT_START {                                                                  \
 
 /* Install a new XSUB under 'name' and set the function index attribute
  * Requires a previous declaration of a CV* cv!
+ * TODO: Once the array case has been migrated to storing pointers instead
+ *       of indexes, this macro can probably go away.
  **/
 #define INSTALL_NEW_CV_WITH_INDEX(name, xsub, function_index)               \
 STMT_START {                                                                \
@@ -391,6 +394,17 @@ STMT_START {                                                                \
   if (cv == NULL)                                                           \
     croak("ARG! Something went really wrong while installing a new XSUB!"); \
   XSANY.any_i32 = function_index;                                           \
+} STMT_END
+
+/* Install a new XSUB under 'name' and set the function index attribute
+ * Requires a previous declaration of a CV* cv!
+ **/
+#define INSTALL_NEW_CV_WITH_PTR(name, xsub, user_pointer)                   \
+STMT_START {                                                                \
+  cv = newXS(name, xsub, (char*)__FILE__);                                  \
+  if (cv == NULL)                                                           \
+    croak("ARG! Something went really wrong while installing a new XSUB!"); \
+  XSANY.any_ptr = (void *)user_pointer;                                     \
 } STMT_END
 
 /* Install a new XSUB under 'name' and set the function index attribute
@@ -409,16 +423,14 @@ STMT_START {                                                                 \
  **/
 #define INSTALL_NEW_CV_HASH_OBJ(name, xsub, obj_hash_key)                    \
 STMT_START {                                                                 \
-  autoxs_hashkey hashkey;                                                    \
   const U32 key_len = strlen(obj_hash_key);                                  \
-  const U32 function_index = get_hashkey_index(aTHX_ obj_hash_key, key_len); \
-  INSTALL_NEW_CV_WITH_INDEX(name, xsub, function_index);                     \
-  hashkey.key = (char*)cxa_malloc((key_len+1));                              \
-  cxa_memcpy(hashkey.key, obj_hash_key, key_len);                            \
-  hashkey.key[key_len] = 0;                                                  \
-  hashkey.len = key_len;                                                     \
-  PERL_HASH(hashkey.hash, obj_hash_key, key_len);                            \
-  CXSAccessor_hashkeys[function_index] = hashkey;                            \
+  autoxs_hashkey * hk_ptr = get_hashkey(aTHX_ obj_hash_key, key_len);        \
+  INSTALL_NEW_CV_WITH_PTR(name, xsub, hk_ptr);                               \
+  hk_ptr->key = (char*)cxa_malloc((key_len+1));                              \
+  cxa_memcpy(hk_ptr->key, obj_hash_key, key_len);                            \
+  hk_ptr->key[key_len] = 0;                                                  \
+  hk_ptr->len = key_len;                                                     \
+  PERL_HASH(hk_ptr->hash, obj_hash_key, key_len);                            \
 } STMT_END
 
 #ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
@@ -570,7 +582,11 @@ END()
     PROTOTYPE:
     CODE:
         if (CXSAccessor_reverse_hashkeys) {
-            /*CXSA_HashTable_free(CXSAccessor_reverse_hashkeys);*/
+            /* This can run before Perl is done, so accessors might still be called,
+             * so we can't free our memory here. Solution? Special global destruction
+             * phase *AFTER* all Perl END() subs were run? */
+
+            /*CXSA_HashTable_free(CXSAccessor_reverse_hashkeys, true);*/
         }
 
 void

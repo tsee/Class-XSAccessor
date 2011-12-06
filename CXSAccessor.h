@@ -4,32 +4,37 @@
 #include "hash_table.h"
 #include "cxsa_locking.h"
 
-typedef struct {
+typedef struct autoxs_hashkey_str autoxs_hashkey;
+struct autoxs_hashkey_str {
   U32 hash;
   char* key;
   I32 len; /* not STRLEN for perl internal UTF hacks and hv_common_keylen
               -- man, these things can take you by surprise */
-} autoxs_hashkey;
+  autoxs_hashkey * next; /* Alas, this is the node of a linked list */
+};
 
 /********************
  * prototype section 
  ********************/
 
-I32 get_hashkey_index(pTHX_ const char* key, const I32 len);
-I32 _new_hashkey();
+autoxs_hashkey * get_hashkey(pTHX_ const char* key, const I32 len);
+autoxs_hashkey * _new_hashkey();
 
 void _resize_array(I32** array, U32* len, U32 newlen);
 void _resize_array_init(I32** array, U32* len, U32 newlen, I32 init);
 I32 _new_internal_arrayindex();
 I32 get_internal_array_index(I32 object_ary_idx);
 
+/* Macro to encapsulate fetching of a hashkey struct pointer for the actual
+ * XSUBs */
+#define CXAH_GET_HASHKEY ((autoxs_hashkey *) XSANY.any_ptr)
+
 /*************************
  * initialization section 
  ************************/
 
-U32 CXSAccessor_no_hashkeys = 0;
-U32 CXSAccessor_free_hashkey_no = 0;
-autoxs_hashkey* CXSAccessor_hashkeys = NULL;
+autoxs_hashkey * CXSAccessor_last_hashkey = NULL;
+autoxs_hashkey * CXSAccessor_hashkeys = NULL;
 HashTable* CXSAccessor_reverse_hashkeys = NULL;
 
 U32 CXSAccessor_no_arrayindices = 0;
@@ -45,8 +50,9 @@ I32* CXSAccessor_reverse_arrayindices = NULL;
 
 /* implement hash containers */
 
-I32 get_hashkey_index(pTHX_ const char* key, const I32 len) {
-  I32 index;
+autoxs_hashkey *
+get_hashkey(pTHX_ const char* key, const I32 len) {
+  autoxs_hashkey * hashkey;
 
   CXSA_ACQUIRE_GLOBAL_LOCK(CXSAccessor_lock);
 
@@ -54,30 +60,34 @@ I32 get_hashkey_index(pTHX_ const char* key, const I32 len) {
   if (CXSAccessor_reverse_hashkeys == NULL)
     CXSAccessor_reverse_hashkeys = CXSA_HashTable_new(16, 0.9);
 
-  index = CXSA_HashTable_fetch(CXSAccessor_reverse_hashkeys, key, (STRLEN)len);
-  if ( index == -1 ) { /* does not exist */
-    index = _new_hashkey();
+  hashkey = (autoxs_hashkey *) CXSA_HashTable_fetch(CXSAccessor_reverse_hashkeys, key, (STRLEN)len);
+  if (hashkey == NULL) { /* does not exist */
+    hashkey = _new_hashkey();
     /* store the new hash key in the reverse lookup table */
-    CXSA_HashTable_store(CXSAccessor_reverse_hashkeys, key, len, index);
+    CXSA_HashTable_store(CXSAccessor_reverse_hashkeys, key, len, hashkey);
   }
 
   CXSA_RELEASE_GLOBAL_LOCK(CXSAccessor_lock);
 
-  return index;
+  return hashkey;
 }
 
-/* this is private, call get_hashkey_index instead */
-I32 _new_hashkey() {
-  if (CXSAccessor_no_hashkeys == CXSAccessor_free_hashkey_no) {
-    U32 extend = 1 + CXSAccessor_no_hashkeys * 2;
-    /*printf("extending hashkey storage by %u\n", extend);*/
-    CXSAccessor_hashkeys = (autoxs_hashkey*)cxa_realloc(
-      (void*)CXSAccessor_hashkeys,
-      (CXSAccessor_no_hashkeys + extend) * sizeof(autoxs_hashkey)
-    );
-    CXSAccessor_no_hashkeys += extend;
+/* this is private, call get_hashkey instead */
+autoxs_hashkey *
+_new_hashkey() {
+  autoxs_hashkey * retval;
+  retval = (autoxs_hashkey *) cxa_malloc( sizeof(autoxs_hashkey) );
+  retval->next = NULL;
+
+  if (CXSAccessor_last_hashkey != NULL) { /* apend to list */
+    CXSAccessor_last_hashkey->next = retval;
   }
-  return CXSAccessor_free_hashkey_no++;
+  else { /* init */
+    CXSAccessor_hashkeys = retval;
+  }
+  CXSAccessor_last_hashkey = retval;
+
+  return retval;
 }
 
 

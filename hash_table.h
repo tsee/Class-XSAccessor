@@ -32,13 +32,13 @@ typedef struct {
     NV threshold;
 } HashTable;
 
-/* STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len); */
-STATIC I32 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len);
-STATIC I32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, void * value);
+/* STATIC void * CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len); */
+STATIC void * CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len);
+STATIC void * CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, void * value);
 STATIC HashTableEntry* CXSA_HashTable_find(HashTable* table, const char* key, STRLEN len);
 STATIC HashTable* CXSA_HashTable_new(UV size, NV threshold);
-STATIC void CXSA_HashTable_clear(HashTable* table);
-STATIC void CXSA_HashTable_free(HashTable* table);
+STATIC void CXSA_HashTable_clear(HashTable* table, bool do_release_values);
+STATIC void CXSA_HashTable_free(HashTable* table, bool do_release_values);
 STATIC void CXSA_HashTable_grow(HashTable* table);
 
 STATIC
@@ -119,7 +119,7 @@ CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len) {
 STATIC
 void *
 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, void * value) {
-    I32 retval = -1;
+    void * retval = NULL;
     HashTableEntry* entry = CXSA_HashTable_find(table, key, len);
 
     if (entry) {
@@ -189,7 +189,7 @@ CXSA_HashTable_grow(HashTable* table) {
 
 STATIC
 void
-CXSA_HashTable_clear(HashTable *table) {
+CXSA_HashTable_clear(HashTable *table, bool do_release_values) {
     if (table && table->items) {
         HashTableEntry** const array = table->array;
         UV riter = table->size - 1;
@@ -202,6 +202,9 @@ CXSA_HashTable_clear(HashTable *table) {
                 entry = entry->next;
                 if (temp->key)
                     cxa_free((void*)temp->key);
+                if (do_release_values) {
+                    cxa_free((void*)temp->value);
+                }
                 cxa_free(temp);
             }
 
@@ -219,9 +222,9 @@ CXSA_HashTable_clear(HashTable *table) {
 
 STATIC
 void
-CXSA_HashTable_free(HashTable* table) {
+CXSA_HashTable_free(HashTable* table, bool do_release_values) {
     if (table) {
-        CXSA_HashTable_clear(table);
+        CXSA_HashTable_clear(table, do_release_values);
         cxa_free(table->array);
         cxa_free(table);
     }
