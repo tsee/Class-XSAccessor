@@ -22,7 +22,7 @@ typedef struct HashTableEntry {
     struct HashTableEntry* next;
     const char* key;
     STRLEN len;
-    I32 value;
+    void * value;
 } HashTableEntry;
 
 typedef struct {
@@ -34,14 +34,16 @@ typedef struct {
 
 /* STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len); */
 STATIC I32 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len);
-STATIC I32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, I32 value);
+STATIC I32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, void * value);
 STATIC HashTableEntry* CXSA_HashTable_find(HashTable* table, const char* key, STRLEN len);
 STATIC HashTable* CXSA_HashTable_new(UV size, NV threshold);
 STATIC void CXSA_HashTable_clear(HashTable* table);
 STATIC void CXSA_HashTable_free(HashTable* table);
 STATIC void CXSA_HashTable_grow(HashTable* table);
 
-STATIC HashTable* CXSA_HashTable_new(UV size, NV threshold) {
+STATIC
+HashTable*
+CXSA_HashTable_new(UV size, NV threshold) {
     HashTable* table;
 
     if ((size < 2) || (size & (size - 1))) {
@@ -63,7 +65,9 @@ STATIC HashTable* CXSA_HashTable_new(UV size, NV threshold) {
     return table;
 }
 
-STATIC HashTableEntry* CXSA_HashTable_find(HashTable* table, const char* key, STRLEN len) {
+STATIC
+HashTableEntry*
+CXSA_HashTable_find(HashTable* table, const char* key, STRLEN len) {
     HashTableEntry* entry;
     UV index = CXSA_string_hash(key, len) & (table->size - 1);
 
@@ -77,11 +81,13 @@ STATIC HashTableEntry* CXSA_HashTable_find(HashTable* table, const char* key, ST
 
 /* currently unused */
 /*
-STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) {
+STATIC
+void *
+CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) {
     HashTableEntry *entry, *prev = NULL;
     UV index = CXSA_string_hash(key, len) & (table->size - 1);
 
-    I32 retval = -1;
+    void * retval = NULL;
     for (entry = table->array[index]; entry; prev = entry, entry = entry->next) {
         if (strcmp(entry->key, key) == 0) {
 
@@ -103,12 +109,16 @@ STATIC I32 CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) 
 }
 */
 
-STATIC I32 CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len) {
+STATIC
+void *
+CXSA_HashTable_fetch(HashTable* table, const char* key, STRLEN len) {
     HashTableEntry const * const entry = CXSA_HashTable_find(table, key, len);
-    return entry ? entry->value : -1;
+    return entry ? entry->value : NULL;
 }
 
-STATIC I32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, I32 value) {
+STATIC
+void *
+CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, void * value) {
     I32 retval = -1;
     HashTableEntry* entry = CXSA_HashTable_find(table, key, len);
 
@@ -137,7 +147,9 @@ STATIC I32 CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, I
 }
 
 /* double the size of the array */
-STATIC void CXSA_HashTable_grow(HashTable* table) {
+STATIC
+void
+CXSA_HashTable_grow(HashTable* table) {
     HashTableEntry** array = table->array;
     const UV oldsize = table->size;
     UV newsize = oldsize * 2;
@@ -175,7 +187,9 @@ STATIC void CXSA_HashTable_grow(HashTable* table) {
     }
 }
 
-STATIC void CXSA_HashTable_clear(HashTable *table) {
+STATIC
+void
+CXSA_HashTable_clear(HashTable *table) {
     if (table && table->items) {
         HashTableEntry** const array = table->array;
         UV riter = table->size - 1;
@@ -203,7 +217,9 @@ STATIC void CXSA_HashTable_clear(HashTable *table) {
     }
 }
 
-STATIC void CXSA_HashTable_free(HashTable* table) {
+STATIC
+void
+CXSA_HashTable_free(HashTable* table) {
     if (table) {
         CXSA_HashTable_clear(table);
         cxa_free(table->array);
