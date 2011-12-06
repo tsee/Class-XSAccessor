@@ -14,6 +14,23 @@ struct autoxs_hashkey_str {
   I32 len; /* not STRLEN for perl internal UTF hacks and hv_common_keylen
               -- man, these things can take you by surprise */
   autoxs_hashkey * next; /* Alas, this is the node of a linked list */
+
+  /* It may be tempting to add more data here for further parameterization
+   * of the accessor methods. That's simple at first sight (just add another
+   * bit of data here, say a void* for user data, whatever). But when you
+   * think about it some more, you'll see that this has various nasty
+   * consequences in the context of re-using the hashkey entries.
+   * - Hashkey structs are shared and there's a reverse look-up using the
+   *   hash-key-string itself for that purpose.
+   * - Sharing the hashkey structs is important for threads: Otherwise, we
+   *   have to implement full cloning on thread creation. Oh my.
+   * - If we didn't share hashkey structs, we'd have to deallocate them when
+   *   an accessor method is no longer used. That means detecting when that
+   *   happens. Note that there is not reference counting mechanism we can
+   *   use to make this easy. So the sharing/reuse of hashkey structs was a
+   *   way to avoid this real or perceived memory leak on re-generation of
+   *   accessors for the same object slot.
+   */
 };
 
 autoxs_hashkey * get_hashkey(pTHX_ const char* key, const I32 len);
