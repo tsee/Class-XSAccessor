@@ -19,7 +19,7 @@ cached_getter_init(self)
       PUSHs(*svp);
     else {
       SV * sv;
-      CXSA_CALL_GET_METHOD(readfrom->key, readfrom->len);
+      CXSA_CALL_GET_METHOD("_cxsa_get", readfrom->key, readfrom->len);
       svp = hv_store((HV *)SvRV(self), readfrom->key, readfrom->len, sv, readfrom->hash);
       PUSHs(sv);
     }
@@ -37,7 +37,7 @@ cached_getter(self)
       PUSHs(*svp);
     else {
       SV * sv;
-      CXSA_CALL_GET_METHOD(readfrom->key, readfrom->len);
+      CXSA_CALL_GET_METHOD("_cxsa_get", readfrom->key, readfrom->len);
       svp = hv_store((HV *)SvRV(self), readfrom->key, readfrom->len, sv, readfrom->hash);
       PUSHs(sv);
     }
@@ -54,7 +54,7 @@ cached_accessor_init(self, ...)
     CXAH_OPTIMIZE_ENTERSUB(cached_accessor);
     if (items > 1) {
       SV* newvalue = ST(1);
-      CXSA_CALL_SET_METHOD(readfrom->key, readfrom->len, newvalue);
+      CXSA_CALL_SET_METHOD("_cxsa_set", readfrom->key, readfrom->len, newvalue);
       PUSHs(newvalue);
     }
     else {
@@ -62,7 +62,7 @@ cached_accessor_init(self, ...)
         PUSHs(*svp);
       else {
         SV * sv;
-        CXSA_CALL_GET_METHOD(readfrom->key, readfrom->len);
+        CXSA_CALL_GET_METHOD("_cxsa_get", readfrom->key, readfrom->len);
         svp = hv_store((HV *)SvRV(self), readfrom->key, readfrom->len, sv, readfrom->hash);
         PUSHs(sv);
       }
@@ -79,7 +79,7 @@ cached_accessor(self, ...)
     CXA_CHECK_HASH(self);
     if (items > 1) {
       SV* newvalue = ST(1);
-      CXSA_CALL_SET_METHOD(readfrom->key, readfrom->len, newvalue);
+      CXSA_CALL_SET_METHOD("_cxsa_set", readfrom->key, readfrom->len, newvalue);
       PUSHs(newvalue);
     }
     else {
@@ -87,7 +87,7 @@ cached_accessor(self, ...)
         PUSHs(*svp);
       else {
         SV * sv;
-        CXSA_CALL_GET_METHOD(readfrom->key, readfrom->len);
+        CXSA_CALL_GET_METHOD("_cxsa_get", readfrom->key, readfrom->len);
         svp = hv_store((HV *)SvRV(self), readfrom->key, readfrom->len, sv, readfrom->hash);
         PUSHs(sv);
       }

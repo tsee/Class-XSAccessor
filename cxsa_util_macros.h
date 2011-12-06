@@ -17,7 +17,7 @@
  * a single argument: The provided hash key string. Runs in scalar
  * context and assigns the result to the "sv" SV* */
 #ifndef CXSA_CALL_GET_METHOD
-#  define CXSA_CALL_GET_METHOD(key, keylen)           \
+#  define CXSA_CALL_GET_METHOD(methname, key, keylen) \
     STMT_START {                                      \
         int count;                                    \
         dSP;                                          \
@@ -30,7 +30,7 @@
         XPUSHs(sv_2mortal(newSVpv((key), (keylen)))); \
         PUTBACK;                                      \
                                                       \
-        count = call_method("_get", G_SCALAR);        \
+        count = call_method((methname), G_SCALAR);    \
         SPAGAIN;                                      \
                                                       \
         if (count != 1)                               \
@@ -48,25 +48,26 @@
  * a two arguments: The provided hash key string and the provided
  * scalar value. Runs in void context */
 #ifndef CXSA_CALL_SET_METHOD
-#  define CXSA_CALL_SET_METHOD(key, keylen, newvalue) \
-    STMT_START {                                      \
-        dSP;                                          \
-                                                      \
-        ENTER;                                        \
-        SAVETMPS;                                     \
-                                                      \
-        PUSHMARK(SP);                                 \
-        XPUSHs(self);                                 \
-        XPUSHs(sv_2mortal(newSVpv((key), (keylen)))); \
-        XPUSHs((newvalue));                           \
-        PUTBACK;                                      \
-                                                      \
-        if (0 != call_method("_set", G_VOID))         \
-          croak("Big trouble\n");                     \
-        SPAGAIN;                                      \
-                                                      \
-        PUTBACK;                                      \
-        FREETMPS;                                     \
-        LEAVE;                                        \
+#  define CXSA_CALL_SET_METHOD(methname, key, keylen, newvalue) \
+    STMT_START {                                                \
+        dSP;                                                    \
+                                                                \
+        ENTER;                                                  \
+        SAVETMPS;                                               \
+                                                                \
+        PUSHMARK(SP);                                           \
+        XPUSHs(self);                                           \
+        XPUSHs(sv_2mortal(newSVpv((key), (keylen))));           \
+        XPUSHs((newvalue));                                     \
+        PUTBACK;                                                \
+                                                                \
+        if (0 != call_method((methname), G_VOID))               \
+          croak("Big trouble\n");                               \
+        SPAGAIN;                                                \
+                                                                \
+        PUTBACK;                                                \
+        FREETMPS;                                               \
+        LEAVE;                                                  \
     } STMT_END
 #endif
+

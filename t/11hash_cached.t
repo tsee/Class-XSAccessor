@@ -28,21 +28,21 @@ sub set_testvars {
   ($expected_hashkey, $retval, $test_name) = @_;
   $set_called = $called = 0;
 }
-sub _get {
-  Test::More::ok(@_ == 2, "num args in _get");
+sub _cxsa_get {
+  Test::More::ok(@_ == 2, "num args in _cxsa_get");
   my $self = shift;
   my $hashkey = shift;
-  Test::More::is($hashkey, $expected_hashkey, "$test_name in _get");
+  Test::More::is($hashkey, $expected_hashkey, "$test_name in _cxsa_get");
   $called = 1;
   return $retval;
 }
-sub _set {
-  Test::More::ok(@_ == 3, "num args in _set");
+sub _cxsa_set {
+  Test::More::ok(@_ == 3, "num args in _cxsa_set");
   my $self = shift;
   my $hashkey = shift;
   $self->{$hashkey} = shift;
   $set_called = 1;
-  Test::More::is($hashkey, $expected_hashkey, "$test_name in _set");
+  Test::More::is($hashkey, $expected_hashkey, "$test_name in _cxsa_set");
 }
 
 use Class::XSAccessor
@@ -78,7 +78,7 @@ delete $foo->{c};
 
 Foo::set_testvars('c', 52, "call after deleting slot hits slow method");
 is($foo->c(), '52');
-ok($called, "_get was called");
+ok($called, "_cxsa_get was called");
 ok(!$set_called);
 
 Foo::set_testvars('c', 'baz', "accessor works as mutator");
@@ -88,11 +88,11 @@ ok(!$called);
 
 Foo::set_testvars('c', 'baz', "accessor works as mutator");
 is($foo->c(), 'bar');
-ok(!$called, "_get was not called");
+ok(!$called, "_cxsa_get was not called");
 ok(!$set_called);
 
 package Bar;
-sub _get {
+sub _cxsa_get {
   my $self = shift;
   my $hashkey = shift;
   return();
