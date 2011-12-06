@@ -261,6 +261,8 @@ the C<class> option allows the target class to be specified.
 
 =head1 CACHED ACCESSORS
 
+B<THIS IS AN EXPERIMENTAL FEATURE>. Subject to change.
+
 It takes a couple of words to explain what I mean by I<cached getter>
 and I<cached accessor>. But most of that can be done away with by
 telling you what Perl code the I<cached getters> implement more efficiently:
@@ -308,6 +310,13 @@ fetching data from a database). Note that if either C<_cxsa_get> or C<_cxsa_set>
 needs to be invoked, the overall performance will be similar
 (slightly faster on my machine in a trivial benchmark) 
 to the pure-Perl implementation since calling into Perl from C is very slow.
+
+There is one particular gotcha to be aware of when using the cached accessors
+and getters: When in the C<_cxsa_set> or C<_cxsa_get> methods, the caller stack
+would include an entry for the accessor itself, but only for the C<_cxsa_get>
+or C<_cxsa_set> method. This is because part of the optimization is to skip
+constructing such a stack frame in the first place. This behaviour is an
+implementation detail and subject to change.
 
 =head1 LVALUES
 
