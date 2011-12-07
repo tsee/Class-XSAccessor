@@ -1,5 +1,15 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.12_02  Wed Dec  7 08:20 2011
+  - Removes the cached read-only and read-write accessors
+    for the time being. (These were only available from another
+    development releasse.
+  - Much more brutal thread-safety testing.
+  - Fixed thread-safety problem with the global hashkey storage.
+  - Lots of refactoring in the C code.
+  - Instead of storing an index in the CV, we store a pointer to
+    the hashkey struct.
+
 1.12_01  Tue Nov 29 18:40 2011
   - Implements cached read-only and read-write accessors.
     Details on what that means are in the documentation.
