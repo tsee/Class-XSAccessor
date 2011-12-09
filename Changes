@@ -1,5 +1,8 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.12_03  Fri Dec  0 18:29 2011
+  - Fix for unthreaded perls (broken in 1.12_02).
+
 1.12_02  Wed Dec  7 08:20 2011
   - Removes the cached read-only and read-write accessors
     for the time being. (These were only available from another
