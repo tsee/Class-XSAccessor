@@ -1,6 +1,7 @@
 #include "cxsa_locking.h"
 #include "cxsa_memory.h"
 
+#ifdef USE_ITHREADS
 cxsa_global_lock CXSAccessor_lock;
 
 void _init_cxsa_lock(cxsa_global_lock* theLock) {
@@ -9,3 +10,4 @@ void _init_cxsa_lock(cxsa_global_lock* theLock) {
   COND_INIT(&theLock->cond);
   theLock->locks = 0;
 }
+#endif
