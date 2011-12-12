@@ -6,7 +6,7 @@ use Carp qw/croak/;
 use Class::XSAccessor::Heavy;
 use XSLoader;
 
-our $VERSION = '1.12_03';
+our $VERSION = '1.13';
 
 XSLoader::load('Class::XSAccessor', $VERSION);
 
