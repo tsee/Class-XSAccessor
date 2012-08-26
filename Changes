@@ -1,5 +1,9 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.14  Sun Aug 26 23:23 2012
+  - Skip some failing tests on old debugging perls. Guys, please
+    upgrade your perl!
+
 1.13  Mon Dec 12 08:21 2011
   - Promotes 1.12_03 to a stable release.
 
