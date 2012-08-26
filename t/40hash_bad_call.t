@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 19;
 
 BEGIN { use_ok('Class::XSAccessor') };
 
@@ -25,30 +25,47 @@ $hash->bar('BAR');
 is $hash->foo, 'FOO';
 is $hash->bar, 'BAR';
 
-eval { Hash->foo };
+my $ok;
+my $err;
 
-like $@, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
+$ok = eval { Hash->foo; 1 };
+$err = $@ || 'Zombie error';
+ok(!$ok);
+like $err, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
 
-eval { Hash->bar };
+$ok = eval { Hash->bar; 1 };
+$err = $@ || 'Zombie error';
+ok(!$ok);
+like $err, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
 
-like $@, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
-
-eval { Hash::foo() };
+$ok = eval { Hash::foo() };
+$err = $@ || 'Zombie error';
+ok(!$ok);
 
 # package name introduced in 5.10.1
-like $@, qr{Usage: (Hash::)?foo\(self, \.\.\.\) };
+SKIP: {
+  skip "Old perl behaves funny. You should upgrade.", 1 if $] < 5.010001;
+  like $err, qr{Usage: (Hash::)?foo\(self, \.\.\.\) };
+}
 
-eval { Hash::bar() };
+$ok = eval { Hash::bar(); 1 };
+$err = $@ || 'Zombie error';
+ok(!$ok);
 
-like $@, qr{Usage: (Hash::)?bar\(self, \.\.\.\) };
+SKIP: {
+  skip "Old perl behaves funny. You should upgrade.", 1 if $] < 5.010001;
+  like $err, qr{Usage: (Hash::)?bar\(self, \.\.\.\) };
+}
 
-eval { Hash::foo( [] ) };
+$ok = eval { Hash::foo( [] ); 1 };
+$err = $@ || 'Zombie error';
+ok(!$ok);
+like $err, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
 
-like $@, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
-
-eval { Hash::bar( '' ) };
-
-like $@, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
+$ok = eval { Hash::bar( '' ); 1 };
+$err = $@ || 'Zombie error';
+ok(!$ok);
+like $err, qr{Class::XSAccessor: invalid instance method invocant: no hash ref supplied };
 
 is Hash::foo($hash), 'FOO';
 is Hash::bar($hash), 'BAR';
