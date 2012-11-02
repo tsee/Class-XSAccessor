@@ -413,52 +413,67 @@ test(self, ...)
     }
 
 void
-newxs_getter(name, key)
-  char* name;
-  char* key;
+newxs_getter(namesv, keysv)
+    SV *namesv;
+    SV *keysv;
   ALIAS:
     Class::XSAccessor::newxs_lvalue_accessor = 1
     Class::XSAccessor::newxs_predicate = 2
+  PREINIT:
+    STRLEN nlen, klen;
+    char *key;
+    char *name;
+    CV *cv;
   PPCODE:
+    name = SvPV(namesv, nlen);
+    key = SvPV(keysv, klen);
     switch (ix) {
     case 0: /* newxs_getter */
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(getter_init), key);
+      MAKE_NEW_CV_HASH_OBJ_LEN(CXAH(getter_init), key, klen, cv);
       break;
-    case 1: { /* newxs_lvalue_accessor */
-      CV* cv;
-        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(lvalue_accessor_init), key);
-        /* Make the CV lvalue-able. "cv" was set by the previous macro */
-        CvLVALUE_on(cv);
-      }
+    case 1: /* newxs_lvalue_accessor */
+      MAKE_NEW_CV_HASH_OBJ_LEN(CXAH(lvalue_accessor_init), key, klen, cv);
+      /* Make the CV lvalue-able */
+      CvLVALUE_on(cv);
       break;
     case 2:
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(predicate_init), key);
+      MAKE_NEW_CV_HASH_OBJ_LEN(CXAH(predicate_init), key, klen, cv);
       break;
     default:
       croak("Invalid alias of newxs_getter called");
       break;
     }
+    INSTALL_CV_NAME_LEN(cv, name, nlen);
+
 
 void
-newxs_setter(name, key, chained)
-    char* name;
-    char* key;
+newxs_setter(namesv, keysv, chained)
+    SV *namesv;
+    SV *keysv;
     bool chained;
   ALIAS:
     Class::XSAccessor::newxs_accessor = 1
+  PREINIT:
+    char* name;
+    char* key;
+    STRLEN nlen, klen;
+    CV *cv;
   PPCODE:
+    name = SvPV(namesv, nlen);
+    key = SvPV(keysv, klen);
     if (ix == 0) { /* newxs_setter */
     if (chained)
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_setter_init), key);
+      MAKE_NEW_CV_HASH_OBJ_LEN(CXAH(chained_setter_init), key, klen, cv);
     else
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(setter_init), key);
+      MAKE_NEW_CV_HASH_OBJ_LEN(CXAH(setter_init), key, klen, cv);
     }
     else { /* newxs_accessor */
       if (chained)
-        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_accessor_init), key);
+        MAKE_NEW_CV_HASH_OBJ_LEN(CXAH(chained_accessor_init), key, klen, cv);
       else
-        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(accessor_init), key);
+        MAKE_NEW_CV_HASH_OBJ_LEN(CXAH(accessor_init), key, klen, cv);
     }
+    INSTALL_CV_NAME_LEN(cv, name, nlen);
 
 void
 newxs_constructor(name)

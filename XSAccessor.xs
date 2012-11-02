@@ -434,6 +434,88 @@ STMT_START {                                                                 \
   PERL_HASH(hk_ptr->hash, obj_hash_key, key_len);                            \
 } STMT_END
 
+
+
+/* Make a new XSUB and automatically set the file name, setting outcv */
+#define MAKE_NEW_CV(xsub, outcv)                                              \
+STMT_START {                                                                  \
+  if (NULL == (outcv = newXS(NULL, xsub, (char*)__FILE__) == NULL))           \
+    croak("ARG! Something went really wrong while installing a new XSUB!");   \
+} STMT_END
+
+/* Make a new XSUB (setting outcv) and set the function index attribute
+ * TODO: Once the array case has been migrated to storing pointers instead
+ *       of indexes, this macro can probably go away.
+ **/
+#define MAKE_NEW_CV_WITH_INDEX(xsub, function_index, outcv)                 \
+STMT_START {                                                                \
+  (outcv) = newXS(NULL, xsub, (char*)__FILE__);                             \
+  if ((outcv) == NULL)                                                      \
+    croak("ARG! Something went really wrong while installing a new XSUB!"); \
+  XSANY.any_i32 = function_index;                                           \
+} STMT_END
+
+/* Make a new XSUB (setting outcv) and set the function index attribute */
+#define MAKE_NEW_CV_WITH_PTR(xsub, user_pointer, outcv)                      \
+STMT_START {                                                                \
+  (outcv) = newXS(NULL, xsub, (char*)__FILE__);                             \
+  if ((outcv) == NULL)                                                      \
+    croak("ARG! Something went really wrong while installing a new XSUB!"); \
+  XSANY.any_ptr = (void *)user_pointer;                                     \
+} STMT_END
+
+/* Make a new XSUB (setting outcv) and set the function index attribute
+ * for array-based objects.
+ **/
+#define MAKE_NEW_CV_ARRAY_OBJ(xsub, obj_array_index, outcv)                  \
+STMT_START {                                                                 \
+  const U32 function_index = get_internal_array_index((I32)obj_array_index); \
+  MAKE_NEW_CV_WITH_INDEX(xsub, function_index, outcv);                       \
+  CXSAccessor_arrayindices[function_index] = obj_array_index;                \
+} STMT_END
+
+
+/* Make a new XSUB (setting outcv) and set the function index attribute
+ * for hash-based objects.
+ **/
+#define MAKE_NEW_CV_HASH_OBJ(xsub, obj_hash_key, outcv)                      \
+STMT_START {                                                                 \
+  const U32 key_len = strlen(obj_hash_key);                                  \
+  autoxs_hashkey * hk_ptr = get_hashkey(aTHX_ obj_hash_key, key_len);        \
+  MAKE_NEW_CV_WITH_PTR(xsub, hk_ptr, outcv);                                 \
+  hk_ptr->key = (char*)cxa_malloc((key_len+1));                              \
+  cxa_memcpy(hk_ptr->key, obj_hash_key, key_len);                            \
+  hk_ptr->key[key_len] = 0;                                                  \
+  hk_ptr->len = key_len;                                                     \
+  PERL_HASH(hk_ptr->hash, obj_hash_key, key_len);                            \
+} STMT_END
+
+/* Make a new XSUB (setting outcv) and set the function index attribute
+ * for hash-based objects.
+ **/
+#define MAKE_NEW_CV_HASH_OBJ_LEN(xsub, obj_hash_key, obj_hash_key_len, outcv)\
+STMT_START {                                                                 \
+  autoxs_hashkey *hk_ptr = get_hashkey(aTHX_ obj_hash_key, obj_hash_key_len);\
+  MAKE_NEW_CV_WITH_PTR(xsub, hk_ptr, outcv);                                 \
+  hk_ptr->key = (char*)cxa_malloc((obj_hash_key_len+1));                     \
+  cxa_memcpy(hk_ptr->key, obj_hash_key, obj_hash_key_len);                   \
+  hk_ptr->key[obj_hash_key_len] = 0;                                         \
+  hk_ptr->len = obj_hash_key_len;                                            \
+  PERL_HASH(hk_ptr->hash, obj_hash_key, obj_hash_key_len);                   \
+} STMT_END
+
+/* compat with older perls */
+#ifndef GvCV_set
+#  define  GvCV_set(gv, cv) GvCV(gv) = cv
+#endif
+
+/* Simply install a CV under the given name/len combo */
+#define INSTALL_CV_NAME_LEN(cv, name, nlen)                                  \
+STMT_START {                                                                 \
+      GV * const gv = gv_fetchpvn_flags(name, nlen, GV_ADDMULTI, SVt_PVCV);  \
+      GvCV_set(gv, cv);                                                      \
+} STMT_END
+
 #ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
 static Perl_ppaddr_t CXA_DEFAULT_ENTERSUB = NULL;
 
