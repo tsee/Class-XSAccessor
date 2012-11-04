@@ -201,7 +201,7 @@ _newxs_compat_setter(namesv, keysv)
     name = SvPV(namesv, namelen);
     key = SvPV(keysv, keylen);
     /* WARNING: If this is called in your code, you're doing it WRONG! */
-    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(array_setter_init), key);
+    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(array_setter_init), key, keylen);
 
 void
 _newxs_compat_accessor(namesv, keysv)
@@ -215,5 +215,5 @@ _newxs_compat_accessor(namesv, keysv)
     name = SvPV(namesv, namelen);
     key = SvPV(keysv, keylen);
     /* WARNING: If this is called in your code, you're doing it WRONG! */
-    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(array_accessor_init), key);
+    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(array_accessor_init), key, keylen);
 

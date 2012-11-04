@@ -428,17 +428,17 @@ newxs_getter(namesv, keysv)
     key = SvPV(keysv, keylen);
     switch (ix) {
     case 0: /* newxs_getter */
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(getter_init), key);
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(getter_init), key, keylen);
       break;
     case 1: { /* newxs_lvalue_accessor */
         CV* cv;
-        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(lvalue_accessor_init), key);
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(lvalue_accessor_init), key, keylen);
         /* Make the CV lvalue-able. "cv" was set by the previous macro */
         CvLVALUE_on(cv);
       }
       break;
     case 2:
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(predicate_init), key);
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(predicate_init), key, keylen);
       break;
     default:
       croak("Invalid alias of newxs_getter called");
@@ -461,15 +461,15 @@ newxs_setter(namesv, keysv, chained)
     key = SvPV(keysv, keylen);
     if (ix == 0) { /* newxs_setter */
     if (chained)
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_setter_init), key);
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_setter_init), key, keylen);
     else
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(setter_init), key);
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(setter_init), key, keylen);
     }
     else { /* newxs_accessor */
       if (chained)
-        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_accessor_init), key);
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_accessor_init), key, keylen);
       else
-        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(accessor_init), key);
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(accessor_init), key, keylen);
     }
 
 void
@@ -507,6 +507,6 @@ newxs_test(namesv, keysv)
   PPCODE:
     name = SvPV(namesv, namelen);
     key = SvPV(keysv, keylen);
-    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(test_init), key);
+    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(test_init), key, keylen);
 
 

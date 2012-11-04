@@ -422,16 +422,15 @@ STMT_START {                                                                 \
 /* Install a new XSUB under 'name' and set the function index attribute
  * for hash-based objects. Requires a previous declaration of a CV* cv!
  **/
-#define INSTALL_NEW_CV_HASH_OBJ(name, xsub, obj_hash_key)                    \
+#define INSTALL_NEW_CV_HASH_OBJ(name, xsub, obj_hash_key, obj_hash_key_len)  \
 STMT_START {                                                                 \
-  const U32 key_len = strlen(obj_hash_key);                                  \
-  autoxs_hashkey * hk_ptr = get_hashkey(aTHX_ obj_hash_key, key_len);        \
+  autoxs_hashkey *hk_ptr = get_hashkey(aTHX_ obj_hash_key, obj_hash_key_len);\
   INSTALL_NEW_CV_WITH_PTR(name, xsub, hk_ptr);                               \
-  hk_ptr->key = (char*)cxa_malloc((key_len+1));                              \
-  cxa_memcpy(hk_ptr->key, obj_hash_key, key_len);                            \
-  hk_ptr->key[key_len] = 0;                                                  \
-  hk_ptr->len = key_len;                                                     \
-  PERL_HASH(hk_ptr->hash, obj_hash_key, key_len);                            \
+  hk_ptr->key = (char*)cxa_malloc(obj_hash_key_len+1);                       \
+  cxa_memcpy(hk_ptr->key, obj_hash_key, obj_hash_key_len);                   \
+  hk_ptr->key[obj_hash_key_len] = 0;                                         \
+  hk_ptr->len = obj_hash_key_len;                                            \
+  PERL_HASH(hk_ptr->hash, obj_hash_key, obj_hash_key_len);                   \
 } STMT_END
 
 #ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
