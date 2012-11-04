@@ -413,13 +413,19 @@ test(self, ...)
     }
 
 void
-newxs_getter(name, key)
-  char* name;
-  char* key;
+newxs_getter(namesv, keysv)
+  SV *namesv;
+  SV *keysv;
   ALIAS:
     Class::XSAccessor::newxs_lvalue_accessor = 1
     Class::XSAccessor::newxs_predicate = 2
+  PREINIT:
+    char *name;
+    char *key;
+    STRLEN namelen, keylen;
   PPCODE:
+    name = SvPV(namesv, namelen);
+    key = SvPV(keysv, keylen);
     switch (ix) {
     case 0: /* newxs_getter */
       INSTALL_NEW_CV_HASH_OBJ(name, CXAH(getter_init), key);
