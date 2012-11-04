@@ -414,8 +414,8 @@ test(self, ...)
 
 void
 newxs_getter(namesv, keysv)
-  SV *namesv;
-  SV *keysv;
+    SV *namesv;
+    SV *keysv;
   ALIAS:
     Class::XSAccessor::newxs_lvalue_accessor = 1
     Class::XSAccessor::newxs_predicate = 2
@@ -431,7 +431,7 @@ newxs_getter(namesv, keysv)
       INSTALL_NEW_CV_HASH_OBJ(name, CXAH(getter_init), key);
       break;
     case 1: { /* newxs_lvalue_accessor */
-      CV* cv;
+        CV* cv;
         INSTALL_NEW_CV_HASH_OBJ(name, CXAH(lvalue_accessor_init), key);
         /* Make the CV lvalue-able. "cv" was set by the previous macro */
         CvLVALUE_on(cv);
