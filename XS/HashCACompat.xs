@@ -190,18 +190,30 @@ array_accessor(self, ...)
     } /* end writing branch */
 
 void
-_newxs_compat_setter(name, key)
-  char* name;
-  char* key;
+_newxs_compat_setter(namesv, keysv)
+    SV *namesv;
+    SV *keysv;
+  PREINIT:
+    char *name;
+    char *key;
+    STRLEN namelen, keylen;
   PPCODE:
+    name = SvPV(namesv, namelen);
+    key = SvPV(keysv, keylen);
     /* WARNING: If this is called in your code, you're doing it WRONG! */
     INSTALL_NEW_CV_HASH_OBJ(name, CXAH(array_setter_init), key);
 
 void
-_newxs_compat_accessor(name, key)
-  char* name;
-  char* key;
+_newxs_compat_accessor(namesv, keysv)
+    SV *namesv;
+    SV *keysv;
+  PREINIT:
+    char *name;
+    char *key;
+    STRLEN namelen, keylen;
   PPCODE:
+    name = SvPV(namesv, namelen);
+    key = SvPV(keysv, keylen);
     /* WARNING: If this is called in your code, you're doing it WRONG! */
     INSTALL_NEW_CV_HASH_OBJ(name, CXAH(array_accessor_init), key);
 

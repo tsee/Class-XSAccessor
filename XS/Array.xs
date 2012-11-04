@@ -334,13 +334,17 @@ constructor(class, ...)
     PUSHs(sv_2mortal(obj));
 
 void
-newxs_getter(name, index)
-    char* name;
+newxs_getter(namesv, index)
+    SV *namesv;
     U32 index;
   ALIAS:
     Class::XSAccessor::Array::newxs_lvalue_accessor = 1
     Class::XSAccessor::Array::newxs_predicate       = 2
+  PREINIT:
+    char *name;
+    STRLEN namelen;
   PPCODE:
+    name = SvPV(namesv, namelen);
     switch (ix) {
     case 0: /* newxs_getter */
       INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(getter_init), index);
@@ -362,13 +366,17 @@ newxs_getter(name, index)
     }
 
 void
-newxs_setter(name, index, chained)
-    char* name;
+newxs_setter(namesv, index, chained)
+    SV *namesv;
     U32 index;
     bool chained;
   ALIAS:
     Class::XSAccessor::Array::newxs_accessor = 1
+  PREINIT:
+    char *name;
+    STRLEN namelen;
   PPCODE:
+    name = SvPV(namesv, namelen);
     if (ix == 0) { /* newxs_setter */
       if (chained)
         INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(chained_setter_init), index);
@@ -383,7 +391,11 @@ newxs_setter(name, index, chained)
     }
 
 void
-newxs_constructor(name)
-  char* name;
+newxs_constructor(namesv)
+    SV *namesv;
+  PREINIT:
+    char *name;
+    STRLEN namelen;
   PPCODE:
+    name = SvPV(namesv, namelen);
     INSTALL_NEW_CV(name, CXAA(constructor_init));
