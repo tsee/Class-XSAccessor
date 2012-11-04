@@ -446,13 +446,19 @@ newxs_getter(namesv, keysv)
     }
 
 void
-newxs_setter(name, key, chained)
-    char* name;
-    char* key;
+newxs_setter(namesv, keysv, chained)
+    SV *namesv;
+    SV *keysv;
     bool chained;
   ALIAS:
     Class::XSAccessor::newxs_accessor = 1
+  PREINIT:
+    char *name;
+    char *key;
+    STRLEN namelen, keylen;
   PPCODE:
+    name = SvPV(namesv, namelen);
+    key = SvPV(keysv, keylen);
     if (ix == 0) { /* newxs_setter */
     if (chained)
       INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_setter_init), key);
@@ -467,26 +473,40 @@ newxs_setter(name, key, chained)
     }
 
 void
-newxs_constructor(name)
-  char* name;
+newxs_constructor(namesv)
+    SV *namesv;
+  PREINIT:
+    char *name;
+    STRLEN namelen;
   PPCODE:
+    name = SvPV(namesv, namelen);
     INSTALL_NEW_CV(name, CXAH(constructor_init));
 
 void
-newxs_boolean(name, truth)
-  char* name;
-  bool truth;
+newxs_boolean(namesv, truth)
+    SV *namesv;
+    bool truth;
+  PREINIT:
+    char *name;
+    STRLEN namelen;
   PPCODE:
+    name = SvPV(namesv, namelen);
     if (truth)
       INSTALL_NEW_CV(name, CXAH(constant_true_init));
     else
       INSTALL_NEW_CV(name, CXAH(constant_false_init));
 
 void
-newxs_test(name, key)
-  char* name;
-  char* key;
+newxs_test(namesv, keysv)
+    SV *namesv;
+    SV *keysv;
+  PREINIT:
+    char *name;
+    char *key;
+    STRLEN namelen, keylen;
   PPCODE:
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(test_init), key);
+    name = SvPV(namesv, namelen);
+    key = SvPV(keysv, keylen);
+    INSTALL_NEW_CV_HASH_OBJ(name, CXAH(test_init), key);
 
 
