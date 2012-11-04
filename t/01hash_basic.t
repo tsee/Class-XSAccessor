@@ -27,7 +27,7 @@ use Class::XSAccessor
   replace => 1,
   getters => {
     get_foo => 'foo',
-    get_bar => 'bar',
+    get_bar => "bar\0baz",
   };
 package main;
 
@@ -36,7 +36,7 @@ BEGIN {pass();}
 ok( Foo->can('get_foo') );
 ok( Foo->can('get_bar') );
 
-my $foo = bless  {foo => 'a', bar => 'b', c => 'd'} => 'Foo';
+my $foo = bless  {foo => 'a', "bar\0baz" => 'b', c => 'd'} => 'Foo';
 ok($foo->get_foo() eq 'a');
 ok($foo->get_bar() eq 'b');
 can_ok($foo, 'get_c');
@@ -46,7 +46,7 @@ package Foo;
 use Class::XSAccessor
   setters => {
     set_foo => 'foo',
-    set_bar => 'bar',
+    set_bar => "bar\0baz",
   };
 
 package main;

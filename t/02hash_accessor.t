@@ -4,7 +4,7 @@ use warnings;
 package Class::XSAccessor::Test;
 
 use Class::XSAccessor
-  accessors => { bar => 'bar' },
+  accessors => { bar => "b\0ar" },
   getters   => { get_foo => 'foo' },
   setters   => { set_foo => 'foo' };
 
@@ -16,7 +16,7 @@ use Class::XSAccessor
 
 sub new {
   my $class = shift;
-  bless { bar => 'baz' }, $class;
+  bless { "b\0ar" => 'baz' }, $class;
 }
 
 package main;
