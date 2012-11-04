@@ -1,5 +1,8 @@
 Revision history for Perl extension Class-XSAccessor.
 
+  - Support for hash keys with NUL (\0) characters. Previously,
+    these were truncated.
+
 1.14  Sun Aug 26 23:23 2012
   - Skip some failing tests on old debugging perls. Guys, please
     upgrade your perl!
