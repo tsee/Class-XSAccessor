@@ -3,6 +3,7 @@
 \bXSAccessor\.c$
 \bt\.pl$
 \bt\.c$
+\bMYMETA\..*$
 
 # Avoid version control files.
 \bRCS\b

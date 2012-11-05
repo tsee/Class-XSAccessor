@@ -1,5 +1,8 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.16  Mon Nov  5 13:47 2012
+  - Drop erroneous MYMETA files from distribution.
+
 1.15  Sun Nov  4 15:30 2012
   - Support for hash keys with NUL (\0) characters. Previously,
     these were truncated.
