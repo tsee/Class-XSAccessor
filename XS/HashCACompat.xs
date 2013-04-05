@@ -48,9 +48,8 @@ array_setter_init(self, ...)
       croak_xs_usage(cv, "self, newvalue(s)");
     }
 
-    if ((hashAssignRes = hv_store((HV*)SvRV(self), readfrom->key, readfrom->len, newvalue, readfrom->hash))) {
-      PUSHs(*hashAssignRes);
-    }
+    if ((hashAssignRes = hv_store((HV*)SvRV(self), readfrom->key, readfrom->len, newvalue, readfrom->hash)))
+      XSA_RETURN_SV(*hashAssignRes);
     else {
       SvREFCNT_dec(newvalue);
       croak("Failed to write new value to hash.");
@@ -89,7 +88,7 @@ array_setter(self, ...)
     }
 
     if ((hashAssignRes = hv_store((HV*)SvRV(self), readfrom->key, readfrom->len, newvalue, readfrom->hash))) {
-      PUSHs(*hashAssignRes);
+      XSA_RETURN_SV(*hashAssignRes);
     }
     else {
       SvREFCNT_dec(newvalue);
@@ -111,7 +110,7 @@ array_accessor_init(self, ...)
     if (items == 1) {
       SV** svp;
       if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)))
-        PUSHs(*svp);
+        XSA_RETURN_SV(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -135,7 +134,7 @@ array_accessor_init(self, ...)
       }
 
       if ((hashAssignRes = hv_store((HV*)SvRV(self), readfrom->key, readfrom->len, newvalue, readfrom->hash))) {
-        PUSHs(*hashAssignRes);
+        XSA_RETURN_SV(*hashAssignRes);
       }
       else {
         SvREFCNT_dec(newvalue);
@@ -157,7 +156,7 @@ array_accessor(self, ...)
     if (items == 1) {
       SV** svp;
       if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)))
-        PUSHs(*svp);
+        XSA_RETURN_SV(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -181,7 +180,7 @@ array_accessor(self, ...)
       }
 
       if ((hashAssignRes = hv_store((HV*)SvRV(self), readfrom->key, readfrom->len, newvalue, readfrom->hash))) {
-        PUSHs(*hashAssignRes);
+        XSA_RETURN_SV(*hashAssignRes);
       }
       else {
         SvREFCNT_dec(newvalue);

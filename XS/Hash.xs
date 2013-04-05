@@ -28,7 +28,7 @@ getter_init(self)
     CXA_CHECK_HASH(self);
     CXAH_OPTIMIZE_ENTERSUB(getter);
     if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)))
-      PUSHs(*svp);
+      XSA_RETURN_SV(*svp);
     else
       XSRETURN_UNDEF;
 
@@ -42,7 +42,7 @@ getter(self)
   PPCODE:
     CXA_CHECK_HASH(self);
     if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)))
-      PUSHs(*svp);
+      XSA_RETURN_SV(*svp);
     else
       XSRETURN_UNDEF;
 
@@ -169,7 +169,7 @@ accessor_init(self, ...)
     }
     else {
       if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)))
-        PUSHs(*svp);
+        XSA_RETURN_SV(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -191,7 +191,7 @@ accessor(self, ...)
     }
     else {
       if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)))
-        PUSHs(*svp);
+        XSA_RETURN_SV(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -215,7 +215,7 @@ chained_accessor_init(self, ...)
     }
     else {
       if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)))
-        PUSHs(*svp);
+        XSA_RETURN_SV(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -237,7 +237,7 @@ chained_accessor(self, ...)
     }
     else {
       if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)))
-        PUSHs(*svp);
+        XSA_RETURN_SV(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -280,6 +280,7 @@ constructor_init(class, ...)
     SV* obj;
     const char* classname;
   PPCODE:
+    /* FIXME this could most likely use TARG, too */
     CXAH_OPTIMIZE_ENTERSUB(constructor);
 
     classname = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen_const(class);
@@ -309,6 +310,7 @@ constructor(class, ...)
     SV* obj;
     const char* classname;
   PPCODE:
+    /* FIXME this could most likely use TARG, too */
     classname = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen_const(class);
     hash = newHV();
     obj = sv_bless(newRV_noinc((SV *)hash), gv_stashpv(classname, 1));
@@ -384,7 +386,7 @@ test_init(self, ...)
     }
     else {
       if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)))
-        PUSHs(*svp);
+        XSA_RETURN_SV(*svp);
       else
         XSRETURN_UNDEF;
     }
@@ -407,7 +409,7 @@ test(self, ...)
     }
     else {
       if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)))
-        PUSHs(*svp);
+        XSA_RETURN_SV(*svp);
       else
         XSRETURN_UNDEF;
     }
