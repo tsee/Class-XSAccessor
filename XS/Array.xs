@@ -352,7 +352,7 @@ newxs_getter(namesv, index)
     case 1: /* newxs_lvalue_accessor */
       {
         CV* cv;
-        INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(getter_init), index);
+        INSTALL_NEW_CV_ARRAY_OBJ(name, CXAA(lvalue_accessor_init), index);
         /* Make the CV lvalue-able. "cv" was set by the previous macro */
         CvLVALUE_on(cv);
         break;
