@@ -8,14 +8,17 @@ use Test::More;
 sub get_pp { $_[0]->{X}; }
 use Class::XSAccessor getters => { get_xs => 'X' };
 
-SCOPE: {
+# loops are to make sure that we end up testing both optimized and
+# unoptimized accessor implementations.
+
+for (1..3) {
   my $o   = bless { X=>1 }, 'main';
   my $ref = \($o->get_pp);
   $$ref++;
   is($o->get_pp, 1);
 }
 
-SCOPE: {
+for (1..3) {
   my $o   = bless { X=>1 }, 'main';
   my $ref = \($o->get_xs);
   $$ref++;
