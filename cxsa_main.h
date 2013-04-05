@@ -7,6 +7,25 @@
 
 #include "cxsa_hash_table.h"
 
+/* Alas, PUSHs and PUSHi/PUSHn are different.
+ * PUSHi/n use the TARG, PUSHs just assigns the SV pointer
+ * to the location. We want to use the TARG for returning
+ * an existing SV as well, so we have to use sv_setsv to
+ * copy it. That's unfortunate since it costs a bit of CPU
+ * time, but it's way better than sv_mortalcopy and also way
+ * more correct than just pushing an internal SV on the stack
+ * directly (see t/90regr_82689.t). */
+#define XSA_PUSHs_TARG(s) STMT_START {  \
+      dTARGET;                          \
+      sv_setsv(TARG, s);                \
+      PUSHTARG;                         \
+    } STMT_END
+
+#define XSA_RETURN_SV(s) STMT_START {   \
+      XSA_PUSHs_TARG(s);                \
+      XSRETURN(1);                      \
+    } STMT_END
+
 typedef struct autoxs_hashkey_str autoxs_hashkey;
 struct autoxs_hashkey_str {
   U32 hash;
