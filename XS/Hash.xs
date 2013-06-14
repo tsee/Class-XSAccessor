@@ -1,12 +1,22 @@
 #include "ppport.h"
 
 ## we want hv_fetch but with the U32 hash argument of hv_fetch_ent, so do it ourselves...
+
 #ifdef hv_common_key_len
-#define CXSA_HASH_FETCH(hv, key, len, hash) hv_common_key_len((hv), (key), (len), HV_FETCH_JUST_SV, NULL, (hash))
-#define CXSA_HASH_FETCH_LVALUE(hv, key, len, hash) hv_common_key_len((hv), (key), (len), (HV_FETCH_JUST_SV|HV_FETCH_LVALUE), NULL, (hash))
+
+# define CXSA_HASH_FETCH(hv, key, len, hash) \
+      hv_common_key_len((hv), (key), (len), HV_FETCH_JUST_SV, NULL, (hash))
+# define CXSA_HASH_FETCH_LVALUE(hv, key, len, hash) \
+      hv_common_key_len((hv), (key), (len), (HV_FETCH_JUST_SV|HV_FETCH_LVALUE), NULL, (hash))
+# define CXSA_HASH_EXISTS(hv, key, len, hash) \
+      hv_common_key_len((hv), (key), (len), HV_FETCH_ISEXISTS, NULL, (hash))
+
 #else
-#define CXSA_HASH_FETCH(hv, key, len, hash) hv_fetch((hv), (key), (len), 0)
-#define CXSA_HASH_FETCH_LVALUE(hv, key, len, hash) hv_fetch((hv), (key), (len), 1)
+
+# define CXSA_HASH_FETCH(hv, key, len, hash) hv_fetch((hv), (key), (len), 0)
+# define CXSA_HASH_FETCH_LVALUE(hv, key, len, hash) hv_fetch((hv), (key), (len), 1)
+# define CXSA_HASH_EXISTS(hv, key, len, hash) hv_exists((hv), (key), (len))
+
 #endif
 
 
@@ -252,7 +262,8 @@ predicate_init(self)
   PPCODE:
     CXA_CHECK_HASH(self);
     CXAH_OPTIMIZE_ENTERSUB(predicate);
-    if ( ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) && SvOK(*svp) )
+    if (hv_exists((HV *)SvRV(self), readfrom->key, readfrom->len))
+    if ( ((svp = CXSA_HASH_EXISTS((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) )
       XSRETURN_YES;
     else
       XSRETURN_NO;
@@ -266,7 +277,7 @@ predicate(self)
     SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
-    if ( ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) && SvOK(*svp) )
+    if ( ((svp = CXSA_HASH_EXISTS((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) )
       XSRETURN_YES;
     else
       XSRETURN_NO;

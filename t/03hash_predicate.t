@@ -21,7 +21,7 @@ sub new {
 
 package main;
 
-use Test::More tests => 20;
+use Test::More tests => 22;
 
 my $obj = Class::XSAccessor::Test->new();
 
@@ -40,7 +40,12 @@ ok($obj->has_bar());
 is($obj->set_foo(undef), undef);
 is($obj->bar(undef), undef);
 
+ok($obj->has_foo()); # undef is not "doesn't have"
+delete $obj->{foo};
 ok(!$obj->has_foo());
+
+ok($obj->has_bar()); # undef is not "doesn't have"
+delete $obj->{bar};
 ok(!$obj->has_bar());
 
 is($obj->get_zero, 0);

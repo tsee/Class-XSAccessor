@@ -164,7 +164,8 @@ As of version 1.05, some alternative syntax forms are available:
 
 Class::XSAccessor implements fast read, write and read/write accessors in XS.
 Additionally, it can provide predicates such as C<has_foo()> for testing
-whether the attribute C<foo> is defined in the object.
+whether the attribute C<foo> exists in the object (which is different from
+"is defined within the object").
 It only works with objects that are implemented as ordinary hashes.
 L<Class::XSAccessor::Array> implements the same interface for objects
 that use arrays for their internal representation.
@@ -299,7 +300,7 @@ chocolateboy E<lt>chocolate@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008, 2009, 2010, 2011, 2012 by Steffen Mueller
+Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,
