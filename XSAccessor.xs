@@ -284,7 +284,10 @@ STMT_START {                                                                    
 #define Class__XSAccessor_accessor_init Clas_XSAcesor_acesor_init
 #define Class__XSAccessor_chained_accessor_init Cs_XSAs_cid_as_init
 #define Class__XSAccessor_chained_accessor Clas_XSAcesor_chained_acesor
-#define Class__XSAccessor_predicate_init Clas_XSAcesor_predicate_init
+#define Class__XSAccessor_exists_predicate_init Clas_XSAcesor_eprdicate_init
+#define Class__XSAccessor_defined_predicate_init Clas_XSAcesor_dprdicate_init
+#define Class__XSAccessor_exists_predicate Clas_XSAcesor_eprdicate
+#define Class__XSAccessor_defined_predicate Clas_XSAcesor_dprdicate
 #define Class__XSAccessor_constructor_init Cs_XSAs_csuor_init
 #define Class__XSAccessor_constructor Class_XSAccessor_constructor
 #define Class__XSAccessor_constant_false_init Cs_XSAs_csnt_fse_init
@@ -472,9 +475,13 @@ XS(CXAH(chained_accessor));
 XS(CXAH(chained_accessor_init));
 CXAH_GENERATE_ENTERSUB(chained_accessor);
 
-XS(CXAH(predicate));
-XS(CXAH(predicate_init));
-CXAH_GENERATE_ENTERSUB(predicate);
+XS(CXAH(defined_predicate));
+XS(CXAH(defined_predicate_init));
+CXAH_GENERATE_ENTERSUB(defined_predicate);
+
+XS(CXAH(exists_predicate));
+XS(CXAH(exists_predicate_init));
+CXAH_GENERATE_ENTERSUB(exists_predicate);
 
 XS(CXAH(constructor));
 XS(CXAH(constructor_init));

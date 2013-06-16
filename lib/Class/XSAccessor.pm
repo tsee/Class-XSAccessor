@@ -93,10 +93,10 @@ sub _generate_method {
     newxs_setter($subname, $hashkey, $opts->{chained}||0);
   }
   elsif ($type eq 'def_predicate') {
-    newxs_predicate($subname, $hashkey);
+    newxs_defined_predicate($subname, $hashkey);
   }
   elsif ($type eq 'ex_predicate') {
-    newxs_predicate($subname, $hashkey);
+    newxs_exists_predicate($subname, $hashkey);
   }
   elsif ($type eq 'constructor') {
     newxs_constructor($subname);
