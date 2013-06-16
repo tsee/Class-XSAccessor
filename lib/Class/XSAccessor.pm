@@ -141,7 +141,12 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
       foo => 'foo',
       bar => 'bar',
     },
-    predicates => {
+    # "predicates" is an alias for "defined_predicates"
+    defined_predicates => {
+      defined_foo => 'foo',
+      defined_bar => 'bar',
+    },
+    exists_predicates => {
       has_foo => 'foo',
       has_bar => 'bar',
     },
@@ -213,6 +218,11 @@ just return true or false (and always do so). If that seems like a
 really superfluous thing to you, then consider a large class hierarchy
 with interfaces such as L<PPI>. These methods are provided by the C<true>
 and C<false> options - see the synopsis.
+
+C<defined_predicates> check whether a given object attribute is defined.
+C<predicates> is an alias for C<defined_predicates> for compatibility with
+older versions of C<Class::XSAccessor>. C<exists_predicates> checks
+whether the given attribute exists in the object using C<exists>.
 
 =head1 OPTIONS
 
