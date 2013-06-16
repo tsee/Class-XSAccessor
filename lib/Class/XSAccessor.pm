@@ -39,6 +39,8 @@ sub import {
   my $acc_subs       = _make_hash($opts{accessors} || {});
   my $lvacc_subs     = _make_hash($opts{lvalue_accessors} || {});
   my $pred_subs      = _make_hash($opts{predicates} || {});
+  my $ex_pred_subs   = _make_hash($opts{exists_predicates} || {});
+  my $def_pred_subs  = _make_hash($opts{defined_predicates} || {});
   my $test_subs      = _make_hash($opts{__tests__} || {});
   my $construct_subs = $opts{constructors} || [defined($opts{constructor}) ? $opts{constructor} : ()];
   my $true_subs      = $opts{true} || [];
@@ -49,7 +51,9 @@ sub import {
                         ["accessor", $acc_subs],
                         ["lvalue_accessor", $lvacc_subs],
                         ["test", $test_subs],
-                        ["predicate", $pred_subs] )
+                        ["ex_predicate", $ex_pred_subs],
+                        ["def_predicate", $def_pred_subs],
+                        ["def_predicate", $pred_subs] )
   {
     my $subs = $subtype->[1];
     foreach my $subname (keys %$subs) {
@@ -88,7 +92,10 @@ sub _generate_method {
   elsif ($type eq 'setter') {
     newxs_setter($subname, $hashkey, $opts->{chained}||0);
   }
-  elsif ($type eq 'predicate') {
+  elsif ($type eq 'def_predicate') {
+    newxs_predicate($subname, $hashkey);
+  }
+  elsif ($type eq 'ex_predicate') {
     newxs_predicate($subname, $hashkey);
   }
   elsif ($type eq 'constructor') {

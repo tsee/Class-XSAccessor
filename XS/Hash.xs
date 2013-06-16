@@ -253,7 +253,7 @@ chained_accessor(self, ...)
     }
 
 void
-predicate_init(self)
+exists_predicate_init(self)
     SV* self;
   INIT:
     /* Get the const hash key struct from the global storage */
@@ -261,15 +261,28 @@ predicate_init(self)
     SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
-    CXAH_OPTIMIZE_ENTERSUB(predicate);
-    if (hv_exists((HV *)SvRV(self), readfrom->key, readfrom->len))
+    CXAH_OPTIMIZE_ENTERSUB(exists_predicate);
+    if ( (svp = CXSA_HASH_EXISTS((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash)) )
+      XSRETURN_YES;
+    else
+      XSRETURN_NO;
+
+void
+exists_predicate(self)
+    SV* self;
+  INIT:
+    /* Get the const hash key struct from the global storage */
+    const autoxs_hashkey * readfrom = CXAH_GET_HASHKEY;
+    SV** svp;
+  PPCODE:
+    CXA_CHECK_HASH(self);
     if ( ((svp = CXSA_HASH_EXISTS((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) )
       XSRETURN_YES;
     else
       XSRETURN_NO;
 
 void
-predicate(self)
+defined_predicate_init(self)
     SV* self;
   INIT:
     /* Get the const hash key struct from the global storage */
@@ -277,10 +290,26 @@ predicate(self)
     SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
-    if ( ((svp = CXSA_HASH_EXISTS((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) )
+    CXAH_OPTIMIZE_ENTERSUB(defined_predicate);
+    if ( ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) && SvOK(*svp) )
       XSRETURN_YES;
     else
       XSRETURN_NO;
+
+void
+defined_predicate(self)
+    SV* self;
+  INIT:
+    /* Get the const hash key struct from the global storage */
+    const autoxs_hashkey * readfrom = CXAH_GET_HASHKEY;
+    SV** svp;
+  PPCODE:
+    CXA_CHECK_HASH(self);
+    if ( ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) && SvOK(*svp) )
+      XSRETURN_YES;
+    else
+      XSRETURN_NO;
+
 
 void
 constructor_init(class, ...)
@@ -432,6 +461,8 @@ newxs_getter(namesv, keysv)
   ALIAS:
     Class::XSAccessor::newxs_lvalue_accessor = 1
     Class::XSAccessor::newxs_predicate = 2
+    Class::XSAccessor::newxs_exists_predicate = 3
+    Class::XSAccessor::newxs_defined_predicate = 4
   PREINIT:
     char *name;
     char *key;
@@ -451,7 +482,11 @@ newxs_getter(namesv, keysv)
       }
       break;
     case 2:
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(predicate_init), key, keylen);
+    case 3:
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(exists_predicate_init), key, keylen);
+      break;
+    case 4:
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(defined_predicate_init), key, keylen);
       break;
     default:
       croak("Invalid alias of newxs_getter called");
