@@ -6,7 +6,7 @@ use Carp qw/croak/;
 use Class::XSAccessor;
 use Class::XSAccessor::Heavy;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 
 sub import {
   my $own_class = shift;

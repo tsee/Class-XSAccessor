@@ -1,5 +1,10 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.18  Mon Jun 17 18:07 2013
+  - Revert fixes for implicitly-lvalue getters for now since that
+    actually breaks user code. It seems it's not just because the
+    users are naughty, so more investigation required.
+
 1.17  Mon Jun 17 07:09 2013
   - For Hashes: Implement predicates that check definedness and
     existance explicitly. The traditional "predicates" check
