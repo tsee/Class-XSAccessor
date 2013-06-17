@@ -1,5 +1,13 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.17  Mon Jun 17 07:09 2013
+  - For Hashes: Implement predicates that check definedness and
+    existance explicitly. The traditional "predicates" check
+    definedness. It's conceivable to also want a bool-check
+    type predicate. File a ticket if you need that.
+  - Fix bug regarding getters being implicitly lvalue by
+    returning the internal SV*. Instead, we now use TARG.
+
 1.16  Mon Nov  5 13:47 2012
   - Drop erroneous MYMETA files from distribution.
 
