@@ -258,7 +258,6 @@ exists_predicate_init(self)
   INIT:
     /* Get the const hash key struct from the global storage */
     const autoxs_hashkey * readfrom = CXAH_GET_HASHKEY;
-    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
     CXAH_OPTIMIZE_ENTERSUB(exists_predicate);
@@ -273,7 +272,6 @@ exists_predicate(self)
   INIT:
     /* Get the const hash key struct from the global storage */
     const autoxs_hashkey * readfrom = CXAH_GET_HASHKEY;
-    SV** svp;
   PPCODE:
     CXA_CHECK_HASH(self);
     if ( CXSA_HASH_EXISTS((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash) != NULL )
