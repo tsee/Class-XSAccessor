@@ -18,7 +18,7 @@ getter_init(self)
     CXA_CHECK_ARRAY(self);
     CXAA_OPTIMIZE_ENTERSUB(getter);
     if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
-      XSA_RETURN_SV(svp[0]);
+      PUSHs(svp[0]);
     else
       XSRETURN_UNDEF;
 
@@ -35,7 +35,7 @@ getter(self)
   PPCODE:
     CXA_CHECK_ARRAY(self);
     if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
-      XSA_RETURN_SV(svp[0]);
+      PUSHs(svp[0]);
     else
       XSRETURN_UNDEF;
 
@@ -183,7 +183,7 @@ accessor_init(self, ...)
     }
     else {
       if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
-        XSA_RETURN_SV(svp[0]);
+        PUSHs(svp[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -208,7 +208,7 @@ accessor(self, ...)
     }
     else {
       if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
-        XSA_RETURN_SV(svp[0]);
+        PUSHs(svp[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -234,7 +234,7 @@ chained_accessor_init(self, ...)
     }
     else {
       if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
-        XSA_RETURN_SV(svp[0]);
+        PUSHs(svp[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -259,7 +259,7 @@ chained_accessor(self, ...)
     }
     else {
       if ((svp = av_fetch((AV *)SvRV(self), index, 1)))
-        XSA_RETURN_SV(svp[0]);
+        PUSHs(svp[0]);
       else
         XSRETURN_UNDEF;
     }
@@ -308,7 +308,7 @@ constructor_init(class, ...)
     const char* classname;
   PPCODE:
     CXAA_OPTIMIZE_ENTERSUB(constructor);
-    /* FIXME could likely use TARG */
+
     classname = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen_const(class);
     array = newAV();
     obj = sv_bless( newRV_noinc((SV*)array), gv_stashpv(classname, 1) );
@@ -325,7 +325,6 @@ constructor(class, ...)
     SV* obj;
     const char* classname;
   PPCODE:
-    /* FIXME could likely use TARG */
     classname = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen_const(class);
     array = newAV();
     obj = sv_bless( newRV_noinc((SV*)array), gv_stashpv(classname, 1) );
