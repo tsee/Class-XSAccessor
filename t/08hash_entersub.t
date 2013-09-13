@@ -3,7 +3,43 @@
 use strict;
 use warnings;
 
-use Class::XSAccessor;
+use constant {
+    EMPTY      => [],
+    OPTIMIZING => [
+        'accessor: inside test',
+        'accessor: op_spare: 0',
+        'accessor: optimizing entersub',
+    ],
+    OPTIMIZED => [
+        'entersub: inside optimized entersub',
+        'accessor: inside test',
+        'accessor: op_spare: 0',
+        'accessor: entersub has been optimized'
+    ],
+    # XXX not used: not sure we want to trigger this internal error
+    DISABLING_NOT_DEFINED => [
+        'entersub: inside optimized entersub',
+        'entersub: disabling optimization: SV is null'
+    ],
+    DISABLING_NOT_CV => [
+        'entersub: inside optimized entersub',
+        'entersub: disabling optimization: SV is not a CV'
+    ],
+    DISABLING_NOT_SAME_ACCESSOR => [
+        'entersub: inside optimized entersub',
+        'entersub: disabling optimization: SV is not test'
+    ],
+    DISABLED => [
+        'accessor: inside test',
+        'accessor: op_spare: 1',
+        'accessor: entersub optimization has been disabled'
+    ],
+};
+
+use Class::XSAccessor {
+    __tests__ => [ qw(foo bar) ],
+    getters   => [ 'quux' ],
+};
 
 BEGIN {
     unless (Class::XSAccessor::__entersub_optimized__()) {
@@ -12,337 +48,161 @@ BEGIN {
     }
 }
 
-use Test::More tests => 103;
-# use Data::Dumper; $Data::Dumper::Terse = $Data::Dumper::Indent = 1;
+use Data::Dumper;
+use Test::More tests => 68;
 
-our @WARNINGS = ();
+our @MESSAGES = ();
 
-use Class::XSAccessor
-    constructor => 'new',
-    __tests__   => [ qw(foo bar) ];
+sub is_debug ($) {
+    my $want = shift;
 
-sub baz {
-    my $self = shift;
-    @_ ? $self->{baz} = shift : $self->{baz}
-}
+    # report errors with the caller's line number
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-# standard: verify that the subs work as expected
-sub test1 {
-    my $self = shift;
-    is($self->foo('foo1'), 'foo1');
-    is($self->foo(), 'foo1');
-    is($self->{foo}, 'foo1');
-    is($self->bar('bar1'), 'bar1');
-    is($self->bar(), 'bar1');
-    is($self->{bar}, 'bar1');
-}
+    my $got = [ splice @MESSAGES ];
 
-# loop: verify that the second time through, the optimized entersub is called
-sub test2 {
-    my $self = shift;
-    for (1 .. 2) {
-        is($self->foo('foo2'), 'foo2');
-        is($self->foo(), 'foo2');
-        is($self->{foo}, 'foo2');
-        is($self->bar('bar2'), 'bar2');
-        is($self->bar(), 'bar2');
-        is($self->{bar}, 'bar2');
+    unless (is_deeply($got, $want)) {
+        local ($Data::Dumper::Terse, $Data::Dumper::Indent) = (1, 1);
+        print STDERR $/, 'unmatched messages: ', Dumper($got), $/;
     }
 }
 
-# dynamic
-sub test3 {
-    my $self = shift;
-    for my $name (qw(foo bar)) {
-        is($self->$name("${name}3"), "${name}3");
-        is($self->$name(), "${name}3");
-        is($self->{$name}, "${name}3");
-    }
-}
-
-# dynamic with a twist: the second sub isn't a Class::XSAccessor XSUB.
-# this should disable the optimization for the two entersub calls,
-# and (of course) still work as expected for foo and baz.
-# the bar accessor should still be optimizing
-sub test4 {
-    my $self = shift;
-    for my $name (qw(foo baz)) {
-        is($self->$name("${name}4"), "${name}4");
-        is($self->$name(), "${name}4");
-        is($self->{$name}, "${name}4");
-    }
-    is($self->bar('bar4'), 'bar4');
-    is($self->bar(), 'bar4');
-    is($self->{bar}, 'bar4');
-}
-
-# call the methods as subs to see how this impacts the optimized entersub. XXX: passed as GVs
-sub test5 {
-    my $self = shift;
-    is(foo($self, 'foo5'), 'foo5');
-    is(foo($self), 'foo5');
-    is($self->{foo}, 'foo5');
-    is(bar($self, 'bar5'), 'bar5');
-    is(bar($self), 'bar5');
-    is($self->{bar}, 'bar5');
-}
-
-# call the methods as subs with & (this sets a flag in the entersub's op_private)
-# XXX: these are passed in as GVs rather than CVs, which the optimization doesn't currently support
-sub test6 {
-    my $self = shift;
-    is(&foo($self, 'foo6'), 'foo6');
-    is(&foo($self), 'foo6');
-    is($self->{foo}, 'foo6');
-    is(&bar($self, 'bar6'), 'bar6');
-    is(bar($self), 'bar6');
-    is($self->{bar}, 'bar6');
-}
-
-# call the methods with $self->can('accessor_name') to see how this impacts the optimized entersub.
-# XXX: methods found by can() are passed in as GVs, which the optimization doesn't currently
-# support
-sub test7 {
-    my $self = shift;
-    is($self->can('foo')->($self, 'foo7'), 'foo7');
-    is($self->can('foo')->($self), 'foo7');
-    is($self->{foo}, 'foo7');
-    is($self->can('bar')->($self, 'bar7'), 'bar7');
-    is($self->can('bar')->($self), 'bar7');
-    is($self->{bar}, 'bar7');
-}
-
-$SIG{__WARN__} = sub {
+local $SIG{__WARN__} = sub {
     my $warning = join '', @_;
 
-    if ($warning =~ m{^cxah: (.+)\n$}) {
-        push @WARNINGS, $1;
+    if ($warning =~ m{^cxah: (.+?) at \Q$0\E}) {
+        push @MESSAGES, $1;
     } else {
         warn @_; # from perldoc -f warn: "__WARN__ hooks are not called from inside one"
     }
 };
 
-my $self = main->new();
+sub baz {
+    my $self = shift;
+    @_ ? $self->{baz} = shift : $self->{baz};
+}
 
-$self->test1();
-$self->test2();
-$self->test3();
-$self->test4();
-$self->test5();
-$self->test6();
-$self->test7();
+# XXX debugging note: change if/else branches to separate
+# statements to debug/troubleshoot, otherwise the error will appear
+# to come from the first line of the if/else statement i.e. change:
+#
+#     1: if ($_ == 1) {
+#     2:     is_debug ...
+#     3: } else {
+#     4:     is_debug ... # error
+#     5: }
+#
+#     # error at line 1
+#
+# to:
+#
+#     1: if ($_ == 1) {
+#     2:     is_debug ...
+#     3: }
+#     4:
+#     5: if ($_ == 2) {
+#     6:     is_debug ... # error
+#     7: }
+#
+#     # error at line 5
 
-$self->test1();
-$self->test2();
-$self->test3();
-$self->test4();
-$self->test5();
-$self->test6();
-$self->test7();
+my $SELF = bless {
+    foo  => 'Foo',
+    bar  => 'Bar',
+    baz  => 'Baz',
+    quux => 'Quux'
+};
 
-# The best way to verify this test is to a) look for lines above that should disable
-# optimization and search for "disabling" below (e.g. ack disabling t/08hash_entersub.t),
-# and/or b) look for "disabling" below and make sure it matches the behaviours above
+# standard: verify that the accessors work as expected
+for (1 .. 3) {
+    is $SELF->foo, 'Foo';
+    is_debug ($_ == 1 ? OPTIMIZING : OPTIMIZED);
 
-my $WANT = [
-    'accessor: inside test_init at t/08hash_entersub.t line 32.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 32.',
-    'accessor: inside test_init at t/08hash_entersub.t line 33.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 33.',
-    'accessor: inside test_init at t/08hash_entersub.t line 35.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 35.',
-    'accessor: inside test_init at t/08hash_entersub.t line 36.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 36.',
-    'accessor: inside test_init at t/08hash_entersub.t line 44.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 44.',
-    'accessor: inside test_init at t/08hash_entersub.t line 45.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 45.',
-    'accessor: inside test_init at t/08hash_entersub.t line 47.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 47.',
-    'accessor: inside test_init at t/08hash_entersub.t line 48.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 48.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 44.',
-    'accessor: inside test at t/08hash_entersub.t line 44.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 45.',
-    'accessor: inside test at t/08hash_entersub.t line 45.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 47.',
-    'accessor: inside test at t/08hash_entersub.t line 47.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 48.',
-    'accessor: inside test at t/08hash_entersub.t line 48.',
-    'accessor: inside test_init at t/08hash_entersub.t line 57.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 57.',
-    'accessor: inside test_init at t/08hash_entersub.t line 58.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 58.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 57.',
-    'accessor: inside test at t/08hash_entersub.t line 57.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 58.',
-    'accessor: inside test at t/08hash_entersub.t line 58.',
-    'accessor: inside test_init at t/08hash_entersub.t line 70.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 70.',
-    'accessor: inside test_init at t/08hash_entersub.t line 71.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 71.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 70.',
-    'entersub: disabling optimization: CV is not test at t/08hash_entersub.t line 70.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 71.',
-    'entersub: disabling optimization: CV is not test at t/08hash_entersub.t line 71.',
-    'accessor: inside test_init at t/08hash_entersub.t line 74.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 74.',
-    'accessor: inside test_init at t/08hash_entersub.t line 75.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 75.',
-    'accessor: inside test_init at t/08hash_entersub.t line 82.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 82.',
-    'accessor: inside test_init at t/08hash_entersub.t line 83.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 83.',
-    'accessor: inside test_init at t/08hash_entersub.t line 85.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 85.',
-    'accessor: inside test_init at t/08hash_entersub.t line 86.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 86.',
-    'accessor: inside test_init at t/08hash_entersub.t line 94.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 94.',
-    'accessor: inside test_init at t/08hash_entersub.t line 95.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 95.',
-    'accessor: inside test_init at t/08hash_entersub.t line 97.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 97.',
-    'accessor: inside test_init at t/08hash_entersub.t line 98.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 98.',
-    'accessor: inside test_init at t/08hash_entersub.t line 107.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 107.',
-    'accessor: inside test_init at t/08hash_entersub.t line 108.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 108.',
-    'accessor: inside test_init at t/08hash_entersub.t line 110.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 110.',
-    'accessor: inside test_init at t/08hash_entersub.t line 111.',
-    'accessor: op_spare: 0',
-    'accessor: optimizing entersub at t/08hash_entersub.t line 111.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 32.',
-    'accessor: inside test at t/08hash_entersub.t line 32.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 33.',
-    'accessor: inside test at t/08hash_entersub.t line 33.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 35.',
-    'accessor: inside test at t/08hash_entersub.t line 35.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 36.',
-    'accessor: inside test at t/08hash_entersub.t line 36.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 44.',
-    'accessor: inside test at t/08hash_entersub.t line 44.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 45.',
-    'accessor: inside test at t/08hash_entersub.t line 45.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 47.',
-    'accessor: inside test at t/08hash_entersub.t line 47.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 48.',
-    'accessor: inside test at t/08hash_entersub.t line 48.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 44.',
-    'accessor: inside test at t/08hash_entersub.t line 44.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 45.',
-    'accessor: inside test at t/08hash_entersub.t line 45.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 47.',
-    'accessor: inside test at t/08hash_entersub.t line 47.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 48.',
-    'accessor: inside test at t/08hash_entersub.t line 48.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 57.',
-    'accessor: inside test at t/08hash_entersub.t line 57.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 58.',
-    'accessor: inside test at t/08hash_entersub.t line 58.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 57.',
-    'accessor: inside test at t/08hash_entersub.t line 57.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 58.',
-    'accessor: inside test at t/08hash_entersub.t line 58.',
-    'accessor: inside test_init at t/08hash_entersub.t line 70.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 70.',
-    'accessor: inside test_init at t/08hash_entersub.t line 71.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 71.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 74.',
-    'accessor: inside test at t/08hash_entersub.t line 74.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 75.',
-    'accessor: inside test at t/08hash_entersub.t line 75.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 82.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 82.',
-    'accessor: inside test_init at t/08hash_entersub.t line 82.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 82.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 83.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 83.',
-    'accessor: inside test_init at t/08hash_entersub.t line 83.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 83.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 85.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 85.',
-    'accessor: inside test_init at t/08hash_entersub.t line 85.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 85.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 86.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 86.',
-    'accessor: inside test_init at t/08hash_entersub.t line 86.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 86.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 94.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 94.',
-    'accessor: inside test_init at t/08hash_entersub.t line 94.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 94.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 95.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 95.',
-    'accessor: inside test_init at t/08hash_entersub.t line 95.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 95.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 97.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 97.',
-    'accessor: inside test_init at t/08hash_entersub.t line 97.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 97.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 98.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 98.',
-    'accessor: inside test_init at t/08hash_entersub.t line 98.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 98.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 107.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 107.',
-    'accessor: inside test_init at t/08hash_entersub.t line 107.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 107.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 108.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 108.',
-    'accessor: inside test_init at t/08hash_entersub.t line 108.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 108.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 110.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 110.',
-    'accessor: inside test_init at t/08hash_entersub.t line 110.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 110.',
-    'entersub: inside optimized entersub at t/08hash_entersub.t line 111.',
-    'entersub: disabling optimization: sv is not a CV at t/08hash_entersub.t line 111.',
-    'accessor: inside test_init at t/08hash_entersub.t line 111.',
-    'accessor: op_spare: 1',
-    'accessor: entersub optimization has been disabled at t/08hash_entersub.t line 111.'
-];
+    is $SELF->bar, 'Bar';
+    is_debug ($_ == 1 ? OPTIMIZING : OPTIMIZED);
 
-is_deeply(\@WARNINGS, $WANT);
+    is $SELF->baz, 'Baz';
+    is_debug EMPTY;
+}
 
-# print STDERR Dumper(\@WARNINGS), $/;
+# changing the CV at a call site is OK (i.e. doesn't disable
+# the entersub optimization) if both CVs are the same type of
+# Class::XSAccessor accessor: foo (test) -> bar (test)
+for (1 .. 4) {
+    my $name = [ qw(foo bar foo bar) ]->[$_ - 1];
+    is $SELF->$name, ucfirst($name);
+
+    if ($_ == 1) {
+        is_debug OPTIMIZING;
+    } else {
+        is_debug OPTIMIZED;
+    }
+}
+
+# disable the entersub optimization (method 1):
+# change it to a different type of Class::XSAccessor accessor:
+# foo (test) -> quux (getter)
+for (1 .. 4) {
+    my $name = [ qw(foo quux foo quux) ]->[$_ - 1];
+    is $SELF->$name, ucfirst($name);
+
+    if ($_ == 1) {
+        is_debug OPTIMIZING;
+    } elsif ($_ == 2) {
+        is_debug DISABLING_NOT_SAME_ACCESSOR;
+    } elsif ($_ == 3) {
+        is_debug DISABLED;
+    } else {
+        is_debug EMPTY;
+    }
+}
+
+# disable the entersub optimization (method 2):
+# change it to a non-Class::XSAccessor CV: foo (test) -> baz
+for (1 .. 4) {
+    my $name = [ qw(foo baz foo baz) ]->[$_ - 1];
+    is $SELF->$name, ucfirst($name);
+
+    if ($_ == 1) {
+        is_debug OPTIMIZING;
+    } elsif ($_ == 2) {
+        is_debug DISABLING_NOT_SAME_ACCESSOR;
+    } elsif ($_ == 3) {
+        is_debug DISABLED;
+    } else {
+        is_debug EMPTY;
+    }
+}
+
+# if the SV passed to entersub is not a CV, disable the optimisation.
+# note: the invalid type is detected in the optimised entersub,
+# *not* in the accessor.
+for (1 .. 4) {
+    # when entersub is called in this way, the SV is a GV
+    # rather than a CV
+    is foo($SELF), 'Foo';
+
+    if ($_ == 1) {
+        # in the accessor (test)
+        is_debug OPTIMIZING;
+    } elsif ($_ == 2) {
+        # the optimized entersub backs itself out
+        # because the SV is a GV rather than a CV
+        is_debug [ @{DISABLING_NOT_CV()}, @{DISABLED()} ];
+    } else {
+        # in the accessor (test)
+        is_debug DISABLED;
+    }
+}
+
+# confirm we haven't pessimized other call sites
+for (1 .. 3) {
+    is $SELF->foo, 'Foo';
+    is_debug ($_ == 1 ? OPTIMIZING : OPTIMIZED);
+
+    is $SELF->bar, 'Bar';
+    is_debug ($_ == 1 ? OPTIMIZING : OPTIMIZED);
+
+    is $SELF->baz, 'Baz';
+    is_debug EMPTY;
+}
