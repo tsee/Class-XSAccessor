@@ -9,6 +9,12 @@ BEGIN {
   }
 }
 
+eval "use Time::HiRes qw(sleep);";
+if ($@) {
+    print "1..0 # SKIP Time::HiRes is required for this testing.\n";
+    exit(0);
+}
+
 # The purpose of this test is to check the thread-safety of the module.
 # Since this kind of stuff is highly non-deterministic, it's hard to construct
 # tests that are. The test consists of running several threads in parallel,
@@ -54,7 +60,6 @@ print "1.." . ($NumThreads*3 + 1) . "\n";
 
 use threads;
 use Class::XSAccessor;
-use Time::HiRes qw(sleep);
 
 my @chars = ('a'..'z', 'A'..'Z');
 
