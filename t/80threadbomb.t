@@ -11,7 +11,7 @@ BEGIN {
 
 eval "use Time::HiRes qw(sleep);";
 if ($@) {
-    print "1..0 # Time::HiRes required for testing.\n";
+    print "1..0 # SKIP Time::HiRes is required for this testing.\n";
     exit(0);
 }
 
