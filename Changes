@@ -1,5 +1,11 @@
 Revision history for Perl extension Class-XSAccessor.
 
+1.19  Fri Nov 22 07:15 2013
+  - Remove the OP tree munging optimization since it wasn't in the
+    end really speeding things up. (chocolateboy)
+  - Require Time::HiRes explicitly because CentOS cripples the base
+    perl install.
+
 1.18  Mon Jun 17 18:07 2013
   - Revert fixes for implicitly-lvalue getters for now since that
     actually breaks user code. It seems it's not just because the
