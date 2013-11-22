@@ -36,6 +36,7 @@ WriteMakefile1(
     VERSION_FROM      => 'lib/Class/XSAccessor.pm', # finds $VERSION
     PREREQ_PM         => {
         'XSLoader' => 0,
+        'Time::HiRes' => '0',
     }, # e.g., Module::Name => 1.1
     LICENSE => 'perl',
     ABSTRACT_FROM => 'lib/Class/XSAccessor.pm',
