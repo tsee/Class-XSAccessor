@@ -175,14 +175,20 @@ if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVAV)) {                         
 
 #ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
 
-#define CXA_OPTIMIZATION_OK(op) ((op->op_spare & 1) != 1)
-#define CXA_DISABLE_OPTIMIZATION(op) (op->op_spare |= 1)
+#ifdef USE_CPERL
+#define OpSPARE(o) o->op_typechecked
+#else
+#define OpSPARE(o) o->op_spare
+#endif
+
+#define CXA_OPTIMIZATION_OK(op) ((OpSPARE(op) & 1) != 1)
+#define CXA_DISABLE_OPTIMIZATION(op) (OpSPARE(op) |= 1)
 
 /* see t/08hash_entersub.t */
 #define CXAH_OPTIMIZE_ENTERSUB_TEST(name)                                     \
 STMT_START {                                                                  \
     /* print op_spare so that we get failing tests if perl starts using it */ \
-    warn("cxah: accessor: op_spare: %u", PL_op->op_spare);                    \
+    warn("cxah: accessor: op_spare: %u", OpSPARE(PL_op));                     \
                                                                               \
     if (PL_op->op_ppaddr == CXA_DEFAULT_ENTERSUB) {                           \
         if (CXA_OPTIMIZATION_OK(PL_op)) {                                     \
@@ -483,7 +489,11 @@ PROTOTYPES: DISABLE
 
 BOOT:
 #ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
+# ifdef USE_CPERL
+CXA_DEFAULT_ENTERSUB = PL_ppaddr[OP_ENTERXSSUB];
+# else
 CXA_DEFAULT_ENTERSUB = PL_ppaddr[OP_ENTERSUB];
+# endif
 #endif
 #ifdef USE_ITHREADS
 _init_cxsa_lock(&CXSAccessor_lock); /* cf. CXSAccessor.h */
