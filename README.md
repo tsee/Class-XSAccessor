@@ -7,6 +7,7 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
 
 # SYNOPSIS
 
+```perl
     package MyClass;
     use Class::XSAccessor
       replace     => 1,   # Replace existing methods (if any)
@@ -41,9 +42,11 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
     # The imported methods are implemented in fast XS.
 
     # normal class code here.
+```
 
 As of version 1.05, some alternative syntax forms are available:
 
+```perl
     package MyClass;
 
     # Options can be passed as a HASH reference, if preferred,
@@ -53,6 +56,7 @@ As of version 1.05, some alternative syntax forms are available:
        # the following shorthand can be used.
        accessors => [ 'foo', 'bar' ],
     };
+```
 
 # DESCRIPTION
 
@@ -70,10 +74,12 @@ Since version 0.10, the module can also generate simple constructors
 `constructors => ['new', 'create', 'spawn']` option.
 These constructors do the equivalent of the following Perl code:
 
+```perl
     sub new {
       my $class = shift;
       return bless { @_ }, ref($class)||$class;
     }
+```
 
 That means they can be called on objects and classes but will not
 clone objects entirely. Parameters to `new()` are added to the
@@ -112,11 +118,13 @@ In addition to specifying the types and names of accessors, additional options
 can be supplied which modify behaviour. The options are specified as key/value pairs
 in the same manner as the accessor declaration. For example:
 
+```perl
     use Class::XSAccessor
       getters => {
         get_foo => 'foo',
       },
       replace => 1;
+```
 
 The list of available options is:
 
@@ -150,6 +158,7 @@ yet.
 
 The following example demonstrates an lvalue accessor:
 
+```perl
     package Address;
     use Class::XSAccessor
       constructor => 'new',
@@ -160,6 +169,7 @@ The following example demonstrates an lvalue accessor:
     print $address->zip_code, "\n"; # prints 2
     $address->zip_code = 76135; # <--- This is it!
     print $address->zip_code, "\n"; # prints 76135
+```
 
 # CAVEATS
 
@@ -188,8 +198,8 @@ but it will be recycled when the same class, or a similar class, is loaded again
 
 # AUTHORS
 
-- Steffen Mueller <smueller@cpan.org>
-- chocolateboy <chocolate@cpan.org>
+- [Steffen Mueller](mailto:smueller@cpan.org)
+- [chocolateboy](mailto:chocolate@cpan.org)
 
 # COPYRIGHT AND LICENSE
 
