@@ -1,8 +1,10 @@
 NAME
+
     Class::XSAccessor - Generate fast XS accessors without runtime
     compilation
 
 SYNOPSIS
+
       package MyClass;
       use Class::XSAccessor
         replace     => 1,   # Replace existing methods (if any)
@@ -28,15 +30,15 @@ SYNOPSIS
         },
         true  => [ 'is_token', 'is_whitespace' ],
         false => [ 'significant' ];
-  
+
       # The imported methods are implemented in fast XS.
-  
+
       # normal class code here.
 
     As of version 1.05, some alternative syntax forms are available:
 
       package MyClass;
-  
+
       # Options can be passed as a HASH reference, if preferred,
       # which can also help Perl::Tidy to format the statement correctly.
       use Class::XSAccessor {
@@ -46,6 +48,7 @@ SYNOPSIS
       };
 
 DESCRIPTION
+
     Class::XSAccessor implements fast read, write and read/write accessors
     in XS. Additionally, it can provide predicates such as "has_foo()" for
     testing whether the attribute "foo" is defined in the object. It only
@@ -89,6 +92,7 @@ DESCRIPTION
     by the "true" and "false" options - see the synopsis.
 
 OPTIONS
+
     In addition to specifying the types and names of accessors, additional
     options can be supplied which modify behaviour. The options are
     specified as key/value pairs in the same manner as the accessor
@@ -120,6 +124,7 @@ OPTIONS
     "class" option allows the target class to be specified.
 
 LVALUES
+
     Support for lvalue accessors via the keyword "lvalue_accessors" was
     added in version 1.08. At this point, THEY ARE CONSIDERED HIGHLY
     EXPERIMENTAL. Furthermore, their performance hasn't been benchmarked
@@ -131,7 +136,7 @@ LVALUES
       use Class::XSAccessor
         constructor => 'new',
         lvalue_accessors => { zip_code => 'zip' };
-  
+
       package main;
       my $address = Address->new(zip => 2);
       print $address->zip_code, "\n"; # prints 2
@@ -139,6 +144,7 @@ LVALUES
       print $address->zip_code, "\n"; # prints 76135
 
 CAVEATS
+
     Probably won't work for objects based on *tied* hashes. But that's a
     strange thing to do anyway.
 
@@ -161,19 +167,19 @@ CAVEATS
     class, or a similar class, is loaded again in any thread.
 
 SEE ALSO
-    *   Class::XSAccessor::Array
 
+    *   Class::XSAccessor::Array
     *   AutoXS
 
-AUTHOR
-    Steffen Mueller <smueller@cpan.org>
+AUTHORS
 
+    Steffen Mueller <smueller@cpan.org>
     chocolateboy <chocolate@cpan.org>
 
 COPYRIGHT AND LICENSE
-    Copyright (C) 2008, 2009, 2010, 2011, 2012 by Steffen Mueller
+
+    Copyright (C) 2008-2019 by Steffen Mueller
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.8 or, at your
     option, any later version of Perl 5 you may have available.
-

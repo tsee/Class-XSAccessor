@@ -263,19 +263,27 @@ again in B<any> thread.
 
 =head1 SEE ALSO
 
-L<Class::XSAccessor>
+=over
 
-L<AutoXS>
+=item * L<Class::XSAccessor>
 
-=head1 AUTHOR
+=item * L<AutoXS>
 
-Steffen Mueller E<lt>smueller@cpan.orgE<gt>
+=back
 
-chocolateboy E<lt>chocolate@cpan.orgE<gt>
+=head1 AUTHORS
+
+=over
+
+=item * Steffen Mueller E<lt>smueller@cpan.orgE<gt>
+
+=item * chocolateboy E<lt>chocolate@cpan.orgE<gt>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by Steffen Mueller
+Copyright (C) 2008-2019 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,

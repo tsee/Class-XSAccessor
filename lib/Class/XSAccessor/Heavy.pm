@@ -58,15 +58,19 @@ No user-serviceable parts inside!
 L<Class::XSAccessor>
 L<Class::XSAccessor::Array>
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+=over
 
-chocolateboy, E<lt>chocolate@cpan.orgE<gt>
+=item * Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+
+=item * chocolateboy, E<lt>chocolate@cpan.orgE<gt>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by Steffen Mueller
+Copyright (C) 2008-2019 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,
