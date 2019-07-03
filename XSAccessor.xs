@@ -278,7 +278,7 @@ OP * cxah_entersub_ ## name(pTHX) {                                             
         }                                                                        \
         CXA_DISABLE_OPTIMIZATION(PL_op); /* make sure it's not reinstated */     \
         PL_op->op_ppaddr = CXA_DEFAULT_ENTERSUB;                                 \
-        return CXA_DEFAULT_ENTERSUB(aTHX);                                       \
+        return (* ( PL_op->op_ppaddr ) )(aTHX);                                  \
     }                                                                            \
 }
 
@@ -297,7 +297,7 @@ OP * cxah_entersub_ ## name(pTHX) {                                             
     } else { /* not static: disable optimization */                                     \
         CXA_DISABLE_OPTIMIZATION(PL_op); /* make sure it's not reinstated */            \
         PL_op->op_ppaddr = CXA_DEFAULT_ENTERSUB;                                        \
-        return CXA_DEFAULT_ENTERSUB(aTHX);                                              \
+        return (* ( PL_op->op_ppaddr ) )(aTHX);                                         \
     }                                                                                   \
 }
 
@@ -316,7 +316,7 @@ OP * cxaa_entersub_ ## name(pTHX) {                                             
     } else { /* not static: disable optimization */                                     \
         CXA_DISABLE_OPTIMIZATION(PL_op); /* make sure it's not reinstated */            \
         PL_op->op_ppaddr = CXA_DEFAULT_ENTERSUB;                                        \
-        return CXA_DEFAULT_ENTERSUB(aTHX);                                              \
+        return (* ( PL_op->op_ppaddr ) )(aTHX);                                         \
     }                                                                                   \
 }
 #endif /* CXA_ENABLE_ENTERSUB_OPTIMIZATION */
@@ -376,9 +376,9 @@ STMT_START {                                                                 \
   PERL_HASH(hk_ptr->hash, obj_hash_key, obj_hash_key_len);                   \
 } STMT_END
 
-#ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
-static Perl_ppaddr_t CXA_DEFAULT_ENTERSUB = NULL;
+#define CXA_DEFAULT_ENTERSUB PL_ppaddr[OP_ENTERSUB]
 
+#ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
 /* predeclare the XSUBs so we can refer to them in the optimized entersubs */
 
 XS(CXAH(getter));
@@ -482,9 +482,6 @@ MODULE = Class::XSAccessor        PACKAGE = Class::XSAccessor
 PROTOTYPES: DISABLE
 
 BOOT:
-#ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
-CXA_DEFAULT_ENTERSUB = PL_ppaddr[OP_ENTERSUB];
-#endif
 #ifdef USE_ITHREADS
 _init_cxsa_lock(&CXSAccessor_lock); /* cf. CXSAccessor.h */
 #endif /* USE_ITHREADS */
