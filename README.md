@@ -8,54 +8,55 @@ Class::XSAccessor - Generate fast XS accessors without runtime compilation
 # SYNOPSIS
 
 ```perl
-    package MyClass;
-    use Class::XSAccessor
-      replace     => 1,   # Replace existing methods (if any)
-      constructor => 'new',
-      getters     => {
+package MyClass;
+
+use Class::XSAccessor
+    replace     => 1,   # Replace existing methods (if any)
+    constructor => 'new',
+    getters     => {
         get_foo => 'foo', # 'foo' is the hash key to access
         get_bar => 'bar',
-      },
-      setters => {
+    },
+    setters => {
         set_foo => 'foo',
         set_bar => 'bar',
-      },
-      accessors => {
+    },
+    accessors => {
         foo => 'foo',
         bar => 'bar',
-      },
-      # "predicates" is an alias for "defined_predicates"
-      defined_predicates => {
+    },
+    # "predicates" is an alias for "defined_predicates"
+    defined_predicates => {
         defined_foo => 'foo',
         defined_bar => 'bar',
-      },
-      exists_predicates => {
+    },
+    exists_predicates => {
         has_foo => 'foo',
         has_bar => 'bar',
-      },
-      lvalue_accessors => { # see below
+    },
+    lvalue_accessors => { # see below
         baz => 'baz', # ...
-      },
-      true  => [ 'is_token', 'is_whitespace' ],
-      false => [ 'significant' ];
+    },
+    true  => [ 'is_token', 'is_whitespace' ],
+    false => [ 'significant' ];
 
-    # The imported methods are implemented in fast XS.
+# The imported methods are implemented in fast XS.
 
-    # normal class code here.
+# normal class code here.
 ```
 
 As of version 1.05, some alternative syntax forms are available:
 
 ```perl
-    package MyClass;
+package MyClass;
 
-    # Options can be passed as a HASH reference, if preferred,
-    # which can also help Perl::Tidy to format the statement correctly.
-    use Class::XSAccessor {
-       # If the name => key values are always identical,
-       # the following shorthand can be used.
-       accessors => [ 'foo', 'bar' ],
-    };
+# Options can be passed as a HASH reference, if preferred,
+# which can also help Perl::Tidy to format the statement correctly.
+use Class::XSAccessor {
+    # If the name => key values are always identical,
+    # the following shorthand can be used.
+    accessors => [ 'foo', 'bar' ],
+};
 ```
 
 # DESCRIPTION
@@ -75,10 +76,10 @@ Since version 0.10, the module can also generate simple constructors
 These constructors do the equivalent of the following Perl code:
 
 ```perl
-    sub new {
-      my $class = shift;
-      return bless { @_ }, ref($class)||$class;
-    }
+sub new {
+    my $class = shift;
+    return bless { @_ }, ref($class) || $class;
+}
 ```
 
 That means they can be called on objects and classes but will not
@@ -119,11 +120,12 @@ can be supplied which modify behaviour. The options are specified as key/value p
 in the same manner as the accessor declaration. For example:
 
 ```perl
-    use Class::XSAccessor
-      getters => {
+use Class::XSAccessor {
+    getters => {
         get_foo => 'foo',
-      },
-      replace => 1;
+    },
+    replace => 1
+};
 ```
 
 The list of available options is:
@@ -159,16 +161,19 @@ yet.
 The following example demonstrates an lvalue accessor:
 
 ```perl
-    package Address;
-    use Class::XSAccessor
-      constructor => 'new',
-      lvalue_accessors => { zip_code => 'zip' };
+package Address;
 
-    package main;
-    my $address = Address->new(zip => 2);
-    print $address->zip_code, "\n"; # prints 2
-    $address->zip_code = 76135; # <--- This is it!
-    print $address->zip_code, "\n"; # prints 76135
+use Class::XSAccessor {
+    constructor => 'new',
+    lvalue_accessors => { zip_code => 'zip' }
+}
+
+package main;
+
+my $address = Address->new(zip => 2);
+print $address->zip_code, "\n"; # prints 2
+$address->zip_code = 76135; # <--- This is it!
+print $address->zip_code, "\n"; # prints 76135
 ```
 
 # CAVEATS
@@ -198,12 +203,12 @@ but it will be recycled when the same class, or a similar class, is loaded again
 
 # AUTHORS
 
-- [Steffen Mueller](mailto:smueller@cpan.org)
+- [Steffen Müller](mailto:smueller@cpan.org)
 - [chocolateboy](mailto:chocolate@cpan.org)
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2019 by Steffen Mueller
+Copyright (C) 2008-2019 by Steffen Müller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,
