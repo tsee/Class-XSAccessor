@@ -503,18 +503,6 @@ _init_cxsa_lock(&CXSAccessor_lock); /* cf. CXSAccessor.h */
 */
 
 void
-END()
-    PROTOTYPE:
-    CODE:
-        if (CXSAccessor_reverse_hashkeys) {
-            /* This can run before Perl is done, so accessors might still be called,
-             * so we can't free our memory here. Solution? Special global destruction
-             * phase *AFTER* all Perl END() subs were run? */
-
-            /*CXSA_HashTable_free(CXSAccessor_reverse_hashkeys, true);*/
-        }
-
-void
 __entersub_optimized__()
     PROTOTYPE:
     CODE:
