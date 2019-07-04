@@ -519,9 +519,9 @@ __entersub_optimized__()
     PROTOTYPE:
     CODE:
 #ifdef CXA_ENABLE_ENTERSUB_OPTIMIZATION
-        XSRETURN(1);
+        XSRETURN_YES;
 #else
-        XSRETURN(0);
+        XSRETURN_NO;
 #endif
 
 INCLUDE: XS/Hash.xs
