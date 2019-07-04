@@ -381,73 +381,28 @@ static Perl_ppaddr_t CXA_DEFAULT_ENTERSUB = NULL;
 
 /* predeclare the XSUBs so we can refer to them in the optimized entersubs */
 
-XS(CXAH(getter));
-CXAH_GENERATE_ENTERSUB(getter);
+#define CXA_Setup_Xsub_Hash(x)  XS(CXAH(x)); CXAH_GENERATE_ENTERSUB(x);
+#define CXA_Setup_Xsub_Array(x) XS(CXAA(x)); CXAA_GENERATE_ENTERSUB(x);
+#define CXA_Setup_Xsub_All(x)   CXA_Setup_Xsub_Hash(x); CXA_Setup_Xsub_Array(x);
 
-XS(CXAH(lvalue_accessor));
-CXAH_GENERATE_ENTERSUB(lvalue_accessor);
+CXA_Setup_Xsub_All(accessor);
+CXA_Setup_Xsub_All(chained_accessor);
+CXA_Setup_Xsub_All(chained_setter);
+CXA_Setup_Xsub_All(constructor);
+CXA_Setup_Xsub_All(getter);
+CXA_Setup_Xsub_All(lvalue_accessor);
+CXA_Setup_Xsub_All(setter);
+CXA_Setup_Xsub_Array(predicate);
+CXA_Setup_Xsub_Hash(array_accessor); /* for the Class::Accessor compatibility layer only! */
+CXA_Setup_Xsub_Hash(array_setter); /* for the Class::Accessor compatibility layer only! */
+CXA_Setup_Xsub_Hash(constant_false);
+CXA_Setup_Xsub_Hash(constant_true);
+CXA_Setup_Xsub_Hash(defined_predicate);
+CXA_Setup_Xsub_Hash(exists_predicate);
 
-XS(CXAH(setter));
-CXAH_GENERATE_ENTERSUB(setter);
-
-/* for the Class::Accessor compatibility layer only! */
-XS(CXAH(array_setter));
-CXAH_GENERATE_ENTERSUB(array_setter);
-
-XS(CXAH(chained_setter));
-CXAH_GENERATE_ENTERSUB(chained_setter);
-
-XS(CXAH(accessor));
-CXAH_GENERATE_ENTERSUB(accessor);
-
-/* for the Class::Accessor compatibility layer only! */
-XS(CXAH(array_accessor));
-CXAH_GENERATE_ENTERSUB(array_accessor);
-
-XS(CXAH(chained_accessor));
-CXAH_GENERATE_ENTERSUB(chained_accessor);
-
-XS(CXAH(defined_predicate));
-CXAH_GENERATE_ENTERSUB(defined_predicate);
-
-XS(CXAH(exists_predicate));
-CXAH_GENERATE_ENTERSUB(exists_predicate);
-
-XS(CXAH(constructor));
-CXAH_GENERATE_ENTERSUB(constructor);
-
-XS(CXAH(constant_false));
-CXAH_GENERATE_ENTERSUB(constant_false);
-
-XS(CXAH(constant_true));
-CXAH_GENERATE_ENTERSUB(constant_true);
-
+/* special case for test function */
 XS(CXAH(test));
 CXAH_GENERATE_ENTERSUB_TEST(test);
-
-XS(CXAA(getter));
-CXAA_GENERATE_ENTERSUB(getter);
-
-XS(CXAA(lvalue_accessor));
-CXAA_GENERATE_ENTERSUB(lvalue_accessor);
-
-XS(CXAA(setter));
-CXAA_GENERATE_ENTERSUB(setter);
-
-XS(CXAA(chained_setter));
-CXAA_GENERATE_ENTERSUB(chained_setter);
-
-XS(CXAA(accessor));
-CXAA_GENERATE_ENTERSUB(accessor);
-
-XS(CXAA(chained_accessor));
-CXAA_GENERATE_ENTERSUB(chained_accessor);
-
-XS(CXAA(predicate));
-CXAA_GENERATE_ENTERSUB(predicate);
-
-XS(CXAA(constructor));
-CXAA_GENERATE_ENTERSUB(constructor);
 
 #endif /* CXA_ENABLE_ENTERSUB_OPTIMIZATION */
 
