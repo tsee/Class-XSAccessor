@@ -1,4 +1,10 @@
 language: perl
+env:
+  global:
+    - PERL_USE_UNSAFE_INC=0
+    - AUTHOR_TESTING=1
+    - AUTOMATED_TESTING=1
+    - RELEASE_TESTING=1
 perl:
   - '5.8'
   - '5.10'
