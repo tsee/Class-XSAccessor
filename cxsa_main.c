@@ -32,7 +32,7 @@ STATIC
 autoxs_hashkey *
 _new_hashkey() {
   autoxs_hashkey * retval;
-  retval = (autoxs_hashkey *) cxa_malloc( sizeof(autoxs_hashkey) );
+  cxa_malloc(retval, 1, autoxs_hashkey);
   retval->next = NULL;
 
   if (CXSAccessor_last_hashkey != NULL) { /* apend to list */
@@ -75,7 +75,7 @@ get_hashkey(pTHX_ const char* key, const I32 len) {
 STATIC
 void
 _resize_array(I32** array, U32* len, U32 newlen) {
-  *array = (I32*)cxa_realloc((void*)(*array), newlen*sizeof(I32));
+  cxa_realloc(*array, newlen, I32);
   *len = newlen;
 }
 
@@ -83,7 +83,7 @@ STATIC
 void
 _resize_array_init(I32** array, U32* len, U32 newlen, I32 init) {
   U32 i;
-  *array = (I32*)cxa_realloc((void*)(*array), newlen*sizeof(I32));
+  cxa_realloc(*array, newlen, I32);
   for (i = *len; i < newlen; ++i)
     (*array)[i] = init;
   *len = newlen;
