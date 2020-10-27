@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/tsee/Class-XSAccessor.svg)](http://travis-ci.org/tsee/Class-XSAccessor)
-[![CPAN Version](https://badge.fury.io/pl/Class-XSAccessor.svg)](http://badge.fury.io/pl/Class-XSAccessor)
+[![Build Status](https://travis-ci.org/tsee/Class-XSAccessor.svg)](https://travis-ci.org/tsee/Class-XSAccessor)
+[![CPAN Version](https://badge.fury.io/pl/Class-XSAccessor.svg)](https://badge.fury.io/pl/Class-XSAccessor)
 
 # NAME
 
@@ -208,7 +208,7 @@ but it will be recycled when the same class, or a similar class, is loaded again
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2019 by Steffen Müller
+Copyright (C) 2008-2020 by Steffen Müller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,
