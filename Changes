@@ -1,16 +1,22 @@
 Revision history for Perl extension Class-XSAccessor.
 
-1.19  Fri Nov 22 07:15 2013
+1.20 - TBD
+
+  - B::C compatibility fix (thanks, Todd Rinaldo)
+  - Clean up macros (thanks, Nicolas R)
+  - Re-enable erroneously disabled test (thanks, Peter Rabbitson)
+
+1.19 - 2013-11-22
   - Require Time::HiRes explicitly because CentOS cripples the base
     perl install.
   - Simplify entersub optimization (chocolateboy)
 
-1.18  Mon Jun 17 18:07 2013
+1.18 - 2013-06-17
   - Revert fixes for implicitly-lvalue getters for now since that
     actually breaks user code. It seems it's not just because the
     users are naughty, so more investigation required.
 
-1.17  Mon Jun 17 07:09 2013
+1.17 - 2013-06-17
   - For Hashes: Implement predicates that check definedness and
     existance explicitly. The traditional "predicates" check
     definedness. It's conceivable to also want a bool-check
@@ -18,24 +24,24 @@ Revision history for Perl extension Class-XSAccessor.
   - Fix bug regarding getters being implicitly lvalue by
     returning the internal SV*. Instead, we now use TARG.
 
-1.16  Mon Nov  5 13:47 2012
+1.16 - 2012-11-05
   - Drop erroneous MYMETA files from distribution.
 
-1.15  Sun Nov  4 15:30 2012
+1.15 - 2012-11-04
   - Support for hash keys with NUL (\0) characters. Previously,
     these were truncated.
 
-1.14  Sun Aug 26 23:23 2012
+1.14 - 2012-08-26
   - Skip some failing tests on old debugging perls. Guys, please
     upgrade your perl!
 
-1.13  Mon Dec 12 08:21 2011
+1.13 - 2011-12-12
   - Promotes 1.12_03 to a stable release.
 
-1.12_03  Fri Dec  9 18:29 2011
+1.12_03 - 2011-12-09
   - Fix for unthreaded perls (broken in 1.12_02).
 
-1.12_02  Wed Dec  7 08:20 2011
+1.12_02 - 2011-12-07
   - Removes the cached read-only and read-write accessors
     for the time being. (These were only available from another
     development releasse.
@@ -45,43 +51,43 @@ Revision history for Perl extension Class-XSAccessor.
   - Instead of storing an index in the CV, we store a pointer to
     the hashkey struct.
 
-1.12_01  Tue Nov 29 18:40 2011
+1.12_01 - 2011-11-29
   - Implements cached read-only and read-write accessors.
     Details on what that means are in the documentation.
 
-1.12  Fri Sep  4 19:00 2011
+1.12 - 2011-09-04
   - Reclaim compatibility with the most recent versions of
     ExtUtils::ParseXS.
   - Explicit tests for wrong-type invocants.
 
-1.11  Fri Dec  3 18:00 2010
+1.11 - 2010-12-03
   - Fix assignment to lvalue accessors that
     point at an uninitialized hash element.
 
-1.10  Wed Dec  1 20:44 2010
+1.10 - 2010-12-01
   - Fix RT #63458 and potentially #50454
     We don't occasionally crash during END any more.
     Instead, we rely on the OS to reap a bit of memory after
     perl was shut down anyway.
   - Tiny refactoring for smaller object size.
 
-1.09  Sun Oct 31 12:45 2010
+1.09 - 2010-10-31
   - Fix #62531: Predicates return value, not bool (SJOHNSTON)
   - TODO test for perl-crashing bug (in perl) that can happen
     on (arcane) XSUB aliasing on perls < 5.8.9 (Peter Rabbitson)
     We're open for work-around patches.
 
-1.08  Fri Sep 17 20:30 2010
+1.08 - 2010-09-17
   - Promote latest development release to a stable release.
 
-1.07_04  Sun Sep 12 10:30 2010
+1.07_04 - 2010-09-12
   - Since WIN32 doesn't have the PERL_CORE optimization,
     it gets the PERL_NO_GET_CONTEXT optimization back.
   - Add threading test that would previously crash on win32
     and perls compiled with track-mempool.
   - Use the system's malloc/etc for the shared memory, not perl's.
 
-1.07_03  Thu Sep  9 20:30 2010
+1.07_03 - 2010-09-09
   - Minor constructor optimization/cleanup.
   - Various built-time warning fixes.
   - PERL_CORE optimization now disabled on WIN32.
@@ -90,15 +96,15 @@ Revision history for Perl extension Class-XSAccessor.
   - Clear requirement of Perl 5.8 everywhere.
   - Fix minor (constant as in O(1)) memory leak.
 
-1.07_02  Mon Aug 23 20:30 2010
+1.07_02 - 2010-08-23
   - Various warning fixes and small cleanups over previous
     dev. version.
 
-1.07_01  Wed Aug 18 20:30 2010
+1.07_01 - 2010-08-18
   - Experimental support for lvalue accessors:
     $obj->foo = 12
 
-1.07  Sun Aug 15 14:41 2010
+1.07 - 2010-08-15
   - Include two new test files for the fix in 1.06.
   - Define PERL_CORE, but *only* while including XSUB.h to get
     a significant speed-up (see XSAccessor.xs for an explanation).
@@ -106,15 +112,15 @@ Revision history for Perl extension Class-XSAccessor.
     perl5-porters (in particular but not limited to Nicholas)
     go to Steffen.
 
-1.06  Sat Aug 14 20:21 2010
+1.06 - 2010-08-14
   - Add sanity checks to make sure we don't segfault on
     invalid invocants (chocolateboy)
 
-1.05  Sun Nov 15 12:54 2009
+1.05 - 2009-11-15
   - Minor developer doc tweaks.
   - Minor XS refactoring
 
-1.04_05  Mon Nov  9 20:10 2009
+1.04_05 - 2009-11-09
   - Fixes for perls < 5.10:
     => No entersub optimization
     => Do no use precalculated hashes
@@ -122,11 +128,11 @@ Revision history for Perl extension Class-XSAccessor.
   - Remove brain-damaged double-hashing
   - Minor portability fixlets
 
-1.04_04  Thu Nov  5 18:00 2009
+1.04_04 - 2009-11-05
   - Fixes for non-threaded perls
     (no need for locks, perl_mutex not even defined).
 
-1.04_03  Tue Nov  3 22:32 2009
+1.04_03 - 2009-11-03
   ** This release features some very radical changes. Test well. **
   - Replace use of perl hashes in the global hash key name storage with
     a full-blown, separate implementation of a hash table
@@ -137,12 +143,12 @@ Revision history for Perl extension Class-XSAccessor.
   - Add support for alternate use Class::XSAccessor { ... } syntax
     (Adam K)
 
-1.04_02  Mon Sep  7 11:35 2009
+1.04_02 - 2009-09-07
   ** This release features some very radical changes. Test well. **
   - Significant optimization by replacing the relevant entersub ops
     with stripped down versions (chocolateboy)
 
-1.04_01  Mon Sep  7 11:35 2009
+1.04_01 - 2009-09-07
   ** This release features some very radical changes. Test well. **
   - More aggressive OPTIMIZE flags if possible (chocolateboy)
   - Added shorthand syntax for getters, setters, accessors, and predicates
@@ -154,70 +160,69 @@ Revision history for Perl extension Class-XSAccessor.
     duplicate code (=> Heavy.pm).
   - Upgrade Devel::PPPort/ppport.h (chocolateboy)
 
-1.04  Thu Jun 11 16:40 2009
+1.04 - 2009-06-11
   - Fix a bunch of warnings thanks to a heads up from
     Marcela Maslanova.
 
-1.03  Sun May 31 18:45 2009
+1.03 - 2009-05-31
   - Upgrade to AutoXS::Header 1.01: Make it C89!
 
-1.02  Sun May 17 11:18 2009
+1.02 - 2009-05-17
   - Require new AutoXS header version in order to fix
     prototyping issue.
 
-1.01  Sat May 16 16:11 2009
+1.01 - 2009-05-16
   - XS boolean constants for PPI
 
-1.00  Sat May 16 13:48 2009
+1.00 - 2009-05-16
   - Implement new caching algorithm: Only recreate
     the int => hash key association for new hash keys.
 
-0.14  Tue Dec  9 21:06 2008
+0.14 - 2008-12-09
   - Fix Makefile issue on Windows using nmake (Petar Shangov)
 
-0.13  Thu Dec  4 15:06 2008
+0.13 - 2008-12-04
   - Add predicate tests
   - Fix some compiler warnings (Tom Heady)
 
-0.12  Tue Dec  2 14:07 2008
+0.12 - 2008-12-02
   - Compilation fix for Solaris cc. (Probably going half-way only.)
 
-0.11  Sat Nov 29 21:37 2008
+0.11 - 2008-11-29
   - Forgot to add more tests in previous release.
 
-0.10  Sat Nov 29 21:17 2008
+0.10 - 2008-11-29
   - Add generation of constructors.
 
-0.09  Sat Nov 29 17:28 2008
+0.09 - 2008-11-29
   - Add the class option to set the target class.
 
-0.08 Fri Nov 21 12:17 2008
+0.08 - 2008-11-21
   - Reduce code duplication.
   - Fix for compilation issues on Solaris with Sun's cc.
 
-0.07  Thu Aug 29 14:14 2008
+0.07 - 2008-08-29
   - Documented the "replace" option.
   - Added the "chained" option to generate chainable setters
     and mutators.
 
-0.06  Thu Aug 28 13:39 2008
+0.06 - 2008-08-28
   - Copy input scalars on setter/mutator calls (RT #38573)
 
-0.05  Sat Jun 21 18:06 2008
+0.05 - 2008-06-21
   - Add read/write accessors. (chocolateboy)
   - By default, return the new value from setters. (chocolateboy)
   - Add predicates, i.e. "has_foo".
 
-0.04  Mon May  3 19:12 2008
+0.04 - 2008-05-03
   - Win32 support.
 
-0.03  Mon May  3 19:12 2008
+0.03 - 2008-05-03
   - Refer to Class::XSAccessor::Array for array based objects.
 
-0.02  Mon Apr  3 17:12 2008
+0.02 - 2008-04-03
   - Mention in the docs that fully qualified method names are
           supported.
 
-0.01  Mon Apr  3 17:09 2008
+0.01 - 2008-04-03
   - original version as uploaded to CPAN.
-
