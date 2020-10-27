@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/tsee/Class-XSAccessor.svg)](https://travis-ci.org/tsee/Class-XSAccessor)
+[![Build Status](https://travis-ci.com/chocolateboy/Class-XSAccessor.svg)](https://travis-ci.com/chocolateboy/Class-XSAccessor)
 [![CPAN Version](https://badge.fury.io/pl/Class-XSAccessor.svg)](https://badge.fury.io/pl/Class-XSAccessor)
 
 # NAME
