@@ -47,3 +47,6 @@
 \B\.DS_Store
 #   Mac OSX SMB mount metadata files
 \B\._
+^cpanfile$
+$\.github/
+^author_scripts/
