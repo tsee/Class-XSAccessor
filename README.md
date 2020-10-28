@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/chocolateboy/Class-XSAccessor.svg)](https://travis-ci.com/chocolateboy/Class-XSAccessor)
+[![Build Status](https://github.com/tsee/Class-XSAccessor/workflows/testsuite/badge.svg)](https://github.com/tsee/Class-XSAccessor/actions?query=workflow%3Atestsuite)
 [![CPAN Version](https://badge.fury.io/pl/Class-XSAccessor.svg)](https://badge.fury.io/pl/Class-XSAccessor)
 
 # NAME
