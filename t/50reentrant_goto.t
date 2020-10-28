@@ -1,6 +1,6 @@
 # segfault bug in perls < 5.8.9 (a perl bug)
 # patches welcome
-# see https://github.com/tsee/Class-XSAccessor/commit/8fe9c128027cc49c8e2d89c442c77285598b12d3
+# see http://github.com/tsee/Class-XSAccessor/commit/8fe9c128027cc49c8e2d89c442c77285598b12d3
 
 use strict;
 use warnings;
@@ -33,8 +33,7 @@ sub install_accessor_with_shim {
 }
 
 TODO: {
-  todo_skip 'bug in perls < 5.8.9', 28, $] < 5.008009
-    if $] < 5.008009;
+  todo_skip 'bug in perls < 5.8.9', 28 if $] < 5.008009;
 
   for my $name (qw/bar baz/) {
 
