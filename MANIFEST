@@ -5,7 +5,6 @@ cxsa_locking.c
 cxsa_locking.h
 cxsa_main.c
 cxsa_main.h
-cxsa_memory.c
 cxsa_memory.h
 lib/Class/XSAccessor.pm
 lib/Class/XSAccessor/Array.pm
