@@ -324,6 +324,8 @@ OP * cxaa_entersub_ ## name(pTHX) {                                             
 /* Install a new XSUB under 'name' and automatically set the file name */
 #define INSTALL_NEW_CV(name, xsub)                                            \
 STMT_START {                                                                  \
+  if (strlen(name) != (size_t)namelen)                                        \
+    croak("Subroutine name contains embedded NUL byte");                      \
   if (newXS(name, xsub, (char*)__FILE__) == NULL)                             \
     croak("ARG! Something went really wrong while installing a new XSUB!");   \
 } STMT_END
@@ -335,6 +337,8 @@ STMT_START {                                                                  \
  **/
 #define INSTALL_NEW_CV_WITH_INDEX(name, xsub, function_index)               \
 STMT_START {                                                                \
+  if (strlen(name) != (size_t)namelen)                                      \
+    croak("Subroutine name contains embedded NUL byte");                    \
   cv = newXS(name, xsub, (char*)__FILE__);                                  \
   if (cv == NULL)                                                           \
     croak("ARG! Something went really wrong while installing a new XSUB!"); \
@@ -346,6 +350,8 @@ STMT_START {                                                                \
  **/
 #define INSTALL_NEW_CV_WITH_PTR(name, xsub, user_pointer)                   \
 STMT_START {                                                                \
+  if (strlen(name) != (size_t)namelen)                                      \
+    croak("Subroutine name contains embedded NUL byte");                    \
   cv = newXS(name, xsub, (char*)__FILE__);                                  \
   if (cv == NULL)                                                           \
     croak("ARG! Something went really wrong while installing a new XSUB!"); \

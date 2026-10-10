@@ -2,6 +2,8 @@ Revision history for Perl extension Class-XSAccessor.
 
 1.20 - TBD
 
+  - Normalize old package separator (') to (::) and reject subroutine names
+    containing embedded NUL bytes in both Perl and XS layers (XSA-03).
   - Validate array index bounds (must be 0..10_000_000) to prevent negative
     index out-of-bounds access, realloc(0) deallocation, and excessive
     memory allocation (XSA-02).

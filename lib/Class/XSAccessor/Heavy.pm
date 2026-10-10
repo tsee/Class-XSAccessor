@@ -18,6 +18,11 @@ our @CARP_NOT = qw(
 sub check_sub_existence {
   my $subname = shift;
 
+  if (index($subname, "\0") != -1) {
+    Carp::croak("Subroutine name contains embedded NUL byte");
+  }
+
+  $subname =~ s/'/::/g;
   my $sub_package = $subname;
   $sub_package =~ s/([^:]+)$// or die;
   my $bare_subname = $1;

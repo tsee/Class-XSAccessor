@@ -78,6 +78,11 @@ sub _generate_method {
   croak("Cannot use undef as a hash key for generating an XS $type accessor. (Sub: $subname)")
     if not defined $hashkey;
 
+  if (index($subname, "\0") != -1) {
+    croak("Subroutine name contains embedded NUL byte");
+  }
+
+  $subname =~ s/'/::/g;
   $subname = "${caller_pkg}::$subname" if $subname !~ /::/;
 
   Class::XSAccessor::Heavy::check_sub_existence($subname) if not $opts->{replace};
