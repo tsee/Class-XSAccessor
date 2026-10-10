@@ -31,7 +31,7 @@ sub import {
                         ["setter", $set_subs],
                         ["accessor", $acc_subs],
                         ["lvalue_accessor", $lvacc_subs],
-                        ["pred_subs", $pred_subs] )
+                        ["predicate", $pred_subs] )
   {
     my $subs = $subtype->[1];
     foreach my $subname (keys %$subs) {
@@ -74,7 +74,7 @@ sub _generate_method {
   if ($type eq 'getter') {
     newxs_getter($subname, $array_index);
   }
-  if ($type eq 'lvalue_accessor') {
+  elsif ($type eq 'lvalue_accessor') {
     newxs_lvalue_accessor($subname, $array_index);
   }
   elsif ($type eq 'setter') {

@@ -44,6 +44,7 @@ t/72_security_xsa03.t
 t/73_security_xsa05.t
 t/74_security_xsa11.t
 t/75_security_xsa04.t
+t/76_array_getter_predicate.t
 t/80threadbomb.t
 XS/Array.xs
 XS/Hash.xs
