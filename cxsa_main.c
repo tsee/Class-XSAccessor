@@ -50,6 +50,9 @@ autoxs_hashkey *
 get_hashkey(pTHX_ const char* key, const I32 len) {
   autoxs_hashkey * hashkey;
 
+  if (len < 0 || len > 10000000)
+    croak("Hash key length exceeds maximum supported length (10000000)");
+
   CXSA_ACQUIRE_GLOBAL_LOCK(CXSAccessor_lock);
 
   /* init */

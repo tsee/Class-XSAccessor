@@ -78,6 +78,9 @@ sub _generate_method {
   croak("Cannot use undef as a hash key for generating an XS $type accessor. (Sub: $subname)")
     if not defined $hashkey;
 
+  croak("Hash key length exceeds maximum supported length (10000000). (Sub: $subname)")
+    if length($hashkey) > 10_000_000;
+
   if (index($subname, "\0") != -1) {
     croak("Subroutine name contains embedded NUL byte");
   }

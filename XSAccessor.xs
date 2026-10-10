@@ -375,6 +375,8 @@ STMT_START {                                                                 \
  **/
 #define INSTALL_NEW_CV_HASH_OBJ(name, xsub, obj_hash_key, obj_hash_key_len)  \
 STMT_START {                                                                 \
+  if ((size_t)(obj_hash_key_len) > 10000000)                                 \
+    croak("Hash key length exceeds maximum supported length (10000000)");    \
   autoxs_hashkey *hk_ptr = get_hashkey(aTHX_ obj_hash_key, obj_hash_key_len);\
   INSTALL_NEW_CV_WITH_PTR(name, xsub, hk_ptr);                               \
   cxa_malloc(hk_ptr->key, obj_hash_key_len + 1, char);                       \
