@@ -11,8 +11,9 @@ Revision history for Perl extension Class-XSAccessor.
     are defined and blessed (if references), and check for NULL stash (XSA-11).
   - Validate hash key length against I32 limits to prevent integer wrapping
     and buffer overflows with excessive key lengths (XSA-05).
-  - Normalize old package separator (') to (::) and reject subroutine names
-    containing embedded NUL bytes in both Perl and XS layers (XSA-03).
+  - Normalize old package separator (') to (::) in subroutine names and
+    package parameters, and reject subroutine names containing embedded
+    NUL bytes in both Perl and XS layers (XSA-03).
   - Validate array index bounds (must be 0..10_000_000) to prevent negative
     index out-of-bounds access, realloc(0) deallocation, and excessive
     memory allocation (XSA-02).

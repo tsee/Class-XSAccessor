@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 14;
 use Class::XSAccessor ();
 use Class::XSAccessor::Array ();
 
@@ -31,7 +31,33 @@ use Class::XSAccessor::Array ();
   is($obj->get_a, 99, "Old package separator array method works");
 }
 
-# 3. Reject embedded NUL byte in subname via Class::XSAccessor
+# 3. Old package separator in class parameter: class => "Test'Old'Pkg"
+{
+  eval {
+    Class::XSAccessor->import(
+      class   => "Test'Old'Pkg",
+      getters => { get_x => "x" },
+    );
+  };
+  is($@, '', "Can define accessor when class parameter contains '");
+  my $obj = bless { x => 123 }, "Test::Old::Pkg";
+  is($obj->get_x, 123, "Method installed into normalized package Test::Old::Pkg");
+}
+
+# 4. Old package separator in class parameter for Array: class => "Test'Old'PkgArray"
+{
+  eval {
+    Class::XSAccessor::Array->import(
+      class   => "Test'Old'PkgArray",
+      getters => { get_x => 0 },
+    );
+  };
+  is($@, '', "Can define array accessor when class parameter contains '");
+  my $obj = bless [456], "Test::Old::PkgArray";
+  is($obj->get_x, 456, "Array method installed into normalized package Test::Old::PkgArray");
+}
+
+# 5. Reject embedded NUL byte in subname via Class::XSAccessor
 {
   eval {
     Class::XSAccessor->import(
@@ -42,7 +68,7 @@ use Class::XSAccessor::Array ();
   like($@, qr/embedded NUL byte/, "Class::XSAccessor rejects embedded NUL in subname");
 }
 
-# 4. Reject embedded NUL byte in subname via Class::XSAccessor::Array
+# 6. Reject embedded NUL byte in subname via Class::XSAccessor::Array
 {
   eval {
     Class::XSAccessor::Array->import(
@@ -53,7 +79,7 @@ use Class::XSAccessor::Array ();
   like($@, qr/embedded NUL byte/, "Class::XSAccessor::Array rejects embedded NUL in subname");
 }
 
-# 5. Direct XS call newxs_getter with embedded NUL byte
+# 7. Direct XS call newxs_getter with embedded NUL byte
 {
   eval {
     Class::XSAccessor::newxs_getter("TestDirectNul::get\0foo", "foo");
@@ -61,7 +87,7 @@ use Class::XSAccessor::Array ();
   like($@, qr/embedded NUL byte/, "newxs_getter rejects embedded NUL");
 }
 
-# 6. Direct XS call newxs_setter with embedded NUL byte
+# 8. Direct XS call newxs_setter with embedded NUL byte
 {
   eval {
     Class::XSAccessor::newxs_setter("TestDirectNul::set\0foo", "foo", 0);
@@ -69,7 +95,7 @@ use Class::XSAccessor::Array ();
   like($@, qr/embedded NUL byte/, "newxs_setter rejects embedded NUL");
 }
 
-# 7. Direct XS call Array::newxs_getter with embedded NUL byte
+# 9. Direct XS call Array::newxs_getter with embedded NUL byte
 {
   eval {
     Class::XSAccessor::Array::newxs_getter("TestDirectNulArray::get\0foo", 0);
@@ -77,7 +103,7 @@ use Class::XSAccessor::Array ();
   like($@, qr/embedded NUL byte/, "Array::newxs_getter rejects embedded NUL");
 }
 
-# 8. Direct XS call newxs_constructor with embedded NUL byte
+# 10. Direct XS call newxs_constructor with embedded NUL byte
 {
   eval {
     Class::XSAccessor::newxs_constructor("TestDirectNul::new\0foo");

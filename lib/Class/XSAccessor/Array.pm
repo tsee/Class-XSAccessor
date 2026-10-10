@@ -65,8 +65,8 @@ sub _generate_method {
     croak("Subroutine name contains embedded NUL byte");
   }
 
+  $subname = "${caller_pkg}::$subname" if $subname !~ /::/ && $subname !~ /'/;
   $subname =~ s/'/::/g;
-  $subname = "${caller_pkg}::$subname" if $subname !~ /::/;
 
   Class::XSAccessor::Heavy::check_sub_existence($subname) if not $opts->{replace};
   no warnings 'redefine'; # don't warn about an explicitly requested redefine
