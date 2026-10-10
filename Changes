@@ -1,6 +1,6 @@
 Revision history for Perl extension Class-XSAccessor.
 
-1.20 - TBD
+1.19_01 - 2026-10-10
 
   - Fix Class::XSAccessor::Array method installation: ensure getters and
     predicates are not accidentally overwritten as read-write accessors.
