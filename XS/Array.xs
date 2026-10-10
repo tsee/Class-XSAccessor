@@ -165,13 +165,25 @@ constructor(class, ...)
   PPCODE:
     CXAA_OPTIMIZE_ENTERSUB(constructor);
 
+    if (!SvOK(class)) {
+      croak("Can't call constructor on an undefined value");
+    }
+
     if (SvROK(class)) {
       SV* const referent = SvRV(class);
-      stash = SvOBJECT(referent) ? SvSTASH(referent) : gv_stashpv(sv_reftype(referent, 1), 1);
+      if (!SvOBJECT(referent)) {
+        croak("Can't call constructor on an unblessed reference");
+      }
+      stash = SvSTASH(referent);
     }
     else {
       stash = gv_stashsv(class, GV_ADD);
     }
+
+    if (!stash) {
+      croak("Can't bless into an invalid package");
+    }
+
     array = newAV();
     obj = sv_bless( newRV_noinc((SV*)array), stash );
     /* we ignore arguments. See Class::XSAccessor's XS code for

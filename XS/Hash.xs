@@ -182,13 +182,25 @@ constructor(class, ...)
   PPCODE:
     CXAH_OPTIMIZE_ENTERSUB(constructor);
 
+    if (!SvOK(class)) {
+      croak("Can't call constructor on an undefined value");
+    }
+
     if (SvROK(class)) {
       SV* const referent = SvRV(class);
-      stash = SvOBJECT(referent) ? SvSTASH(referent) : gv_stashpv(sv_reftype(referent, 1), 1);
+      if (!SvOBJECT(referent)) {
+        croak("Can't call constructor on an unblessed reference");
+      }
+      stash = SvSTASH(referent);
     }
     else {
       stash = gv_stashsv(class, GV_ADD);
     }
+
+    if (!stash) {
+      croak("Can't bless into an invalid package");
+    }
+
     hash = newHV();
     obj = sv_bless(newRV_noinc((SV *)hash), stash);
 
