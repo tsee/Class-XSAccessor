@@ -2,6 +2,8 @@ Revision history for Perl extension Class-XSAccessor.
 
 1.20 - TBD
 
+  - Safe package stash resolution in constructors using gv_stashsv to support
+    full package names and avoid truncation (XSA-11).
   - Validate hash key length against I32 limits to prevent integer wrapping
     and buffer overflows with excessive key lengths (XSA-05).
   - Normalize old package separator (') to (::) and reject subroutine names

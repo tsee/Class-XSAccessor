@@ -161,13 +161,19 @@ constructor(class, ...)
   PREINIT:
     AV* array;
     SV* obj;
-    const char* classname;
+    HV* stash;
   PPCODE:
     CXAA_OPTIMIZE_ENTERSUB(constructor);
 
-    classname = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen_const(class);
+    if (SvROK(class)) {
+      SV* const referent = SvRV(class);
+      stash = SvOBJECT(referent) ? SvSTASH(referent) : gv_stashpv(sv_reftype(referent, 1), 1);
+    }
+    else {
+      stash = gv_stashsv(class, GV_ADD);
+    }
     array = newAV();
-    obj = sv_bless( newRV_noinc((SV*)array), gv_stashpv(classname, 1) );
+    obj = sv_bless( newRV_noinc((SV*)array), stash );
     /* we ignore arguments. See Class::XSAccessor's XS code for
      * how we'd use them in case of bless {@_} => $class.
      */

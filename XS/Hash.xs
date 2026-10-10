@@ -178,13 +178,19 @@ constructor(class, ...)
     int iStack;
     HV* hash;
     SV* obj;
-    const char* classname;
+    HV* stash;
   PPCODE:
     CXAH_OPTIMIZE_ENTERSUB(constructor);
 
-    classname = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen_const(class);
+    if (SvROK(class)) {
+      SV* const referent = SvRV(class);
+      stash = SvOBJECT(referent) ? SvSTASH(referent) : gv_stashpv(sv_reftype(referent, 1), 1);
+    }
+    else {
+      stash = gv_stashsv(class, GV_ADD);
+    }
     hash = newHV();
-    obj = sv_bless(newRV_noinc((SV *)hash), gv_stashpv(classname, 1));
+    obj = sv_bless(newRV_noinc((SV *)hash), stash);
 
     if (items > 1) {
       /* if @_ - 1 (for $class) is even: most compilers probably convert items % 2 into this, but just in case */
