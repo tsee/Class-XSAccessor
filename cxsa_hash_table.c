@@ -102,8 +102,8 @@ CXSA_HashTable_store(HashTable* table, const char* key, STRLEN len, void * value
         cxa_malloc(entry, 1, HashTableEntry);
         cxa_malloc(entry->key, (len + 1), char);
 
-        cxa_memcpy((char*) entry->key, (char*) key, len + 1, char);
-        /*Copy(key, entry->key, len+1, char);*/
+        cxa_memcpy((char*) entry->key, (char*) key, len, char);
+        ((char*) entry->key)[len] = '\0';
         entry->len   = len;
         entry->value = value;
         entry->next  = table->array[index];

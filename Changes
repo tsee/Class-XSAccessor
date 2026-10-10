@@ -5,7 +5,9 @@ Revision history for Perl extension Class-XSAccessor.
   - Fix Class::XSAccessor::Array method installation: ensure getters and
     predicates are not accidentally overwritten as read-write accessors.
   - Use key length comparison and memcmp instead of strcmp in hash registry
-    to prevent key aliasing on embedded NUL bytes and improve lookup speed (XSA-04).
+    to prevent key aliasing on embedded NUL bytes and improve lookup speed;
+    eliminate redundant key re-allocation on shared hash keys and enforce
+    bounded key copy in hash table storage (XSA-04, XSA-05).
   - Safe package stash resolution and invocant validation in constructors:
     use gv_stashsv to support full package names, validate that invocants
     are defined and blessed (if references), and check for NULL stash (XSA-11).

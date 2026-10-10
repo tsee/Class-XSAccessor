@@ -30,12 +30,17 @@ I32* CXSAccessor_reverse_arrayindices = NULL;
 
 STATIC
 autoxs_hashkey *
-_new_hashkey() {
+_new_hashkey(const char* key, const I32 len) {
   autoxs_hashkey * retval;
   cxa_malloc(retval, 1, autoxs_hashkey);
   retval->next = NULL;
+  cxa_malloc(retval->key, len + 1, char);
+  cxa_memcpy(retval->key, key, len, char);
+  retval->key[len] = '\0';
+  retval->len = len;
+  PERL_HASH(retval->hash, key, len);
 
-  if (CXSAccessor_last_hashkey != NULL) { /* apend to list */
+  if (CXSAccessor_last_hashkey != NULL) { /* append to list */
     CXSAccessor_last_hashkey->next = retval;
   }
   else { /* init */
@@ -61,7 +66,7 @@ get_hashkey(pTHX_ const char* key, const I32 len) {
 
   hashkey = (autoxs_hashkey *) CXSA_HashTable_fetch(CXSAccessor_reverse_hashkeys, key, (STRLEN)len);
   if (hashkey == NULL) { /* does not exist */
-    hashkey = _new_hashkey();
+    hashkey = _new_hashkey(key, len);
     /* store the new hash key in the reverse lookup table */
     CXSA_HashTable_store(CXSAccessor_reverse_hashkeys, key, len, hashkey);
   }
