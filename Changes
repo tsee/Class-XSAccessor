@@ -2,6 +2,8 @@ Revision history for Perl extension Class-XSAccessor.
 
 1.20 - TBD
 
+  - Use key length comparison and memcmp instead of strcmp in hash registry
+    to prevent key aliasing on embedded NUL bytes and improve lookup speed (XSA-04).
   - Safe package stash resolution in constructors using gv_stashsv to support
     full package names and avoid truncation (XSA-11).
   - Validate hash key length against I32 limits to prevent integer wrapping

@@ -47,7 +47,7 @@ CXSA_HashTable_find(HashTable* table, const char* key, STRLEN len) {
     UV index = CXSA_string_hash(key, len) & (table->size - 1);
 
     for (entry = table->array[index]; entry; entry = entry->next) {
-        if (strcmp(entry->key, key) == 0)
+        if (entry->len == len && memcmp(entry->key, key, len) == 0)
             break;
     }
 
@@ -63,7 +63,7 @@ CXSA_HashTable_delete(HashTable* table, const char* key, STRLEN len) {
 
     void * retval = NULL;
     for (entry = table->array[index]; entry; prev = entry, entry = entry->next) {
-        if (strcmp(entry->key, key) == 0) {
+        if (entry->len == len && memcmp(entry->key, key, len) == 0) {
 
             if (prev) {
                 prev->next = entry->next;
