@@ -16,7 +16,7 @@ Revision history for Perl extension Class-XSAccessor.
     NUL bytes in both Perl and XS layers (XSA-03).
   - Validate array index bounds (must be 0..10_000_000) to prevent negative
     index out-of-bounds access, realloc(0) deallocation, and excessive
-    memory allocation (XSA-02).
+    memory allocation, with portable IVdf error formatting (XSA-02).
   - B::C compatibility fix (thanks, Todd Rinaldo)
   - Clean up macros (thanks, Nicolas R)
   - Re-enable erroneously disabled test (thanks, Peter Rabbitson)

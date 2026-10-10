@@ -364,7 +364,7 @@ STMT_START {                                                                \
 #define INSTALL_NEW_CV_ARRAY_OBJ(name, xsub, obj_array_index)                \
 STMT_START {                                                                 \
   if ((IV)(obj_array_index) < 0 || (IV)(obj_array_index) > 10000000)         \
-    croak("Invalid array index %ld: must be between 0 and 10000000", (long)(obj_array_index)); \
+    croak("Invalid array index %" IVdf ": must be between 0 and 10000000", (IV)(obj_array_index)); \
   const U32 function_index = get_internal_array_index((I32)obj_array_index); \
   INSTALL_NEW_CV_WITH_INDEX(name, xsub, function_index);                     \
   CXSAccessor_arrayindices[function_index] = (I32)(obj_array_index);         \

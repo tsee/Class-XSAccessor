@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 15;
 
 use Class::XSAccessor::Array ();
 
@@ -28,6 +28,9 @@ like($@, qr/array index/i, "newxs_setter rejects negative array index -1");
 
 eval { Class::XSAccessor::Array::newxs_setter("TestPkgXS::set_huge", 10_000_001, 0) };
 like($@, qr/array index/i, "newxs_setter rejects huge array index");
+
+eval { Class::XSAccessor::Array::newxs_getter("TestPkgXS::get_64bit", 4294967296) };
+like($@, qr/Invalid array index 4294967296: must be between 0 and 10000000/, "64-bit index formatted without truncation");
 
 # 11-14: Valid array indices work correctly
 eval {

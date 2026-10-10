@@ -57,7 +57,7 @@ sub _generate_method {
     croak("Cannot use undef as a array index for generating an XS $type accessor. (Sub: $subname)")
       if not defined $array_index;
 
-    croak("Invalid array index '$array_index' for generating an XS $type accessor: must be a non-negative integer below 10000000. (Sub: $subname)")
+    croak("Invalid array index '$array_index' for generating an XS $type accessor: must be a non-negative integer between 0 and 10000000. (Sub: $subname)")
       if $array_index !~ /^\d+\z/ || $array_index > 10_000_000;
   }
 
