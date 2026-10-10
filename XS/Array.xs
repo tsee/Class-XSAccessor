@@ -176,7 +176,7 @@ constructor(class, ...)
 void
 newxs_getter(namesv, index)
     SV *namesv;
-    U32 index;
+    IV index;
   ALIAS:
     Class::XSAccessor::Array::newxs_lvalue_accessor = 1
     Class::XSAccessor::Array::newxs_predicate       = 2
@@ -208,7 +208,7 @@ newxs_getter(namesv, index)
 void
 newxs_setter(namesv, index, chained)
     SV *namesv;
-    U32 index;
+    IV index;
     bool chained;
   ALIAS:
     Class::XSAccessor::Array::newxs_accessor = 1

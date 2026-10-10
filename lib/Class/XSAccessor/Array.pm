@@ -53,8 +53,13 @@ sub import {
 sub _generate_method {
   my ($caller_pkg, $subname, $array_index, $opts, $type) = @_;
 
-  croak("Cannot use undef as a array index for generating an XS $type accessor. (Sub: $subname)")
-    if not defined $array_index;
+  if ($type ne 'constructor' && $type ne 'true' && $type ne 'false') {
+    croak("Cannot use undef as a array index for generating an XS $type accessor. (Sub: $subname)")
+      if not defined $array_index;
+
+    croak("Invalid array index '$array_index' for generating an XS $type accessor: must be a non-negative integer below 10000000. (Sub: $subname)")
+      if $array_index !~ /^\d+\z/ || $array_index > 10_000_000;
+  }
 
   $subname = "${caller_pkg}::$subname" if $subname !~ /::/;
 

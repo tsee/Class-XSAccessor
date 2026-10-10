@@ -2,6 +2,9 @@ Revision history for Perl extension Class-XSAccessor.
 
 1.20 - TBD
 
+  - Validate array index bounds (must be 0..10_000_000) to prevent negative
+    index out-of-bounds access, realloc(0) deallocation, and excessive
+    memory allocation (XSA-02).
   - B::C compatibility fix (thanks, Todd Rinaldo)
   - Clean up macros (thanks, Nicolas R)
   - Re-enable erroneously disabled test (thanks, Peter Rabbitson)

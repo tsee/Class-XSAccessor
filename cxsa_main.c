@@ -83,6 +83,8 @@ STATIC
 void
 _resize_array_init(I32** array, U32* len, U32 newlen, I32 init) {
   U32 i;
+  if (newlen == 0)
+    return;
   cxa_realloc(*array, newlen, I32);
   for (i = *len; i < newlen; ++i)
     (*array)[i] = init;
@@ -102,6 +104,9 @@ _new_internal_arrayindex() {
 
 I32 get_internal_array_index(I32 object_ary_idx) {
   I32 new_index;
+
+  if (object_ary_idx < 0 || object_ary_idx > 10000000)
+    croak("Invalid array index %ld: must be between 0 and 10000000", (long)object_ary_idx);
 
   CXSA_ACQUIRE_GLOBAL_LOCK(CXSAccessor_lock);
 
