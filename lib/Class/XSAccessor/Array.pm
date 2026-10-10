@@ -285,7 +285,7 @@ again in B<any> thread.
 
 =over
 
-=item * Steffen Mueller E<lt>smueller@cpan.orgE<gt>
+=item * Steffen Mueller E<lt>cpan@steffen-mueller.netE<gt>
 
 =item * chocolateboy E<lt>chocolate@cpan.orgE<gt>
 
@@ -293,7 +293,7 @@ again in B<any> thread.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2020 by Steffen Mueller
+Copyright (C) 2008-2026 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8 or,
