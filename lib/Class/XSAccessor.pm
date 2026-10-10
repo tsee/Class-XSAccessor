@@ -35,8 +35,10 @@ sub import {
 
   # TODO: Refactor. Move more duplicated code to ::Heavy
   my $read_subs      = _make_hash($opts{getters} || {});
+  my $read_lzsubs    = _make_hash($opts{lazy_getters} || {});
   my $set_subs       = _make_hash($opts{setters} || {});
   my $acc_subs       = _make_hash($opts{accessors} || {});
+  my $acc_lzsubs     = _make_hash($opts{lazy_accessors} || {});
   my $lvacc_subs     = _make_hash($opts{lvalue_accessors} || {});
   my $pred_subs      = _make_hash($opts{predicates} || {});
   my $ex_pred_subs   = _make_hash($opts{exists_predicates} || {});
@@ -47,8 +49,10 @@ sub import {
   my $false_subs     = $opts{false} || [];
 
   foreach my $subtype ( ["getter", $read_subs],
+                        ["lazy_getter", $read_lzsubs],
                         ["setter", $set_subs],
                         ["accessor", $acc_subs],
+                        ["lazy_accessor", $acc_lzsubs],
                         ["lvalue_accessor", $lvacc_subs],
                         ["test", $test_subs],
                         ["ex_predicate", $ex_pred_subs],
@@ -94,6 +98,9 @@ sub _generate_method {
   if ($type eq 'getter') {
     newxs_getter($subname, $hashkey);
   }
+  elsif ($type eq 'lazy_getter') {
+    newxs_lzgetter($subname, $hashkey);
+  }
   elsif ($type eq 'lvalue_accessor') {
     newxs_lvalue_accessor($subname, $hashkey);
   }
@@ -117,6 +124,9 @@ sub _generate_method {
   }
   elsif ($type eq 'test') {
     newxs_test($subname, $hashkey);
+  }
+  elsif ($type eq 'lazy_accessor') {
+    newxs_lzaccessor($subname, $hashkey, $opts->{chained}||0);
   }
   else {
     newxs_accessor($subname, $hashkey, $opts->{chained}||0);
@@ -286,6 +296,34 @@ The following example demonstrates an lvalue accessor:
   print $address->zip_code, "\n"; # prints 2
   $address->zip_code = 76135; # <--- This is it!
   print $address->zip_code, "\n"; # prints 76135
+
+=head1 LAZY BUILDERS
+
+Support for lazy builders was added in version 1.20.
+
+  package Counter;
+  use Class::XSAccessor
+    constructor  => 'new',
+    lazy_accessors => { count => 'count' };
+  sub _build_count {
+    my $self = shift;
+    return 0;
+  }
+  sub increment {
+    my $self = shift;
+    $self->count( $self->count + 1 );
+    return $self;
+  }
+  
+  package main;
+  print Counter->new(count => 2)->incremement->count, "\n";  # 3
+  print Counter->new()->incremement->count, "\n";  # 1
+
+The builder is always a method named "_build_" followed by the hash key
+the accessor is providing access to. The builder method will be called
+if the accessor is called as a reader, but the hash key does not exist.
+
+There is similarly a L<lazy_getters> option.
 
 =head1 CAVEATS
 

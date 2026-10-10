@@ -43,6 +43,41 @@ getter(self)
       XSRETURN_UNDEF;
 
 void
+lzgetter(self)
+    SV* self;
+  INIT:
+    /* Get the const hash key struct from the global storage */
+    const autoxs_hashkey * readfrom = CXAH_GET_HASHKEY;
+    SV** svp;
+  PPCODE:
+    CXA_CHECK_HASH(self);
+    CXAH_OPTIMIZE_ENTERSUB(lzgetter);
+    if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) {
+      PUSHs(*svp);
+    }
+    else {
+      SV* const builder = newSVpv("_build_", 7);
+      sv_catpvn(builder, readfrom->key, readfrom->len);
+      STRLEN len;
+      const char *methodname = SvPV(builder, len);
+      SV* newvalue;
+      ENTER;
+      SAVETMPS;
+      PUSHMARK(SP);
+      XPUSHs(self);
+      PUTBACK;
+      call_method(methodname, G_SCALAR);
+      SPAGAIN;
+      newvalue = newSVsv(POPs);
+      PUTBACK;
+      FREETMPS;
+      LEAVE;
+      if (NULL == hv_store((HV*)SvRV(self), readfrom->key, readfrom->len, newSVsv(newvalue), readfrom->hash))
+        croak("Failed to write new value to hash.");
+      PUSHs(newvalue);
+    }
+
+void
 lvalue_accessor(self)
     SV* self;
   INIT:
@@ -120,6 +155,49 @@ accessor(self, ...)
     }
 
 void
+lzaccessor(self, ...)
+    SV* self;
+  INIT:
+    /* Get the const hash key struct from the global storage */
+    const autoxs_hashkey * readfrom = CXAH_GET_HASHKEY;
+    SV** svp;
+  PPCODE:
+    CXA_CHECK_HASH(self);
+    CXAH_OPTIMIZE_ENTERSUB(lzaccessor);
+    if (items > 1) {
+      SV* newvalue = ST(1);
+      if (NULL == hv_store((HV*)SvRV(self), readfrom->key, readfrom->len, newSVsv(newvalue), readfrom->hash))
+        croak("Failed to write new value to hash.");
+      PUSHs(newvalue);
+    }
+    else {
+      if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) {
+        PUSHs(*svp);
+      }
+      else {
+        SV* const builder = newSVpv("_build_", 7);
+        sv_catpvn(builder, readfrom->key, readfrom->len);
+        STRLEN len;
+        const char *methodname = SvPV(builder, len);
+        SV* newvalue = ST(1);
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(self);
+        PUTBACK;
+        call_method(methodname, G_SCALAR);
+        SPAGAIN;
+        newvalue = newSVsv(POPs);
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        if (NULL == hv_store((HV*)SvRV(self), readfrom->key, readfrom->len, newSVsv(newvalue), readfrom->hash))
+          croak("Failed to write new value to hash.");
+        PUSHs(newvalue);
+      }
+    }
+
+void
 chained_accessor(self, ...)
     SV* self;
   INIT:
@@ -140,6 +218,49 @@ chained_accessor(self, ...)
         PUSHs(*svp);
       else
         XSRETURN_UNDEF;
+    }
+
+void
+chained_lzaccessor(self, ...)
+    SV* self;
+  INIT:
+    /* Get the const hash key struct from the global storage */
+    const autoxs_hashkey * readfrom = CXAH_GET_HASHKEY;
+    SV** svp;
+  PPCODE:
+    CXA_CHECK_HASH(self);
+    CXAH_OPTIMIZE_ENTERSUB(chained_accessor);
+    if (items > 1) {
+      SV* newvalue = ST(1);
+      if (NULL == hv_store((HV*)SvRV(self), readfrom->key, readfrom->len, newSVsv(newvalue), readfrom->hash))
+        croak("Failed to write new value to hash.");
+      PUSHs(self);
+    }
+    else {
+      if ((svp = CXSA_HASH_FETCH((HV *)SvRV(self), readfrom->key, readfrom->len, readfrom->hash))) {
+        PUSHs(*svp);
+      }
+      else {
+        SV* const builder = newSVpv("_build_", 7);
+        sv_catpvn(builder, readfrom->key, readfrom->len);
+        STRLEN len;
+        const char *methodname = SvPV(builder, len);
+        SV* newvalue = ST(1);
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(self);
+        PUTBACK;
+        call_method(methodname, G_SCALAR);
+        SPAGAIN;
+        newvalue = newSVsv(POPs);
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        if (NULL == hv_store((HV*)SvRV(self), readfrom->key, readfrom->len, newSVsv(newvalue), readfrom->hash))
+          croak("Failed to write new value to hash.");
+        PUSHs(newvalue);
+      }
     }
 
 void
@@ -271,6 +392,7 @@ newxs_getter(namesv, keysv)
     Class::XSAccessor::newxs_predicate = 2
     Class::XSAccessor::newxs_defined_predicate = 3
     Class::XSAccessor::newxs_exists_predicate = 4
+    Class::XSAccessor::newxs_lzgetter = 5
   PREINIT:
     char *name;
     char *key;
@@ -296,6 +418,9 @@ newxs_getter(namesv, keysv)
     case 4:
       INSTALL_NEW_CV_HASH_OBJ(name, CXAH(exists_predicate), key, keylen);
       break;
+    case 5: /* newxs_lzgetter */
+      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(lzgetter), key, keylen);
+      break;
     default:
       croak("Invalid alias of newxs_getter called");
       break;
@@ -308,6 +433,7 @@ newxs_setter(namesv, keysv, chained)
     bool chained;
   ALIAS:
     Class::XSAccessor::newxs_accessor = 1
+    Class::XSAccessor::newxs_lzaccessor = 2
   PREINIT:
     char *name;
     char *key;
@@ -316,16 +442,22 @@ newxs_setter(namesv, keysv, chained)
     name = SvPV(namesv, namelen);
     key = SvPV(keysv, keylen);
     if (ix == 0) { /* newxs_setter */
-    if (chained)
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_setter), key, keylen);
-    else
-      INSTALL_NEW_CV_HASH_OBJ(name, CXAH(setter), key, keylen);
+      if (chained)
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_setter), key, keylen);
+      else
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(setter), key, keylen);
     }
-    else { /* newxs_accessor */
+    else if (ix == 1) { /* newxs_accessor */
       if (chained)
         INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_accessor), key, keylen);
       else
         INSTALL_NEW_CV_HASH_OBJ(name, CXAH(accessor), key, keylen);
+    }
+    else { /* newxs_lzaccessor */
+      if (chained)
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(chained_lzaccessor), key, keylen);
+      else
+        INSTALL_NEW_CV_HASH_OBJ(name, CXAH(lzaccessor), key, keylen);
     }
 
 void

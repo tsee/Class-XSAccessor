@@ -404,6 +404,8 @@ CXA_Setup_Xsub_Hash(constant_false);
 CXA_Setup_Xsub_Hash(constant_true);
 CXA_Setup_Xsub_Hash(defined_predicate);
 CXA_Setup_Xsub_Hash(exists_predicate);
+CXA_Setup_Xsub_Hash(lzgetter);
+CXA_Setup_Xsub_Hash(lzaccessor);
 
 /* special case for test function */
 XS(CXAH(test));
