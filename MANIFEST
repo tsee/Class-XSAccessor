@@ -39,6 +39,11 @@ t/40hash_bad_call.t
 t/41array_bad_call.t
 t/50reentrant_goto.t
 t/70bad_arguments.t
+t/71_security_xsa02.t
+t/72_security_xsa03.t
+t/73_security_xsa05.t
+t/74_security_xsa11.t
+t/75_security_xsa04.t
 t/80threadbomb.t
 XS/Array.xs
 XS/Hash.xs
